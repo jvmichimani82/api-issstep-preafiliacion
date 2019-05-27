@@ -1,29 +1,21 @@
-HELP.md
-/target/
-!.mvn/wrapper/maven-wrapper.jar
-
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
+# Directories #
 /build/
+/bin/
+target/
+.settings/
+.settings/org.eclipse.wst.common.project.facet.core.xml
 
-### VS Code ###
-.vscode/
+target/m2e-wtp/web-resources/META-INF/MANIFEST.MF
+target/m2e-wtp/web-resources/META-INF/maven/edu.minerva/Minerva/pom.xml
+target/m2e-wtp/web-resources/META-INF/maven/edu.minerva/Minerva/pom.properties
+
+# OS Files #
+.DS_Store
+
+*.class
+.classpath
+
+# Package Files #
+*.jar
+*.war
+*.ear
