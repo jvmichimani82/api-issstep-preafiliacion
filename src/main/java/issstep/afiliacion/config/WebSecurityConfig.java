@@ -18,18 +18,16 @@ import issstep.afiliacion.security.JwtAccesDeniedHandler;
 import issstep.afiliacion.security.JwtAuthenticationEntryPoint;
 import issstep.afiliacion.security.JwtAuthenticationTokenFilter;
 import issstep.afiliacion.security.UserPermissionEvaluator;
-import issstep.afiliacion.service.SessionService;
-
 
 
 @Configuration
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-	@Autowired
-	private SessionService sessionService;
+	//@Autowired
+	//private SessionService sessionService;
 	@Autowired
 	private ShaPasswordEncoder passwordEncoder;
 	
-    @Autowired
+    /*@Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(sessionService).passwordEncoder(passwordEncoder);
         
@@ -39,7 +37,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
       DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
       expressionHandler.setPermissionEvaluator(new UserPermissionEvaluator(sessionService));
       return expressionHandler;
-    }
+    }*/
     
     @Configuration
     @Order(1)
@@ -78,7 +76,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/configuration/**").permitAll()
                     .antMatchers("/v2/**").permitAll()
                     .antMatchers("/webjars/**").permitAll()
-                    .antMatchers("/archivo/downloadDocto/**").permitAll()
                     .antMatchers("/**").permitAll();
                     
                     //.antMatchers("/oficinaCepat/registro/**").permitAll()

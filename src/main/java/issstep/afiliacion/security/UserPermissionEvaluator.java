@@ -11,16 +11,15 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import issstep.afiliacion.service.SessionService;
 
 public class UserPermissionEvaluator implements PermissionEvaluator {
     
-	private SessionService service;
+	//private SessionService service;
 
-    @Autowired
+    /*@Autowired
     public UserPermissionEvaluator(SessionService service) {
         this.service = service;
-    }
+    }*/
 
     @Override
     public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {

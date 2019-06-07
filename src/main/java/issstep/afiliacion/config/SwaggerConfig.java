@@ -69,14 +69,14 @@ public class SwaggerConfig /*implements ReaderListener*/ {
     .globalResponseMessage(RequestMethod.DELETE, globalResponses)
     .globalResponseMessage(RequestMethod.PUT, globalResponses)
     .select()
-	 .apis(RequestHandlerSelectors.basePackage("sip.mx.controller"))
+	 .apis(RequestHandlerSelectors.basePackage("issstep.afiliacion.controller"))
 	               .paths(PathSelectors.any()).build().securitySchemes(Collections.singletonList(apiKey()));
 	}
 	
 	private ApiInfo apiInfo() {
 	     return new ApiInfoBuilder()
-	             .title("SIP")
-	             .description("Seguimiento de inversion publica")
+	             .title("Afiliacion")
+	             .description("Afiliacion Issstep")
 	             .termsOfServiceUrl("")
 	             .version("1.0")
 	             .build();

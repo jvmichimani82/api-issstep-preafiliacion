@@ -32,7 +32,8 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import issstep.afiliacion.security.JwtAccesDeniedHandler;
 import issstep.afiliacion.security.JwtAuthenticationEntryPoint;
 import issstep.afiliacion.security.JwtTokenUtil;
-import issstep.afiliacion.service.SessionService;
+
+
 
 
 
@@ -56,10 +57,10 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 		return new ShaPasswordEncoder(256);  
 	}
 	
-	@Bean 
+	/*@Bean 
 	public SessionService sessionService() throws Exception {  
 		return new SessionService();  
-	}
+	}*/
 	
 	
 	@Bean

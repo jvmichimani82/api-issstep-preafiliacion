@@ -7,8 +7,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-
-
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,28 +15,43 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 
-
-
 public class Usuario implements Serializable, UserDetails {
 	private static final long serialVersionUID = 1L;
 
-	
 	public Usuario() {
 	}
 
-	
+	long id;
+	String nombre;
+
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public String getNombre() {
+		return nombre;
+	}
+
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+
 	@JsonIgnore
 	@Override
 	public String getUsername() {
 		// TODO Auto-generated method stub
-		return null;//getUsuario();
+		return null;// getUsuario();
 	}
 
 	@JsonIgnore
 	@Override
 	public String getPassword() {
 		// TODO Auto-generated method stub
-		return null;//this.getPasswd();
+		return null;// this.getPasswd();
 	}
 
 	@JsonIgnore
@@ -51,8 +64,8 @@ public class Usuario implements Serializable, UserDetails {
 	@JsonIgnore
 	@Override
 	public boolean isAccountNonLocked() {
-		
-			return false;
+
+		return false;
 	}
 
 	@JsonIgnore
@@ -61,7 +74,7 @@ public class Usuario implements Serializable, UserDetails {
 		// TODO Auto-generated method stub
 		return true;
 	}
-	
+
 	@JsonIgnore
 	public Date getLastPasswordResetDate() {
 		return new Date();
@@ -70,10 +83,9 @@ public class Usuario implements Serializable, UserDetails {
 	@JsonIgnore
 	@Override
 	public boolean isEnabled() {
-			return true;
-		
-	}
+		return true;
 
+	}
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -81,18 +93,16 @@ public class Usuario implements Serializable, UserDetails {
 		return null;
 	}
 
-	/*public Collection<? extends SimpleGrantedAuthority> getAuthorities() {
-		// TODO Auto-generated method stub
-		System.out.println(getRol().getClave());
-		authorities = new ArrayList<SimpleGrantedAuthority>();
-		authorities.add(new SimpleGrantedAuthority(getRol().getClave()));
-
-		return authorities;
-	}
-
-	public void setUserAuthorities(List<String> roles) {
-		for (String role : roles)
-			authorities.add(new SimpleGrantedAuthority(role));
-	}*/
+	/*
+	 * public Collection<? extends SimpleGrantedAuthority> getAuthorities() { //
+	 * TODO Auto-generated method stub System.out.println(getRol().getClave());
+	 * authorities = new ArrayList<SimpleGrantedAuthority>(); authorities.add(new
+	 * SimpleGrantedAuthority(getRol().getClave()));
+	 * 
+	 * return authorities; }
+	 * 
+	 * public void setUserAuthorities(List<String> roles) { for (String role :
+	 * roles) authorities.add(new SimpleGrantedAuthority(role)); }
+	 */
 
 }
