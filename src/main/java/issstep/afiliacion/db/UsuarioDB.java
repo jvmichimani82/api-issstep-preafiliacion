@@ -43,8 +43,8 @@ class UsuarioRowMapper implements RowMapper<Usuario> {
     public Usuario mapRow(ResultSet rs, int rowNum) throws SQLException {
     	Usuario usuario = new Usuario();
  
-    	usuario.setId(rs.getLong(1));
-        usuario.setNombre(rs.getString(2));
+    	usuario.setId(rs.getLong("USUARIO"));
+        usuario.setNombre(rs.getString("LOGIN"));
  
         return usuario;
     }

@@ -26,5 +26,5 @@ public class PersonaCONST {
 	
 
 		
-			public static final String curp ="{\"curp\":\"VAMJ820830HPLLCS07\"";
+			public static final String curp ="{\"curp\":\"VAMJ820830HPLLCS07\"}";
 }
