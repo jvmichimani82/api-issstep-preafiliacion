@@ -29,6 +29,8 @@ public class PersonaDB {
 		query.append(curp);
 		query.append("'");
 		
+		System.out.println(query.toString());
+		
 		Persona persona = null;
 		try {
 			persona =  mysqlTemplate.queryForObject(query.toString(), new PersonaRowMapper());
