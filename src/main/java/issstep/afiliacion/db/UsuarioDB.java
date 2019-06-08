@@ -20,7 +20,7 @@ public class UsuarioDB {
 
 	public Usuario getSession(String usuario, String passwd) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT CONSECUTIVO, NOMBRE FROM USUARIO WHERE USUARIO ='");
+		query.append("SELECT USUARIO, LOGIN FROM USUARIO WHERE LOGIN ='");
 		query.append(usuario);
 		query.append("' AND PASSWORD ='");
 		query.append(passwd);
@@ -43,8 +43,8 @@ class UsuarioRowMapper implements RowMapper<Usuario> {
     public Usuario mapRow(ResultSet rs, int rowNum) throws SQLException {
     	Usuario usuario = new Usuario();
  
-    	usuario.setId(rs.getLong("CONSECUTIVO"));
-        usuario.setNombre(rs.getString("NOMBRE"));
+    	usuario.setId(rs.getLong(1));
+        usuario.setNombre(rs.getString(2));
  
         return usuario;
     }
