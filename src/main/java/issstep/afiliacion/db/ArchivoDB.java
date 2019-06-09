@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +42,10 @@ public class ArchivoDB {
 	}
 	
 	
-	/**********Regresamos la descripcion del tipo de docuemnto por id************/
+	/*
+	 * Regresamos la descripcion del tipo de documento por id
+	 */
+	
 	public String getTipoArchivoById(long id) {
 		StringBuilder query = new StringBuilder();
 		query.append("SELECT DESCRIPCION FROM TIPODOCTO WHERE ID = ");
@@ -59,10 +63,16 @@ public class ArchivoDB {
 	
 	public List<Archivo> getArchivosByUsuario(long idIsuario) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT ID, TIPODOCTO, URLDOCTO, NOMBREDOCTO, FECHAREGISTRO, ESTATUS FROM DOCTO WHERE ID = ");
+		query.append("SELECT MAX(D.ID) AS ID, D.TIPODOCTO, TD.DESCRIPCION AS DESTIPODOCTO, D.URLDOCTO, D.NOMBREDOCTO, D.FECHAREGISTRO, D.ESTATUS " + 
+				"FROM DOCTO D, TIPODOCTO TD, IUSUARIODOCTO IUD " + 
+				"WHERE D.TIPODOCTO = TD.ID " + 
+				"AND D.ID = IUD.DOCTO " + 
+				"AND IUD.USUARIO = ");
+		
 		query.append(idIsuario);
-	
-		List<Archivo> archivos = null;
+		query.append(" GROUP BY D.TIPODOCTO");
+		
+		List<Archivo> archivos = new ArrayList<Archivo>();
 		try {
 			archivos =  mysqlTemplate.query(query.toString(), new ArchivoRowMapper());
 		} catch (Exception e) {

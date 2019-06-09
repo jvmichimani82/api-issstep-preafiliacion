@@ -62,7 +62,7 @@ public class ArchivoService{
 			long idArchivoRegistrado;
 			String desTipoDocto = archivoDB.getTipoArchivoById(tipoDocto);
 			
-			if(uploadedFile.getOriginalFilename().length()>30)  
+			if(uploadedFile.getOriginalFilename().length()>60)  
 				return new ResponseEntity<>(new Mensaje("Nombre de archivo demaciado largo"), HttpStatus.CONFLICT);
 			
 			else if(desTipoDocto == null)
@@ -129,8 +129,7 @@ public class ArchivoService{
 			
 			Usuario usuario = usuarioDB.getUsuarioById(idUsuario);
 			if(usuario != null) {
-			
-				return null; //new ResponseEntity<>(document, header, HttpStatus.OK);
+				return new ResponseEntity<>(archivoDB.getArchivosByUsuario(idUsuario),  HttpStatus.OK);
 			}
 			return new ResponseEntity<>(new Mensaje("No existe el usuario"), HttpStatus.CONFLICT);
 		

@@ -43,6 +43,27 @@ public class PersonaDB {
 		return persona;
 	}
 	
+	public Persona getPersonaById(long id) {
+		StringBuilder query = new StringBuilder();
+		query.append("SELECT P.ID AS IDPERSONA, P.NOMBRE, P.APELLIDOPATERNO, P.APELLIDOMATERNO, P.FECHANACIMIENTO, P.CURP, "
+				+ "P.RFC, P.SEXO, P.NACIONALIDAD, P.EMAIL, P.DOCUMENTOPROBATORIO, P.RENAPOVALIDACION, P.SATVALIDACION, "
+				+ "P.FECHAREGISTRO, P.ULTIMOREGISTRO, P.ESTATUS, EF.ID AS IDENTIDAD, EF.DESCRIPCION AS DESENTIDAD, M.ID AS IDMUN, M.DESCRIPCION AS DESMUN  "
+				+ "FROM PERSONA P, ENTIDADFEDERATIVA EF, MUNICIPIO M  WHERE P.MUNICIPIO = M.ID AND M.ENTIDADFEDERATIVA = EF.ID AND P.ID = ");
+		
+		
+		query.append(id);
+				
+		System.out.println(query.toString());
+		
+		Persona persona = null;
+		try {
+			persona =  mysqlTemplate.queryForObject(query.toString(), new PersonaRowMapper());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return persona;
+	}
+	
 	/*public Persona getPersonaByCurp(String curp) {
 		StringBuilder query = new StringBuilder();
 		query.append("SELECT P.ID AS IDPERSONA, P.NOMBRE, P.APELLIDOPATERNO, P.APELLIDOMATERNO, P.FECHANACIMIENTO, P.CURP, "

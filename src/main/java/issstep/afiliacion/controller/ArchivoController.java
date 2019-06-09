@@ -36,9 +36,9 @@ public class ArchivoController {
 	}
 	
 	//@JsonView(Archivo.Views.Simple.class)
-	@RequestMapping(value="/lista/{idUsuario}", method = RequestMethod.GET)
+	@RequestMapping(value="/listadoByidUsuario/{idUsuario}", method = RequestMethod.GET)
 		public ResponseEntity<?> listaDoctos(@PathVariable("idUsuario") long idUsuario, HttpServletResponse response) throws Exception {   
-	 		return null;//archivoService.listaDocumento(idUsuario, response );	
+	 		return archivoService.listaDocumentos(idUsuario, response );	
 	}
 	
 	/*@RequestMapping(value="/deleteDocto/{idDocto}", method = RequestMethod.DELETE)

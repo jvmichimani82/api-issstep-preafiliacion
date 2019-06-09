@@ -37,6 +37,15 @@ public class PersonaController {
 	  	return personaService.getPersonaByCurp(curp.getCurp());
     }
     
+    @JsonView(Persona.Views.Simple.class)
+    @RequestMapping(value = "/{idPersona}", method = RequestMethod.POST)
+    public ResponseEntity<?> getPersonaById(@ApiParam(value = "idPersona", required = true) @PathVariable long idPersona, HttpServletResponse response) {
+
+    	
+	  	return personaService.getPersonaById(idPersona);
+    }
+    
+    
     @ApiOperation(value = "Registro de usuarios")
     @JsonView(Persona.Views.RegistroUsuario.class)
     @RequestMapping(value = "/registro/online", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

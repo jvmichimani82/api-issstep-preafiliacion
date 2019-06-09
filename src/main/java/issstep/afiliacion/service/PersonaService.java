@@ -49,6 +49,17 @@ public class PersonaService {
 		
     }
 	
+	public ResponseEntity<?> getPersonaById(long id) {
+		Persona persona =  personaDB.getPersonaById(id);
+	
+		if (persona != null)
+			return new ResponseEntity<>(persona, HttpStatus.OK);
+		
+		else
+			return new ResponseEntity<>(new Mensaje("No existe esa persona"), HttpStatus.CONFLICT);
+		
+    }
+	
 	
 	public ResponseEntity<?> registraUsuario(boolean registroOnline, Persona persona){
 		try{
