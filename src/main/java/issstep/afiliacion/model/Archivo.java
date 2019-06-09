@@ -6,6 +6,7 @@ public class Archivo {
 
 	long id;
 	long tipoDocto;
+	String desTipoDocto;
 	String urlDocto;
 	String nombreDocto;
 	Timestamp fechaRegistro;
@@ -20,6 +21,13 @@ public class Archivo {
 	}
 	public long getTipoDocto() {
 		return tipoDocto;
+	}
+	
+	public String getDesTipoDocto() {
+		return desTipoDocto;
+	}
+	public void setDesTipoDocto(String desTipoDocto) {
+		this.desTipoDocto = desTipoDocto;
 	}
 	public void setTipoDocto(long tipoDocto) {
 		this.tipoDocto = tipoDocto;

@@ -35,6 +35,12 @@ public class ArchivoController {
 	 		return archivoService.dowloadDocumento(idDocto, response );	
 	}
 	
+	//@JsonView(Archivo.Views.Simple.class)
+	@RequestMapping(value="/lista/{idUsuario}", method = RequestMethod.GET)
+		public ResponseEntity<?> listaDoctos(@PathVariable("idUsuario") long idUsuario, HttpServletResponse response) throws Exception {   
+	 		return null;//archivoService.listaDocumento(idUsuario, response );	
+	}
+	
 	/*@RequestMapping(value="/deleteDocto/{idDocto}", method = RequestMethod.DELETE)
 		public ResponseEntity<?> deletefoto(@PathVariable("idDocto") long idDocto, HttpServletResponse response) throws Exception {   
 	 		return archivoService.deleteDocumento(idDocto, response );	

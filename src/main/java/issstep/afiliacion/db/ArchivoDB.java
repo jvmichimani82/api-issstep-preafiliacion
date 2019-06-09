@@ -27,7 +27,8 @@ public class ArchivoDB {
 	
 	public Archivo getArchivoById(long id) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT ID, TIPODOCTO, URLDOCTO, NOMBREDOCTO, FECHAREGISTRO, ESTATUS FROM DOCTO WHERE ID = ");
+		query.append("SELECT D.ID, D.TIPODOCTO, TD.DESCRIPCION AS DESTIPODOCTO, D.URLDOCTO, D.NOMBREDOCTO, D.FECHAREGISTRO, D.ESTATUS "
+				+ "FROM DOCTO D, TIPODOCTO TD WHERE D.TIPODOCTO = TD.ID AND D.ID = ");
 		query.append(id);
 	
 		Archivo archive = null;
@@ -39,6 +40,8 @@ public class ArchivoDB {
 		return archive;
 	}
 	
+	
+	/**********Regresamos la descripcion del tipo de docuemnto por id************/
 	public String getTipoArchivoById(long id) {
 		StringBuilder query = new StringBuilder();
 		query.append("SELECT DESCRIPCION FROM TIPODOCTO WHERE ID = ");
@@ -54,7 +57,7 @@ public class ArchivoDB {
 		return null;
 	}
 	
-	public List<Archivo> getArchivoByUsuario(long idIsuario) {
+	public List<Archivo> getArchivosByUsuario(long idIsuario) {
 		StringBuilder query = new StringBuilder();
 		query.append("SELECT ID, TIPODOCTO, URLDOCTO, NOMBREDOCTO, FECHAREGISTRO, ESTATUS FROM DOCTO WHERE ID = ");
 		query.append(idIsuario);
@@ -157,6 +160,7 @@ class ArchivoRowMapper implements RowMapper<Archivo> {
     	archive.setId(rs.getLong("ID"));
     	archive.setNombreDocto(rs.getString("NOMBREDOCTO"));
     	archive.setTipoDocto(rs.getInt("TIPODOCTO"));
+    	archive.setDesTipoDocto(rs.getString("DESTIPODOCTO"));
         archive.setUrlDocto(rs.getString("URLDOCTO"));
         archive.setFechaRegistro(rs.getTimestamp("FECHAREGISTRO"));
         archive.setEstatus(rs.getInt("ESTATUS"));

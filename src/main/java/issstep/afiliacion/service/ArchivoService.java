@@ -30,8 +30,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import issstep.afiliacion.db.ArchivoDB;
+import issstep.afiliacion.db.UsuarioDB;
 import issstep.afiliacion.model.Archivo;
 import issstep.afiliacion.model.Mensaje;
+import issstep.afiliacion.model.Usuario;
 import issstep.afiliacion.utils.UtilsImage;
 
 import javax.servlet.http.*;
@@ -51,6 +53,9 @@ public class ArchivoService{
    
    @Autowired
    ArchivoDB archivoDB;
+   
+   @Autowired
+   UsuarioDB usuarioDB;
 
 	public ResponseEntity<?> uploadDocto(int tipoDocto, long idUsuario, MultipartFile uploadedFile, HttpServletResponse response) {
 		try{
@@ -111,6 +116,23 @@ public class ArchivoService{
 				return new ResponseEntity<>(document, header, HttpStatus.OK);
 			}
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		
+		} catch (Exception ex) {
+			System.err.println("Exception ArchivoService.downloadDocumento");
+			ex.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	public ResponseEntity<?> listaDocumentos(long idUsuario, HttpServletResponse response) {
+		try {
+			
+			Usuario usuario = usuarioDB.getUsuarioById(idUsuario);
+			if(usuario != null) {
+			
+				return null; //new ResponseEntity<>(document, header, HttpStatus.OK);
+			}
+			return new ResponseEntity<>(new Mensaje("No existe el usuario"), HttpStatus.CONFLICT);
 		
 		} catch (Exception ex) {
 			System.err.println("Exception ArchivoService.downloadDocumento");
