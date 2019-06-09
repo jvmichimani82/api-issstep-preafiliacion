@@ -40,8 +40,6 @@ public class PersonaController {
     @JsonView(Persona.Views.Simple.class)
     @RequestMapping(value = "/{idPersona}", method = RequestMethod.POST)
     public ResponseEntity<?> getPersonaById(@ApiParam(value = "idPersona", required = true) @PathVariable long idPersona, HttpServletResponse response) {
-
-    	
 	  	return personaService.getPersonaById(idPersona);
     }
     

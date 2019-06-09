@@ -63,14 +63,16 @@ public class ArchivoDB {
 	
 	public List<Archivo> getArchivosByUsuario(long idIsuario) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT MAX(D.ID) AS ID, D.TIPODOCTO, TD.DESCRIPCION AS DESTIPODOCTO, D.URLDOCTO, D.NOMBREDOCTO, D.FECHAREGISTRO, D.ESTATUS " + 
+		query.append("SELECT D.ID, D.TIPODOCTO, TD.DESCRIPCION AS DESTIPODOCTO, D.URLDOCTO, D.NOMBREDOCTO, D.FECHAREGISTRO, D.ESTATUS "
+				+ "FROM DOCTO D, TIPODOCTO TD WHERE D.TIPODOCTO = TD.ID AND D.ID IN"
+				+ "(SELECT MAX(D.ID) AS ID " + 
 				"FROM DOCTO D, TIPODOCTO TD, IUSUARIODOCTO IUD " + 
 				"WHERE D.TIPODOCTO = TD.ID " + 
 				"AND D.ID = IUD.DOCTO " + 
 				"AND IUD.USUARIO = ");
 		
 		query.append(idIsuario);
-		query.append(" GROUP BY D.TIPODOCTO");
+		query.append(" GROUP BY D.TIPODOCTO)");
 		
 		List<Archivo> archivos = new ArrayList<Archivo>();
 		try {
