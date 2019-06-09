@@ -5,21 +5,16 @@ public class PersonaCONST {
 	
 	
 	
-	public static final String registro="Json para Registro Ejemplo \n\n"+"{"
+	public static final String registroUsuario="Json para Registro Usuario online \n\n"+"{"
 			+"\r\n" + 
-			"			    \"usuario\": \"user\",\r\n" + 
-			"			    \"passwd\": \"password\",\r\n" + 
-			"			    \"nombre\": \"JOSE VALENCIA MICHIMANI\",\r\n" + 
-			"			    \"email\": \"jose.valenciamœgmail.com\",\r\n" + 
-			"			    \"contacto\": \"22323232\",\r\n" + 
-			"			    \"rol\": {\r\n" + 
-			"			      \"id\": 2,\r\n" + 
-			"			      \"descripcion\": \"MUNICIPIO\"\r\n" + 
+			"			    \"id\": \"18\",\r\n" + 
+			"			    \"curp\": \"RHUJ820830HPLLCS08\",\r\n" + 
+			"			    \"email\": \"email@correo.com\",\r\n" + 
+			"			    \"usuario\": {\r\n" + 
+			"			      \"login\": \"email@correo.com\",\r\n" + 
+			"			      \"passwd\": \"12345678\"\r\n" + 
 			"			    },\r\n" + 
-			"			    \"municipio\": {\r\n" + 
-			"			      \"id\": 21002,\r\n" + 
-			"			      \"nombre\": \"Acateno\"\r\n" + 
-			"			    }\r\n" + 
+		
 		
 			"			  }";
 	

@@ -20,7 +20,30 @@ public class PersonaDB {
 	@Qualifier("mysqlJdbcTemplate")
 	private JdbcTemplate mysqlTemplate;
 
-	public Persona getPersonaByCurp(String curp) {
+	public Persona getPersonaByColumnaStringValor(String columna, String valor) {
+		StringBuilder query = new StringBuilder();
+		query.append("SELECT P.ID AS IDPERSONA, P.NOMBRE, P.APELLIDOPATERNO, P.APELLIDOMATERNO, P.FECHANACIMIENTO, P.CURP, "
+				+ "P.RFC, P.SEXO, P.NACIONALIDAD, P.EMAIL, P.DOCUMENTOPROBATORIO, P.RENAPOVALIDACION, P.SATVALIDACION, "
+				+ "P.FECHAREGISTRO, P.ULTIMOREGISTRO, P.ESTATUS, EF.ID AS IDENTIDAD, EF.DESCRIPCION AS DESENTIDAD, M.ID AS IDMUN, M.DESCRIPCION AS DESMUN  "
+				+ "FROM PERSONA P, ENTIDADFEDERATIVA EF, MUNICIPIO M  WHERE P.MUNICIPIO = M.ID AND M.ENTIDADFEDERATIVA = EF.ID AND P.");
+		
+		query.append(columna);
+		query.append("= '");
+		query.append(valor);
+		query.append("'");
+		
+		System.out.println(query.toString());
+		
+		Persona persona = null;
+		try {
+			persona =  mysqlTemplate.queryForObject(query.toString(), new PersonaRowMapper());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return persona;
+	}
+	
+	/*public Persona getPersonaByCurp(String curp) {
 		StringBuilder query = new StringBuilder();
 		query.append("SELECT P.ID AS IDPERSONA, P.NOMBRE, P.APELLIDOPATERNO, P.APELLIDOMATERNO, P.FECHANACIMIENTO, P.CURP, "
 				+ "P.RFC, P.SEXO, P.NACIONALIDAD, P.EMAIL, P.DOCUMENTOPROBATORIO, P.RENAPOVALIDACION, P.SATVALIDACION, "
@@ -39,7 +62,45 @@ public class PersonaDB {
 		}
 		return persona;
 	}
-
+	
+	public Persona getPersonaByEmail(String mail) {
+		StringBuilder query = new StringBuilder();
+		query.append("SELECT P.ID AS IDPERSONA, P.NOMBRE, P.APELLIDOPATERNO, P.APELLIDOMATERNO, P.FECHANACIMIENTO, P.CURP, "
+				+ "P.RFC, P.SEXO, P.NACIONALIDAD, P.EMAIL, P.DOCUMENTOPROBATORIO, P.RENAPOVALIDACION, P.SATVALIDACION, "
+				+ "P.FECHAREGISTRO, P.ULTIMOREGISTRO, P.ESTATUS, EF.ID AS IDENTIDAD, EF.DESCRIPCION AS DESENTIDAD, M.ID AS IDMUN, M.DESCRIPCION AS DESMUN  "
+				+ "FROM PERSONA P, ENTIDADFEDERATIVA EF, MUNICIPIO M  WHERE P.MUNICIPIO = M.ID AND M.ENTIDADFEDERATIVA = EF.ID AND P.EMAIL = '");
+		query.append(mail);
+		query.append("'");
+		
+		System.out.println(query.toString());
+		
+		Persona persona = null;
+		try {
+			persona =  mysqlTemplate.queryForObject(query.toString(), new PersonaRowMapper());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return persona;
+	}*/
+	
+	public void actualiza (Persona persona) {
+		StringBuilder query = new StringBuilder();
+		query.append("UPDATE PERSONA SET NOMBRE= ?, APELLIDOPATERNO= ?, APELLIDOMATERNO = ?, EMAIL= ?, ULTIMOREGISTRO= ?, ESTATUS= ? WHERE ID = ? ");
+					
+		System.out.println(query.toString());
+		
+		try {
+			  mysqlTemplate.update(query.toString(), new Object[] { 
+					  persona.getNombre(), persona.getApellidoPaterno(), persona.getApellidoMaterno(), 
+					  persona.getEmail(), persona.getUltimaModificacion(), persona.getEstatus(), persona.getId()
+			});
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	
 	
 }
 
@@ -50,8 +111,8 @@ class PersonaRowMapper implements RowMapper<Persona> {
  
     	persona.setId(rs.getLong("IDPERSONA"));
         persona.setNombre(rs.getString("NOMBRE"));
-        persona.setApellidoPaterno("APELLIDOPATERNO");
-        persona.setApellidoMaterno("APELLIDOMATERNO");
+        persona.setApellidoPaterno(rs.getString("APELLIDOPATERNO"));
+        persona.setApellidoMaterno(rs.getString("APELLIDOMATERNO"));
         persona.setFechaNacimiento(rs.getTimestamp("FECHANACIMIENTO"));
         persona.setCurp(rs.getString("CURP"));
         persona.setRfc(rs.getString("RFC"));

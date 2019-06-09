@@ -30,14 +30,14 @@ public class JwtAuthenticationTokenFilter extends UsernamePasswordAuthentication
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         String authToken = httpRequest.getParameter(messageUtils.getMessage("header_jwt_token")) == null ? httpRequest.getHeader(messageUtils.getMessage("header_jwt_token")) : httpRequest.getParameter(messageUtils.getMessage("header_jwt_token")) ;
-        System.out.println(authToken);
+        //System.out.println(authToken);
 		
          	String username = jwtTokenUtil.getUsernameFromToken(authToken);
    
 	        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 	        	List<SimpleGrantedAuthority> authorities = new ArrayList<SimpleGrantedAuthority>();
 	    		authorities.add(new SimpleGrantedAuthority("ROLE_ANONYMOUS"));
-	    		System.out.println(jwtTokenUtil.getRolFromToken(authToken));
+	    		//System.out.println(jwtTokenUtil.getRolFromToken(authToken));
 	    		
 	    		if(jwtTokenUtil.getRolFromToken(authToken) != "")
 	    		authorities.add(new SimpleGrantedAuthority(jwtTokenUtil.getRolFromToken(authToken)));

@@ -15,14 +15,34 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 
+
 public class Usuario implements Serializable, UserDetails {
 	private static final long serialVersionUID = 1L;
 
 	public Usuario() {
 	}
 
+	@JsonView({Usuario.Views.Simple.class, Usuario.Views.RegistroUsuario.class})
 	long id;
-	String nombre;
+	
+	long rol;
+	
+	@JsonView({Usuario.Views.Simple.class, Usuario.Views.RegistroUsuario.class})
+	String login;
+	
+	String passwd;
+	
+	@JsonView({Usuario.Views.Simple.class, Usuario.Views.RegistroUsuario.class})
+	String token;
+	
+	@JsonView({Usuario.Views.Simple.class, Usuario.Views.RegistroUsuario.class})
+	Timestamp fechaRegistro;
+	
+	@JsonView(Usuario.Views.Simple.class)
+	Timestamp ultimaModificacion;
+	
+	@JsonView({Usuario.Views.Simple.class, Usuario.Views.RegistroUsuario.class})
+	int estatus;
 
 	public long getId() {
 		return id;
@@ -32,12 +52,60 @@ public class Usuario implements Serializable, UserDetails {
 		this.id = id;
 	}
 
-	public String getNombre() {
-		return nombre;
+	public String getLogin() {
+		return login;
 	}
 
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
+	public void setLogin(String nombre) {
+		this.login = nombre;
+	}
+
+	public long getRol() {
+		return rol;
+	}
+
+	public void setRol(long rol) {
+		this.rol = rol;
+	}
+
+	public String getPasswd() {
+		return passwd;
+	}
+
+	public void setPasswd(String passwd) {
+		this.passwd = passwd;
+	}
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
+	}
+
+	public Timestamp getFechaRegistro() {
+		return fechaRegistro;
+	}
+
+	public void setFechaRegistro(Timestamp fechaRegistro) {
+		this.fechaRegistro = fechaRegistro;
+	}
+
+	public Timestamp getUltimaModificacion() {
+		return ultimaModificacion;
+	}
+
+	public void setUltimaModificacion(Timestamp ultimaModificacion) {
+		this.ultimaModificacion = ultimaModificacion;
+	}
+
+	public int getEstatus() {
+		return estatus;
+	}
+
+	public void setEstatus(int estatus) {
+		this.estatus = estatus;
 	}
 
 	@JsonIgnore
@@ -91,6 +159,12 @@ public class Usuario implements Serializable, UserDetails {
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	
+	public static final class Views {
+		public interface Simple {}
+		public interface RegistroUsuario{}
 	}
 
 	/*

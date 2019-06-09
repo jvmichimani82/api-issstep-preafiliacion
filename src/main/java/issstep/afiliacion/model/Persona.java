@@ -2,28 +2,74 @@ package issstep.afiliacion.model;
 
 import java.sql.Timestamp;
 
+import com.fasterxml.jackson.annotation.JsonView;
+
 public class Persona {
 
+	@JsonView({Persona.Views.Simple.class, Persona.Views.RegistroUsuario.class})
 	long id;
+	
+	@JsonView({Persona.Views.Simple.class, Persona.Views.RegistroUsuario.class})
 	String curp;
+	
+	@JsonView({Persona.Views.Simple.class})
 	boolean renapoValidacion;
+	
+	@JsonView({Persona.Views.Simple.class})
 	String apellidoPaterno;
+	
+	@JsonView({Persona.Views.Simple.class})
 	String apellidoMaterno;
+	
+	@JsonView({Persona.Views.Simple.class})
 	String nombre;
+	
+	@JsonView({Persona.Views.Simple.class})
 	String sexo;
+	
+	@JsonView({Persona.Views.Simple.class, Persona.Views.RegistroUsuario.class})
 	String email;
+	
+	@JsonView({Persona.Views.Simple.class})
 	Timestamp fechaNacimiento;
+	
+	@JsonView({Persona.Views.Simple.class})
 	String nacionalidad;
+	
+	@JsonView({Persona.Views.Simple.class})
 	String documentoProbatorio;
+	
+	@JsonView({Persona.Views.Simple.class})
 	long entidad;
+	
+	@JsonView({Persona.Views.Simple.class})
 	String entitadDes;
+	
+	@JsonView({Persona.Views.Simple.class})
 	long municipio;
+	
+	@JsonView({Persona.Views.Simple.class})
 	String municipioDesc;
+	
+	@JsonView({Persona.Views.Simple.class})
 	String rfc;
+	
+	@JsonView({Persona.Views.Simple.class})
 	boolean satValidacion;
+	
+	@JsonView({Persona.Views.Simple.class})
 	Timestamp fechaRegistro;
+	
+	@JsonView({Persona.Views.Simple.class})
 	Timestamp ultimaModificacion;
+	
+	@JsonView({Persona.Views.Simple.class})
 	int estatus;
+	
+	@JsonView({Persona.Views.RegistroUsuario.class})
+	Usuario usuario;
+	
+	String nombreCompleto;
 
 	public Persona() {
 	}
@@ -186,6 +232,24 @@ public class Persona {
 
 	public void setEstatus(int estatus) {
 		this.estatus = estatus;
+	}
+		
+	public Usuario getUsuario() {
+		return usuario;
+	}
+
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
+	}
+
+	public String getNombreCompleto() {
+		return this.nombre +" "+ this.apellidoPaterno+" "+ this.apellidoMaterno;
+	
+	}
+
+	public static final class Views {
+		public interface Simple {}
+		public interface RegistroUsuario extends Usuario.Views.RegistroUsuario {}
 	}
 
 }
