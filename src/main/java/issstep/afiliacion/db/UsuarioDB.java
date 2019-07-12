@@ -20,7 +20,7 @@ public class UsuarioDB {
 
 	public Usuario getSession(String usuario, String passwd) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT USUARIO, ROL, LOGIN, TOKEN, FECHAREGISTRO, ULTIMOREGISTRO, ESTATUS, FROM USUARIO WHERE LOGIN ='");
+		query.append("SELECT USUARIO, PASSWORD, ROL, LOGIN, TOKEN, FECHAREGISTRO, ULTIMOREGISTRO, ESTATUS FROM USUARIO WHERE LOGIN ='");
 		query.append(usuario);
 		query.append("' AND PASSWORD ='");
 		query.append(passwd);
