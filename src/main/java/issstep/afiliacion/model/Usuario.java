@@ -2,17 +2,13 @@ package issstep.afiliacion.model;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 
 
@@ -23,9 +19,13 @@ public class Usuario implements Serializable, UserDetails {
 	}
 
 	@JsonView({Usuario.Views.Simple.class, Usuario.Views.RegistroUsuario.class})
-	long id;
+	long noUsuario;
 	
-	long rol;
+	long noRol;
+	
+	long noControl;
+	
+	long noAfiliacion;
 	
 	@JsonView({Usuario.Views.Simple.class, Usuario.Views.RegistroUsuario.class})
 	String login;
@@ -39,17 +39,33 @@ public class Usuario implements Serializable, UserDetails {
 	Timestamp fechaRegistro;
 	
 	@JsonView(Usuario.Views.Simple.class)
-	Timestamp ultimaModificacion;
+	Timestamp fechaUltimoAcceso;
 	
 	@JsonView({Usuario.Views.Simple.class, Usuario.Views.RegistroUsuario.class})
-	int estatus;
+	int activo;
 
-	public long getId() {
-		return id;
+	public long getNoUsuario() {
+		return noUsuario;
 	}
 
-	public void setId(long id) {
-		this.id = id;
+	public void setNoUsuario(long noUsuario) {
+		this.noUsuario = noUsuario;
+	}
+	
+	public long getNoControl() {
+		return noControl;
+	}
+
+	public void setNoControl(long noControl) {
+		this.noControl = noControl;
+	}
+
+	public long getNoAfiliacion() {
+		return noAfiliacion;
+	}
+
+	public void setNoAfiliacion(long noAfiliacion) {
+		this.noAfiliacion = noAfiliacion;
 	}
 
 	public String getLogin() {
@@ -60,12 +76,12 @@ public class Usuario implements Serializable, UserDetails {
 		this.login = nombre;
 	}
 
-	public long getRol() {
-		return rol;
+	public long getNoRol() {
+		return noRol;
 	}
 
-	public void setRol(long rol) {
-		this.rol = rol;
+	public void setNoRol(long noRol) {
+		this.noRol = noRol;
 	}
 
 	public String getPasswd() {
@@ -92,20 +108,20 @@ public class Usuario implements Serializable, UserDetails {
 		this.fechaRegistro = fechaRegistro;
 	}
 
-	public Timestamp getUltimaModificacion() {
-		return ultimaModificacion;
+	public Timestamp getFechaUltimoAcceso() {
+		return fechaUltimoAcceso;
 	}
 
-	public void setUltimaModificacion(Timestamp ultimaModificacion) {
-		this.ultimaModificacion = ultimaModificacion;
+	public void setFechaUltimoAcceso(Timestamp fechaUltimoAcceso) {
+		this.fechaUltimoAcceso = fechaUltimoAcceso;
 	}
 
-	public int getEstatus() {
-		return estatus;
+	public int getActivo() {
+		return activo;
 	}
 
-	public void setEstatus(int estatus) {
-		this.estatus = estatus;
+	public void setActivo(int activo) {
+		this.activo = activo;
 	}
 
 	@JsonIgnore

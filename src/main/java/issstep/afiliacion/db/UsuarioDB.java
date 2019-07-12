@@ -20,12 +20,15 @@ public class UsuarioDB {
 
 	public Usuario getSession(String usuario, String passwd) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT USUARIO, ROL, LOGIN, TOKEN, FECHAREGISTRO, ULTIMOREGISTRO, ESTATUS, FROM USUARIO WHERE LOGIN ='");
+		query.append("SELECT NOUSUARIO, NOROL, LOGIN, TOKEN, PASSWORD, FECHAREGISTRO, FECHAULTIMOACCESO, ACTIVO FROM USUARIO WHERE LOGIN ='");
 		query.append(usuario);
 		query.append("' AND PASSWORD ='");
 		query.append(passwd);
 		query.append("'");
 		Usuario user = null;
+		
+		System.out.println(query.toString());
+		
 		try {
 			user =  mysqlTemplate.queryForObject(query.toString(), new UsuarioRowMapper());
 		} catch (Exception e) {
@@ -36,7 +39,7 @@ public class UsuarioDB {
 	
 	public Usuario getUsuarioById(long id) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT USUARIO, PASSWORD, ROL, LOGIN, TOKEN, FECHAREGISTRO, ULTIMOREGISTRO, ESTATUS FROM USUARIO WHERE USUARIO = ");
+		query.append("SELECT NOUSUARIO, PASSWORD, NOROL, LOGIN, TOKEN, FECHAREGISTRO, FECHAULTIMOACCESO, ACTIVO FROM USUARIO WHERE NOUSUARIO = ");
 		query.append(id);
 	
 		Usuario user = null;
@@ -65,15 +68,17 @@ public class UsuarioDB {
 	public int insertar (Usuario usuario) {
 		StringBuilder query = new StringBuilder();
 		query.append("INSERT INTO USUARIO "
-				+ "(USUARIO, ROL, LOGIN, PASSWORD, TOKEN, FECHAREGISTRO, ULTIMOREGISTRO, ESTATUS)"
+				+ "(NOUSUARIO, NOCONTROL, NOAFILIACION, NOROL, LOGIN, PASSWORD, TOKEN, ACTIVO)"
 				+ " VALUES(?,?,?,?,?,?,?,?)");
 
-		System.out.println(query.toString());
+		System.out.println("Insersion ==> "+ query.toString());
+	
 		
 		try {
-			return  mysqlTemplate.update(query.toString(), new Object[] { usuario.getId(),
-					usuario.getRol(), usuario.getLogin(), usuario.getPasswd(), usuario.getToken(), 
-					usuario.getFechaRegistro(),usuario.getUltimaModificacion(),usuario.getEstatus() 
+			return  mysqlTemplate.update(query.toString(), new Object[] { usuario.getNoControl(),
+					usuario.getNoControl(), usuario.getNoAfiliacion(),
+					usuario.getNoRol(), usuario.getLogin(), usuario.getPasswd(), usuario.getToken(), 
+					usuario.getActivo() 
 			});
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -83,14 +88,14 @@ public class UsuarioDB {
 	
 	public void actualiza (Usuario usuario) {
 		StringBuilder query = new StringBuilder();
-		query.append("UPDATE USUARIO SET ROL = ?, PASSWORD = ?, TOKEN = ?, ULTIMOREGISTRO = ?, ESTATUS = ? WHERE USUARIO = ? ");
+		query.append("UPDATE USUARIO SET NOROL = ?, PASSWORD = ?, TOKEN = ?, FECHAULTIMOACCESO = ?, ACTIVO = ? WHERE NOUSUARIO = ? ");
 			
 		System.out.println(query.toString());
 		
 		try {
 			  mysqlTemplate.update(query.toString(), new Object[] { 
-					usuario.getRol(), usuario.getPasswd(), usuario.getToken(), 
-					usuario.getUltimaModificacion(),usuario.getEstatus(), usuario.getId()
+					usuario.getNoRol(), usuario.getPasswd(), usuario.getToken(), 
+					usuario.getFechaUltimoAcceso(),usuario.getActivo(), usuario.getNoControl()
 			});
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -106,14 +111,14 @@ class UsuarioRowMapper implements RowMapper<Usuario> {
     public Usuario mapRow(ResultSet rs, int rowNum) throws SQLException {
     	Usuario usuario = new Usuario();
  
-    	usuario.setId(rs.getLong("USUARIO"));
-    	usuario.setRol(rs.getLong("ROL"));
+    	usuario.setNoControl(rs.getLong("NOUSUARIO"));
+    	usuario.setNoRol(rs.getLong("NOROL"));
         usuario.setLogin(rs.getString("LOGIN"));
         usuario.setPasswd(rs.getString("PASSWORD"));
         usuario.setToken(rs.getString("TOKEN"));
         usuario.setFechaRegistro(rs.getTimestamp("FECHAREGISTRO"));
-        usuario.setUltimaModificacion(rs.getTimestamp("ULTIMOREGISTRO"));
-        usuario.setEstatus(rs.getInt("ESTATUS"));
+        usuario.setFechaUltimoAcceso(rs.getTimestamp("FECHAULTIMOACCESO"));
+        usuario.setActivo(rs.getInt("ACTIVO"));
  
         return usuario;
     }

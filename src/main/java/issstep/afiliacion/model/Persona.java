@@ -7,64 +7,73 @@ import com.fasterxml.jackson.annotation.JsonView;
 public class Persona {
 
 	@JsonView({Persona.Views.Simple.class, Persona.Views.RegistroUsuario.class})
-	long id;
+	long noControl;
 	
 	@JsonView({Persona.Views.Simple.class, Persona.Views.RegistroUsuario.class})
-	String curp;
-	
-	@JsonView({Persona.Views.Simple.class})
-	boolean renapoValidacion;
-	
-	@JsonView({Persona.Views.Simple.class})
-	String apellidoPaterno;
-	
-	@JsonView({Persona.Views.Simple.class})
-	String apellidoMaterno;
+	long noAfiliacion;
 	
 	@JsonView({Persona.Views.Simple.class})
 	String nombre;
 	
 	@JsonView({Persona.Views.Simple.class})
-	String sexo;
+	String paterno;
+	
+	@JsonView({Persona.Views.Simple.class})
+	String materno;
 	
 	@JsonView({Persona.Views.Simple.class, Persona.Views.RegistroUsuario.class})
 	String email;
-	
+		
 	@JsonView({Persona.Views.Simple.class})
 	Timestamp fechaNacimiento;
 	
 	@JsonView({Persona.Views.Simple.class})
-	String nacionalidad;
+	String sexo;	
 	
-	@JsonView({Persona.Views.Simple.class})
-	String documentoProbatorio;
-	
-	@JsonView({Persona.Views.Simple.class})
-	long entidad;
-	
-	@JsonView({Persona.Views.Simple.class})
-	String entitadDes;
-	
-	@JsonView({Persona.Views.Simple.class})
-	long municipio;
-	
-	@JsonView({Persona.Views.Simple.class})
-	String municipioDesc;
+	@JsonView({Persona.Views.Simple.class, Persona.Views.RegistroUsuario.class})
+	String curp;
 	
 	@JsonView({Persona.Views.Simple.class})
 	String rfc;
 	
 	@JsonView({Persona.Views.Simple.class})
-	boolean satValidacion;
+	String domicilio;
+	
+	@JsonView({Persona.Views.Simple.class})
+	String codigoPostal;
+	
+	@JsonView({Persona.Views.Simple.class})
+	String telefono;
 	
 	@JsonView({Persona.Views.Simple.class})
 	Timestamp fechaRegistro;
 	
 	@JsonView({Persona.Views.Simple.class})
-	Timestamp ultimaModificacion;
+	Timestamp fechaModificacion;
 	
 	@JsonView({Persona.Views.Simple.class})
-	int estatus;
+	long situacion;
+		
+	@JsonView({Persona.Views.Simple.class})
+	long noColonia;
+	
+	@JsonView({Persona.Views.Simple.class})
+	long noEntidad;
+	
+	@JsonView({Persona.Views.Simple.class})
+	String entidad;
+	
+	@JsonView({Persona.Views.Simple.class})
+	long noMunicipio;
+	
+	@JsonView({Persona.Views.Simple.class})
+	String municipio;
+
+	@JsonView({Persona.Views.Simple.class})
+	long noLocalidad;
+	
+	@JsonView({Persona.Views.Simple.class})
+	String localidad;
 	
 	@JsonView({Persona.Views.RegistroUsuario.class})
 	Usuario usuario;
@@ -74,44 +83,20 @@ public class Persona {
 	public Persona() {
 	}
 
-	public long getId() {
-		return id;
+	public long getNoControl() {
+		return noControl;
 	}
 
-	public void setId(long id) {
-		this.id = id;
+	public void setNoControl(long noControl) {
+		this.noControl = noControl;
 	}
 
-	public String getCurp() {
-		return curp;
+	public long getNoAfiliacion() {
+		return noAfiliacion;
 	}
 
-	public void setCurp(String curp) {
-		this.curp = curp;
-	}
-
-	public boolean isRenapoValidacion() {
-		return renapoValidacion;
-	}
-
-	public void setRenapoValidacion(boolean renapoValidacion) {
-		this.renapoValidacion = renapoValidacion;
-	}
-
-	public String getApellidoPaterno() {
-		return apellidoPaterno;
-	}
-
-	public void setApellidoPaterno(String apellidoPaterno) {
-		this.apellidoPaterno = apellidoPaterno;
-	}
-
-	public String getApellidoMaterno() {
-		return apellidoMaterno;
-	}
-
-	public void setApellidoMaterno(String apellidoMaterno) {
-		this.apellidoMaterno = apellidoMaterno;
+	public void setNoAfiliacion(long noAfiliacion) {
+		this.noAfiliacion = noAfiliacion;
 	}
 
 	public String getNombre() {
@@ -122,12 +107,27 @@ public class Persona {
 		this.nombre = nombre;
 	}
 
-	public String getSexo() {
-		return sexo;
+	public String getPaterno() {
+		return paterno;
 	}
 
-	public void setSexo(String sexo) {
-		this.sexo = sexo;
+	public void setPaterno(String paterno) {
+		this.paterno = paterno;
+	}
+
+	public String getMaterno() {
+		return materno;
+	}
+
+	public void setMaterno(String materno) {
+		this.materno = materno;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	public Timestamp getFechaNacimiento() {
@@ -138,52 +138,20 @@ public class Persona {
 		this.fechaNacimiento = fechaNacimiento;
 	}
 
-	public String getNacionalidad() {
-		return nacionalidad;
+	public String getSexo() {
+		return sexo;
 	}
 
-	public void setNacionalidad(String nacionalidad) {
-		this.nacionalidad = nacionalidad;
+	public void setSexo(String sexo) {
+		this.sexo = sexo;
 	}
 
-	public String getDocumentoProbatorio() {
-		return documentoProbatorio;
+	public String getCurp() {
+		return curp;
 	}
 
-	public void setDocumentoProbatorio(String documentoProbatorio) {
-		this.documentoProbatorio = documentoProbatorio;
-	}
-
-	public long getEntidad() {
-		return entidad;
-	}
-
-	public void setEntidad(long entidad) {
-		this.entidad = entidad;
-	}
-
-	public String getEntitadDes() {
-		return entitadDes;
-	}
-
-	public void setEntitadDes(String entitadDes) {
-		this.entitadDes = entitadDes;
-	}
-
-	public long getMunicipio() {
-		return municipio;
-	}
-
-	public void setMunicipio(long municipio) {
-		this.municipio = municipio;
-	}
-
-	public String getMunicipioDesc() {
-		return municipioDesc;
-	}
-
-	public void setMunicipioDesc(String municipioDesc) {
-		this.municipioDesc = municipioDesc;
+	public void setCurp(String curp) {
+		this.curp = curp;
 	}
 
 	public String getRfc() {
@@ -194,20 +162,28 @@ public class Persona {
 		this.rfc = rfc;
 	}
 
-	public boolean isSatValidacion() {
-		return satValidacion;
+	public String getDomicilio() {
+		return domicilio;
 	}
 
-	public void setSatValidacion(boolean satValidacion) {
-		this.satValidacion = satValidacion;
+	public void setDomicilio(String domicilio) {
+		this.domicilio = domicilio;
 	}
 
-	public String getEmail() {
-		return email;
+	public String getCodigoPostal() {
+		return codigoPostal;
 	}
 
-	public void setEmail(String email) {
-		this.email = email;
+	public void setCodigoPostal(String codigoPostal) {
+		this.codigoPostal = codigoPostal;
+	}
+
+	public String getTelefono() {
+		return telefono;
+	}
+
+	public void setTelefono(String telefono) {
+		this.telefono = telefono;
 	}
 
 	public Timestamp getFechaRegistro() {
@@ -218,22 +194,78 @@ public class Persona {
 		this.fechaRegistro = fechaRegistro;
 	}
 
-	public Timestamp getUltimaModificacion() {
-		return ultimaModificacion;
+	public Timestamp getFechaModificacion() {
+		return fechaModificacion;
 	}
 
-	public void setUltimaModificacion(Timestamp ultimaModificacion) {
-		this.ultimaModificacion = ultimaModificacion;
+	public void setFechaModificacion(Timestamp fechaModificacion) {
+		this.fechaModificacion = fechaModificacion;
 	}
 
-	public int getEstatus() {
-		return estatus;
+	public long getSituacion() {
+		return situacion;
 	}
 
-	public void setEstatus(int estatus) {
-		this.estatus = estatus;
+	public void setSituacion(long situacion) {
+		this.situacion = situacion;
 	}
-		
+
+	public long getNoColonia() {
+		return noColonia;
+	}
+
+	public void setNoColonia(long noColonia) {
+		this.noColonia = noColonia;
+	}
+
+	public long getNoEntidad() {
+		return noEntidad;
+	}
+
+	public void setNoEntidad(long noEntidad) {
+		this.noEntidad = noEntidad;
+	}
+
+	public String getEntidad() {
+		return entidad;
+	}
+
+	public void setEntidad(String entidad) {
+		this.entidad = entidad;
+	}
+
+	public long getNoMunicipio() {
+		return noMunicipio;
+	}
+
+	public void setNoMunicipio(long noMunicipio) {
+		this.noMunicipio = noMunicipio;
+	}
+
+	public String getMunicipio() {
+		return municipio;
+	}
+
+	public void setMunicipio(String municipio) {
+		this.municipio = municipio;
+	}
+
+	public long getNoLocalidad() {
+		return noLocalidad;
+	}
+
+	public void setNoLocalidad(long noLocalidad) {
+		this.noLocalidad = noLocalidad;
+	}
+
+	public String getLocalidad() {
+		return localidad;
+	}
+
+	public void setLocalidad(String localidad) {
+		this.localidad = localidad;
+	}
+
 	public Usuario getUsuario() {
 		return usuario;
 	}
@@ -242,9 +274,12 @@ public class Persona {
 		this.usuario = usuario;
 	}
 
+	public void setNombreCompleto(String nombreCompleto) {
+		this.nombreCompleto = nombreCompleto;
+	}
+
 	public String getNombreCompleto() {
-		return this.nombre +" "+ this.apellidoPaterno+" "+ this.apellidoMaterno;
-	
+		return this.nombre +" "+ this.paterno+" "+ this.materno;	
 	}
 
 	public static final class Views {

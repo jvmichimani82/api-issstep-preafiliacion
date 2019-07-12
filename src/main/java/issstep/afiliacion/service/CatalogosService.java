@@ -30,10 +30,16 @@ public class CatalogosService {
     }
 	
 	public ResponseEntity<?> updateDocument(Documento documento) {	
-		int numDocumento = documentoDB.updateDocumento(documento);
+		Documento registro = documentoDB.getDocumento(documento.getId());
 		
-		if (numDocumento != 0) 
-			return new ResponseEntity<>(documento , HttpStatus.OK);		
+		if (registro != null) {
+			int numDocumento = documentoDB.updateDocumento(documento);
+			
+			if (numDocumento != 0) 
+				return new ResponseEntity<>(documento , HttpStatus.OK);
+			else 
+				return new ResponseEntity<>(new Mensaje("No se pudo actualizar el registro con id: " + documento.getId()), HttpStatus.SERVICE_UNAVAILABLE);
+		}
 		else
 			return new ResponseEntity<>(new Mensaje("No existe documento con el id: " + documento.getId()), HttpStatus.CONFLICT);
     }
@@ -54,10 +60,11 @@ public class CatalogosService {
     }
 	
 	public ResponseEntity<?> deleteDocument(long id) {	
-		long idDocumento = documentoDB.deleteDocumento(id);
-		
-		if (idDocumento != 0)
-			return new ResponseEntity<>( HttpStatus.OK);					
+		Documento registro = documentoDB.getDocumento(id);
+		if (registro != null) {
+			documentoDB.deleteDocumento(id);
+			return new ResponseEntity<>( HttpStatus.OK);
+		}
 		else
 			return new ResponseEntity<>(new Mensaje("El documento con id: " + id + ", no existe."), HttpStatus.NOT_FOUND);
 	}
