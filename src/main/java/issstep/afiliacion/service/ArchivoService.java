@@ -76,10 +76,10 @@ public class ArchivoService{
 						
 						archivo.setNoTrabajador(idUsuario);
 						archivo.setNoBeneficiario(idParentesco);
-						archivo.setUrlDocto(resultado);
-						archivo.setNombreDocto(uploadedFile.getOriginalFilename());
+						//archivo.setUrlDocto(resultado);
+						//archivo.setNombreDocto(uploadedFile.getOriginalFilename());
 						archivo.setFechaRegistro(new Timestamp(new Date().getTime()));
-						archivo.setEstatus(1);
+						//archivo.setEstatus(1);
 		
 				idArchivoRegistrado = archivoDB.insertarArchivo(archivo);
 				
@@ -105,16 +105,16 @@ public class ArchivoService{
 			Archivo archivo = archivoDB.getArchivoById(idArchivo);
 			if(archivo != null) {
 			
-				String nombreTemp = archivo.getUrlDocto();
-				InputStream imputStream = new FileInputStream(new File(nombreTemp));
-				byte[] document = IOUtils.toByteArray(imputStream);
-				String ext = FilenameUtils.getExtension(nombreTemp);
-				String x = (!ext.equalsIgnoreCase("pdf"))?"image":"application";
-				HttpHeaders header = new HttpHeaders();
-				header.setContentType(new MediaType(x,ext));
-				header.set("Content-Disposition", "inline; filename=" + nombreTemp);
-				header.setContentLength(document.length);
-				return new ResponseEntity<>(document, header, HttpStatus.OK);
+				//String nombreTemp = archivo.getUrlDocto();
+				//InputStream imputStream = new FileInputStream(new File(nombreTemp));
+				//byte[] document = IOUtils.toByteArray(imputStream);
+				//String ext = FilenameUtils.getExtension(nombreTemp);
+				//String x = (!ext.equalsIgnoreCase("pdf"))?"image":"application";
+				//HttpHeaders header = new HttpHeaders();
+				//header.setContentType(new MediaType(x,ext));
+				//header.set("Content-Disposition", "inline; filename=" + nombreTemp);
+				//header.setContentLength(document.length);
+				//return new ResponseEntity<>(document, header, HttpStatus.OK);
 			}
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		
