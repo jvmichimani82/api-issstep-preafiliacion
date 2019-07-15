@@ -17,6 +17,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
 import issstep.afiliacion.model.Archivo;
+import issstep.afiliacion.model.ParentescoTipoArchivo;
 
 @Component
 public class ArchivoDB {
@@ -46,11 +47,13 @@ public class ArchivoDB {
 	 * Regresamos la descripcion del tipo de documento por id
 	 */
 	
-	public String getTipoArchivoById(long id) {
+	public String getTipoArchivoByParentescoAndId(long idParentesco, long id) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT DESCRIPCION FROM TIPODOCTO WHERE ID = ");
+		query.append("SELECT TA.NOMBRE AS ARCHIVO FROM PARENTESCOTARCHIVO P, TIPOARCHIVO TA");
+		query.append(" WHERE P.NOTARCHIVO = ");
 		query.append(id);
-	
+		query.append(" AND NOPARENTESCO = ");
+		query.append(idParentesco);
 		
 		try {
 			return (String) mysqlTemplate.queryForObject(query.toString(), String.class);
@@ -84,6 +87,22 @@ public class ArchivoDB {
 	}
 	
 	
+	public List<Archivo> getArchivosByParentesco(long idParentesco) {
+		StringBuilder query = new StringBuilder("SELECT P.*, TA.NOMBRE AS ARCHIVO FROM PARENTESCOTARCHIVO P, TIPOARCHIVO TA ");
+		query.append("WHERE P.NOTARCHIVO = TA.NOARCHIVO AND NOPARENTESCO =");
+		
+		query.append(idParentesco);
+		query.append(" ORDER BY ARCHIVO)");
+		
+		List<Archivo> archivos = new ArrayList<Archivo>();
+		try {
+			archivos =  mysqlTemplate.query(query.toString(), new ArchivoRowMapper());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return archivos;
+	}
+	
 	public long insertarArchivo (Archivo archivo) {
 		StringBuilder query = new StringBuilder();
 		query.append("INSERT INTO DOCTO "
@@ -98,11 +117,11 @@ public class ArchivoDB {
 	    	    new PreparedStatementCreator() {
 	    	        public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
 	    	            PreparedStatement pst = con.prepareStatement(query.toString(), new String[] {"id"});
-	    	            pst.setLong(1, archivo.getTipoDocto());
-	    	            pst.setString(2, archivo.getUrlDocto());
-	    	            pst.setString(3, archivo.getNombreDocto());
+	    	            //pst.setLong(1, archivo.getTipoDocto());
+	    	            //pst.setString(2, archivo.getUrlDocto());
+	    	            //pst.setString(3, archivo.getNombreDocto());
 	    	            pst.setTimestamp(4, archivo.getFechaRegistro());
-	    	            pst.setInt(5, archivo.getEstatus());
+	    	            //pst.setInt(5, archivo.getEstatus());
 	    	            return pst;
 	    	        }
 	    	    },
@@ -169,16 +188,29 @@ class ArchivoRowMapper implements RowMapper<Archivo> {
     public Archivo mapRow(ResultSet rs, int rowNum) throws SQLException {
     	Archivo archive = new Archivo();
  
-    	archive.setId(rs.getLong("ID"));
+    	/*archive.setId(rs.getLong("ID"));
     	archive.setNombreDocto(rs.getString("NOMBREDOCTO"));
     	archive.setTipoDocto(rs.getInt("TIPODOCTO"));
     	archive.setDesTipoDocto(rs.getString("DESTIPODOCTO"));
-        archive.setUrlDocto(rs.getString("URLDOCTO"));
+        archive.setUrlDocto(rs.getString("URLDOCTO"));*/
         archive.setFechaRegistro(rs.getTimestamp("FECHAREGISTRO"));
-        archive.setEstatus(rs.getInt("ESTATUS"));
+        archive.setActivo(rs.getInt("ACTIVO"));
        
  
         return archive;
+    }
+}
+
+class ParentescoTipoArchivoRowMapper implements RowMapper<ParentescoTipoArchivo> {
+    @Override
+    public ParentescoTipoArchivo mapRow(ResultSet rs, int rowNum) throws SQLException {
+    	ParentescoTipoArchivo parentescoTipoArchivo = new ParentescoTipoArchivo();
+ 
+    	parentescoTipoArchivo.setNoTArchivo(rs.getLong("NOTARCHIVO"));
+    	parentescoTipoArchivo.setObligatorio(rs.getLong("OBLIGATORIO"));
+    	parentescoTipoArchivo.setArchivo(rs.getString("ARCHIVO"));
+    	
+        return parentescoTipoArchivo;
     }
 }
 

@@ -99,7 +99,7 @@ public class DocumentoDB {
 	public long deleteDocumento(long id) {
 		StringBuilder query = new StringBuilder();
 		
-		query.append("DELETE FROM TIPODOCTO WHERE id = ?");
+		query.append("DELETE FROM TIPODOCTO WHERE id = " + id);
 		System.out.println(query.toString());
 		
 		try {

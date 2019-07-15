@@ -2,7 +2,6 @@ package issstep.afiliacion.db;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -11,7 +10,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
 import issstep.afiliacion.model.Persona;
-import issstep.afiliacion.model.Usuario;
 
 @Component
 public class PersonaDB {
@@ -22,17 +20,18 @@ public class PersonaDB {
 
 	public Persona getPersonaByColumnaStringValor(String columna, String valor) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT P.ID AS IDPERSONA, P.NOMBRE, P.APELLIDOPATERNO, P.APELLIDOMATERNO, P.FECHANACIMIENTO, P.CURP, "
-				+ "P.RFC, P.SEXO, P.NACIONALIDAD, P.EMAIL, P.DOCUMENTOPROBATORIO, P.RENAPOVALIDACION, P.SATVALIDACION, "
-				+ "P.FECHAREGISTRO, P.ULTIMOREGISTRO, P.ESTATUS, EF.ID AS IDENTIDAD, EF.DESCRIPCION AS DESENTIDAD, M.ID AS IDMUN, M.DESCRIPCION AS DESMUN  "
-				+ "FROM PERSONA P, ENTIDADFEDERATIVA EF, MUNICIPIO M  WHERE P.MUNICIPIO = M.ID AND M.ENTIDADFEDERATIVA = EF.ID AND P.");
+		query.append("SELECT P.*, EF.NOMBRE AS ENTIDAD, M.NOMBRE AS MUNICIPIO, L.NOMBRE AS LOCALIDAD "
+						+ "FROM PERSONA P, ENTIDADFEDERATIVA EF, MUNICIPIO M, LOCALIDAD L "
+						+ "WHERE P.NOENTIDADFEDERATIVA = EF.NOENTIDADFEDERATIVA AND "
+						+ "P.NOMUNICIPIO = M.NOMUNICIPIO AND "
+						+ "P.NOMUNICIPIO = L.NOMUNICIPIO AND P.NOLOCALIDAD = L.NOLOCALIDAD AND P.");
 		
 		query.append(columna);
 		query.append("= '");
 		query.append(valor);
 		query.append("'");
 		
-		System.out.println(query.toString());
+		System.out.println("Consulta ==> " + query.toString());
 		
 		Persona persona = null;
 		try {
@@ -43,15 +42,16 @@ public class PersonaDB {
 		return persona;
 	}
 	
-	public Persona getPersonaById(long id) {
+	public Persona getPersonaById(long noControl) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT P.ID AS IDPERSONA, P.NOMBRE, P.APELLIDOPATERNO, P.APELLIDOMATERNO, P.FECHANACIMIENTO, P.CURP, "
-				+ "P.RFC, P.SEXO, P.NACIONALIDAD, P.EMAIL, P.DOCUMENTOPROBATORIO, P.RENAPOVALIDACION, P.SATVALIDACION, "
-				+ "P.FECHAREGISTRO, P.ULTIMOREGISTRO, P.ESTATUS, EF.ID AS IDENTIDAD, EF.DESCRIPCION AS DESENTIDAD, M.ID AS IDMUN, M.DESCRIPCION AS DESMUN  "
-				+ "FROM PERSONA P, ENTIDADFEDERATIVA EF, MUNICIPIO M  WHERE P.MUNICIPIO = M.ID AND M.ENTIDADFEDERATIVA = EF.ID AND P.ID = ");
+		query.append("SELECT P.*, EF.NOMBRE AS ENTIDAD, M.NOMBRE AS MUNICIPIO, L.NOMBRE AS LOCALIDAD "
+				+ "FROM PERSONA P, ENTIDADFEDERATIVA EF, MUNICIPIO M, LOCALIDAD L "
+				+ "WHERE P.NOENTIDADFEDERATIVA = EF.NOENTIDADFEDERATIVA AND "
+				+ "P.NOMUNICIPIO = M.NOMUNICIPIO AND "
+				+ "P.NOMUNICIPIO = L.NOMUNICIPIO AND P.NOLOCALIDAD = L.NOLOCALIDAD AND P.NOCONTROL = ");
 		
 		
-		query.append(id);
+		query.append(noControl);
 				
 		System.out.println(query.toString());
 		
@@ -106,23 +106,19 @@ public class PersonaDB {
 	
 	public void actualiza (Persona persona) {
 		StringBuilder query = new StringBuilder();
-		query.append("UPDATE PERSONA SET NOMBRE= ?, APELLIDOPATERNO= ?, APELLIDOMATERNO = ?, EMAIL= ?, ULTIMOREGISTRO= ?, ESTATUS= ? WHERE ID = ? ");
+		query.append("UPDATE PERSONA SET NOMBRE= ?, PATERNO= ?, MATERNO = ?, EMAIL= ?, FECHAREGISTRO= ?, SITUACION= ? WHERE NOCONTROL = ? ");
 					
 		System.out.println(query.toString());
 		
 		try {
 			  mysqlTemplate.update(query.toString(), new Object[] { 
-					  persona.getNombre(), persona.getApellidoPaterno(), persona.getApellidoMaterno(), 
-					  persona.getEmail(), persona.getUltimaModificacion(), persona.getEstatus(), persona.getId()
+					  persona.getNombre(), persona.getPaterno(), persona.getMaterno(), 
+					  persona.getEmail(), persona.getFechaModificacion(), persona.getSituacion(), persona.getNoControl()
 			});
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
-		
-	}
-	
-	
-	
+		}		
+	}	
 }
 
 class PersonaRowMapper implements RowMapper<Persona> {
@@ -130,26 +126,26 @@ class PersonaRowMapper implements RowMapper<Persona> {
     public Persona mapRow(ResultSet rs, int rowNum) throws SQLException {
     	Persona persona = new Persona();
  
-    	persona.setId(rs.getLong("IDPERSONA"));
+    	persona.setNoControl(rs.getLong("NOCONTROL"));
+    	persona.setNoAfiliacion(rs.getLong("NOAFILIACION"));
         persona.setNombre(rs.getString("NOMBRE"));
-        persona.setApellidoPaterno(rs.getString("APELLIDOPATERNO"));
-        persona.setApellidoMaterno(rs.getString("APELLIDOMATERNO"));
+        persona.setPaterno(rs.getString("PATERNO"));
+        persona.setMaterno(rs.getString("MATERNO"));
         persona.setFechaNacimiento(rs.getTimestamp("FECHANACIMIENTO"));
         persona.setCurp(rs.getString("CURP"));
         persona.setRfc(rs.getString("RFC"));
         persona.setSexo(rs.getString("SEXO"));
-        persona.setNacionalidad(rs.getString("NACIONALIDAD"));
         persona.setEmail(rs.getString("EMAIL"));
-        persona.setDocumentoProbatorio(rs.getString("DOCUMENTOPROBATORIO"));
-        persona.setRenapoValidacion(rs.getInt("RENAPOVALIDACION")==1?true:false);
-        persona.setSatValidacion(rs.getInt("SATVALIDACION")==1?true:false);
         persona.setFechaRegistro(rs.getTimestamp("FECHAREGISTRO"));
-        persona.setUltimaModificacion(rs.getTimestamp("ULTIMOREGISTRO"));
-        persona.setEstatus(rs.getInt("ESTATUS"));
-        persona.setEntidad(rs.getLong("IDENTIDAD"));
-        persona.setEntitadDes(rs.getString("DESENTIDAD"));
-        persona.setMunicipio(rs.getLong("IDMUN"));
-        persona.setMunicipioDesc(rs.getString("DESMUN"));
+        persona.setFechaModificacion(rs.getTimestamp("FECHAMODIFICACION"));
+        persona.setSituacion(rs.getInt("SITUACION"));
+        persona.setNoEntidad(rs.getLong("NOENTIDADFEDERATIVA"));
+        persona.setEntidad(rs.getString("ENTIDAD"));
+        persona.setNoMunicipio(rs.getLong("NOMUNICIPIO"));
+        persona.setMunicipio(rs.getString("MUNICIPIO"));
+        persona.setNoLocalidad(rs.getLong("NOLOCALIDAD"));
+        persona.setLocalidad(rs.getString("LOCALIDAD"));
+        
         return persona;
     }
 }

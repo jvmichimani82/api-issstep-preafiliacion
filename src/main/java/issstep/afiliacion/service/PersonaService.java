@@ -40,7 +40,7 @@ public class PersonaService {
 		
 	public ResponseEntity<?> getPersonaByCurp(String curp) {
 		Persona persona =  personaDB.getPersonaByColumnaStringValor("CURP", curp);
-	
+		System.out.println("Terminacion");
 		if (persona != null)
 			return new ResponseEntity<>(persona, HttpStatus.OK);
 		
@@ -78,12 +78,13 @@ public class PersonaService {
 	
 			Usuario usuario = new Usuario();
 			
-			usuario.setId(persona.getId());
-			usuario.setRol(2);
+			usuario.setNoControl(oldPersona.getNoControl());
+			usuario.setNoAfiliacion(oldPersona.getNoAfiliacion());
+			usuario.setNoRol(2);
 			usuario.setLogin(persona.getUsuario().getLogin());
 			usuario.setPasswd(Hashing.sha256().hashString(persona.getUsuario().getPasswd(), Charsets.UTF_8).toString());
 			usuario.setToken(token);
-			usuario.setEstatus(-1);
+			usuario.setActivo(-1);
 			usuario.setFechaRegistro(new Timestamp(new Date().getTime()));
 					
 			if(registroOnline && usuarioDB.insertar(usuario) == 1) {
@@ -96,10 +97,10 @@ public class PersonaService {
 				
 					personaDB.actualiza(oldPersona);
 				
-					oldPersona.setUsuario(usuarioDB.getUsuarioById(oldPersona.getId()));
+					oldPersona.setUsuario(usuarioDB.getUsuarioById(oldPersona.getNoControl()));
 				
-    		          mailService.prepareAndSendBienvenida("issstepregistro@gmail.com", oldPersona.getNombreCompleto() ,
-    		        		  oldPersona.getEmail(), oldPersona.getUsuario().getToken(), oldPersona.getUsuario().getId());
+    		         mailService.prepareAndSendBienvenida("issstepregistro@gmail.com", oldPersona.getNombreCompleto() ,
+    		        		  oldPersona.getEmail(), usuario.getToken(), oldPersona.getNoControl());
     		     //}	
 
 			}
@@ -122,10 +123,10 @@ public class PersonaService {
 		try{	
 			Usuario usuario = usuarioDB.getUsuarioByToken(token);
 			if(usuario != null){
-				if(usuario.getEstatus() <= 0){
+				if(usuario.getActivo() <= 0){
 					
-					usuario.setEstatus(1);
-					usuario.setUltimaModificacion(new Timestamp(new Date().getTime()));
+					usuario.setActivo(1);
+					usuario.setFechaUltimoAcceso(new Timestamp(new Date().getTime()));
 					usuario.setToken(null);
 					usuarioDB.actualiza(usuario);
 					

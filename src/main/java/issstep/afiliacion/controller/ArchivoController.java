@@ -24,9 +24,9 @@ public class ArchivoController {
 	ArchivoService archivoService;
 
 	 //@JsonView(Archivo.Views.Simple.class)
-	 @RequestMapping(value="/uploadDocto/{tipoDocto}/{idUsuario}", method = RequestMethod.POST, consumes="multipart/form-data")
-	 public ResponseEntity<?> uploadDoctos(@PathVariable("tipoDocto") int tipoDocto, @PathVariable("idUsuario") long idUsuario, @RequestParam("file") MultipartFile uploadingFiles, HttpServletResponse response) throws Exception {	       
-	 	return archivoService.uploadDocto(tipoDocto, idUsuario, uploadingFiles, response );		
+	 @RequestMapping(value="/uploadDocto/{idParentesco}/{tipoDocto}/{idUsuario}", method = RequestMethod.POST, consumes="multipart/form-data")
+	 public ResponseEntity<?> uploadDoctos(@PathVariable("idParentesco") int idParentesco, @PathVariable("tipoDocto") int tipoDocto, @PathVariable("idUsuario") long idUsuario, @RequestParam("file") MultipartFile uploadingFiles, HttpServletResponse response) throws Exception {	       
+	 	return archivoService.uploadDocto(idParentesco, tipoDocto, idUsuario, uploadingFiles, response );		
 	 }
 	
 	//@JsonView(Archivo.Views.Simple.class)
@@ -36,16 +36,22 @@ public class ArchivoController {
 	}
 	
 	//@JsonView(Archivo.Views.Simple.class)
-	@RequestMapping(value="/listadoByidUsuario/{idUsuario}", method = RequestMethod.GET)
+	/* @RequestMapping(value="/listadoByidUsuario/{idUsuario}", method = RequestMethod.GET)
 		public ResponseEntity<?> listaDoctos(@PathVariable("idUsuario") long idUsuario, HttpServletResponse response) throws Exception {   
 	 		return archivoService.listaDocumentos(idUsuario, response );	
-	}
+	}*/
 	
 	/*@RequestMapping(value="/deleteDocto/{idDocto}", method = RequestMethod.DELETE)
 		public ResponseEntity<?> deletefoto(@PathVariable("idDocto") long idDocto, HttpServletResponse response) throws Exception {   
 	 		return archivoService.deleteDocumento(idDocto, response );	
 	}*/
 	
+	
+	//@JsonView(Archivo.Views.Simple.class)
+	@RequestMapping(value="/listadoByidParentesco/{idControl}/{idParentesco}", method = RequestMethod.GET)
+		public ResponseEntity<?> listaDoctos(@PathVariable("idControl") long idParentesco, HttpServletResponse response) throws Exception {   
+	 		return archivoService.listaDocumentos( idParentesco, response );	
+	}
 
 }
 

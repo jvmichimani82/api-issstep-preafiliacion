@@ -47,7 +47,8 @@ public class AuthenticationRestController {
     	if(authentication != null) {
 	    	SecurityContextHolder.getContext().setAuthentication(authentication);
 	        Usuario usuarioDetails = (Usuario) authentication.getPrincipal();
-        
+	        System.out.println("Usuario ==> ");
+	        System.out.println(usuarioDetails);
    	        String token = jwtTokenUtil.generateToken(usuarioDetails, device, usuarioDetails);
 		     
 		    return ResponseEntity.ok(new JwtAuthenticationResponse(token));

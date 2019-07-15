@@ -4,59 +4,84 @@ import java.sql.Timestamp;
 
 public class Archivo {
 
-	long id;
-	long tipoDocto;
-	String desTipoDocto;
-	String urlDocto;
-	String nombreDocto;
+	long noTrabajador;
+	long noBeneficiario;
+	long noParentesco;
+	long noTArchivo;
+	String nombre;
+	String urlArchivo;
+	long valido ;
 	Timestamp fechaRegistro;
-	int estatus;
+	int activo;
 	
-	
-	public long getId() {
-		return id;
-	}
-	public void setId(long id) {
-		this.id = id;
-	}
-	public long getTipoDocto() {
-		return tipoDocto;
+	public long getNoTrabajador() {
+		return noTrabajador;
 	}
 	
-	public String getDesTipoDocto() {
-		return desTipoDocto;
+	public void setNoTrabajador(long noTrabajador) {
+		this.noTrabajador = noTrabajador;
 	}
-	public void setDesTipoDocto(String desTipoDocto) {
-		this.desTipoDocto = desTipoDocto;
+	
+	public long getNoBeneficiario() {
+		return noBeneficiario;
 	}
-	public void setTipoDocto(long tipoDocto) {
-		this.tipoDocto = tipoDocto;
+	
+	public void setNoBeneficiario(long noBeneficiario) {
+		this.noBeneficiario = noBeneficiario;
 	}
-	public String getUrlDocto() {
-		return urlDocto;
+	
+	public long getNoParentesco() {
+		return noParentesco;
 	}
-	public void setUrlDocto(String urlDocto) {
-		this.urlDocto = urlDocto;
+	
+	public void setNoParentesco(long noParentesco) {
+		this.noParentesco = noParentesco;
 	}
-	public String getNombreDocto() {
-		return nombreDocto;
+	
+	public long getNoTArchivo() {
+		return noTArchivo;
 	}
-	public void setNombreDocto(String nombreDocto) {
-		this.nombreDocto = nombreDocto;
+	public void setNoTArchivo(long noTArchivo) {
+		this.noTArchivo = noTArchivo;
 	}
+	
+	public String getNombre() {
+		return nombre;
+	}
+	
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+	
+	public String getUrlArchivo() {
+		return urlArchivo;
+	}
+	
+	public void setUrlArchivo(String urlArchivo) {
+		this.urlArchivo = urlArchivo;
+	}
+	
+	public long getValido() {
+		return valido;
+	}
+	
+	public void setValido(long valido) {
+		this.valido = valido;
+	}
+	
 	public Timestamp getFechaRegistro() {
 		return fechaRegistro;
 	}
+	
 	public void setFechaRegistro(Timestamp fechaRegistro) {
 		this.fechaRegistro = fechaRegistro;
 	}
-	public int getEstatus() {
-		return estatus;
-	}
-	public void setEstatus(int estatus) {
-		this.estatus = estatus;
+	public int getActivo() {
+		return activo;
 	}
 	
-	
+	public void setActivo(int activo) {
+		this.activo = activo;
+	}	
 	
 }

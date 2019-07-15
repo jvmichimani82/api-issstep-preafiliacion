@@ -20,7 +20,7 @@ public class UsuarioDB {
 
 	public Usuario getSession(String usuario, String passwd) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT USUARIO, PASSWORD, ROL, LOGIN, TOKEN, FECHAREGISTRO, ULTIMOREGISTRO, ESTATUS FROM USUARIO WHERE LOGIN ='");
+		query.append("SELECT NOUSUARIO, NOROL, LOGIN, TOKEN, PASSWORD, FECHAREGISTRO, FECHAULTIMOACCESO, ACTIVO FROM USUARIO WHERE LOGIN ='");
 		query.append(usuario);
 		query.append("' AND PASSWORD ='");
 		query.append(passwd);
@@ -71,10 +71,10 @@ public class UsuarioDB {
 		System.out.println(query.toString());
 		
 		try {
-			return  mysqlTemplate.update(query.toString(), new Object[] { usuario.getId(),
+			return 0; /* mysqlTemplate.update(query.toString(), new Object[] { usuario.getId(),
 					usuario.getRol(), usuario.getLogin(), usuario.getPasswd(), usuario.getToken(), 
 					usuario.getFechaRegistro(),usuario.getUltimaModificacion(),usuario.getEstatus() 
-			});
+			});*/
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -88,10 +88,10 @@ public class UsuarioDB {
 		System.out.println(query.toString());
 		
 		try {
-			  mysqlTemplate.update(query.toString(), new Object[] { 
+			  /*mysqlTemplate.update(query.toString(), new Object[] { 
 					usuario.getRol(), usuario.getPasswd(), usuario.getToken(), 
 					usuario.getUltimaModificacion(),usuario.getEstatus(), usuario.getId()
-			});
+			});*/
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -106,14 +106,14 @@ class UsuarioRowMapper implements RowMapper<Usuario> {
     public Usuario mapRow(ResultSet rs, int rowNum) throws SQLException {
     	Usuario usuario = new Usuario();
  
-    	usuario.setId(rs.getLong("USUARIO"));
-    	usuario.setRol(rs.getLong("ROL"));
+    	//usuario.setId(rs.getLong("USUARIO"));
+    	//usuario.setRol(rs.getLong("ROL"));
         usuario.setLogin(rs.getString("LOGIN"));
         usuario.setPasswd(rs.getString("PASSWORD"));
         usuario.setToken(rs.getString("TOKEN"));
         usuario.setFechaRegistro(rs.getTimestamp("FECHAREGISTRO"));
-        usuario.setUltimaModificacion(rs.getTimestamp("ULTIMOREGISTRO"));
-        usuario.setEstatus(rs.getInt("ESTATUS"));
+        //usuario.setUltimaModificacion(rs.getTimestamp("ULTIMOREGISTRO"));
+        //usuario.setEstatus(rs.getInt("ESTATUS"));
  
         return usuario;
     }

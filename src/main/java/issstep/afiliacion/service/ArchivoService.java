@@ -57,10 +57,10 @@ public class ArchivoService{
    @Autowired
    UsuarioDB usuarioDB;
 
-	public ResponseEntity<?> uploadDocto(int tipoDocto, long idUsuario, MultipartFile uploadedFile, HttpServletResponse response) {
+	public ResponseEntity<?> uploadDocto(int idParentesco, int noTipoArchivo, long idUsuario, MultipartFile uploadedFile, HttpServletResponse response) {
 		try{
 			long idArchivoRegistrado;
-			String desTipoDocto = archivoDB.getTipoArchivoById(tipoDocto);
+			String desTipoDocto = archivoDB.getTipoArchivoByParentescoAndId(idParentesco, noTipoArchivo);
 			
 			if(uploadedFile.getOriginalFilename().length()>60)  
 				return new ResponseEntity<>(new Mensaje("Nombre de archivo demaciado largo"), HttpStatus.CONFLICT);
@@ -74,7 +74,8 @@ public class ArchivoService{
 				
 				Archivo archivo = new Archivo();
 						
-						archivo.setTipoDocto(tipoDocto);
+						archivo.setNoTrabajador(idUsuario);
+						archivo.setNoBeneficiario(idParentesco);
 						archivo.setUrlDocto(resultado);
 						archivo.setNombreDocto(uploadedFile.getOriginalFilename());
 						archivo.setFechaRegistro(new Timestamp(new Date().getTime()));
@@ -124,14 +125,15 @@ public class ArchivoService{
 		}
 	}
 	
-	public ResponseEntity<?> listaDocumentos(long idUsuario, HttpServletResponse response) {
+	public ResponseEntity<?> listaDocumentos(long idParentesco, HttpServletResponse response) {
 		try {
 			
-			Usuario usuario = usuarioDB.getUsuarioById(idUsuario);
-			if(usuario != null) {
-				return new ResponseEntity<>(archivoDB.getArchivosByUsuario(idUsuario),  HttpStatus.OK);
-			}
-			return new ResponseEntity<>(new Mensaje("No existe el usuario"), HttpStatus.CONFLICT);
+			//Usuario usuario = usuarioDB.getUsuarioById(idParentesco);
+			
+			// if(usuario != null) {
+				return new ResponseEntity<>(archivoDB.getArchivosByParentesco(idParentesco),  HttpStatus.OK);
+			// }
+			// return new ResponseEntity<>(new Mensaje("No existe el usuario"), HttpStatus.CONFLICT);
 		
 		} catch (Exception ex) {
 			System.err.println("Exception ArchivoService.downloadDocumento");

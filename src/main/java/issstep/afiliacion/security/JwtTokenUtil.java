@@ -147,9 +147,12 @@ public class JwtTokenUtil implements Serializable {
     public String generateToken(UserDetails userDetails, Device device, Usuario usuario) {
         Map<String, Object> claims = new HashMap<>();
         
-       	claims.put(CLAIM_KEY_ROL, usuario.getRol());
-       	claims.put(CLAIM_KEY_IDUSER, usuario.getId() );
+       //	claims.put(CLAIM_KEY_ROL, usuario.getRol());
+       	//claims.put(CLAIM_KEY_IDUSER, usuario.getId() );
        	claims.put(CLAIM_KEY_USERNAME, userDetails.getUsername());
+       	//claims.put(CLAIM_KEY_ROL, usuario.getRol() != null ?  usuario.getRol().getClave() : "");
+       	claims.put(CLAIM_KEY_IDUSER, usuario.getNoControl());
+       	 claims.put(CLAIM_KEY_USERNAME, userDetails.getUsername());
         claims.put(CLAIM_KEY_AUDIENCE, generateAudience(device));
         claims.put(CLAIM_KEY_CREATED, new Date());
         
