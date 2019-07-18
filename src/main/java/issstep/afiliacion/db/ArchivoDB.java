@@ -17,7 +17,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
 import issstep.afiliacion.model.Archivo;
-import issstep.afiliacion.model.ParentescoTipoArchivo;
+import issstep.afiliacion.model.DocumentosByParentesco;
 
 @Component
 public class ArchivoDB {
@@ -27,12 +27,17 @@ public class ArchivoDB {
 	private JdbcTemplate mysqlTemplate;
 
 	
-	public Archivo getArchivoById(long id) {
+	public Archivo getArchivo(long noTrabajador, long noBeneficiario, long noParentesco, long noTArchivo) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT D.ID, D.TIPODOCTO, TD.DESCRIPCION AS DESTIPODOCTO, D.URLDOCTO, D.NOMBREDOCTO, D.FECHAREGISTRO, D.ESTATUS "
-				+ "FROM DOCTO D, TIPODOCTO TD WHERE D.TIPODOCTO = TD.ID AND D.ID = ");
-		query.append(id);
-	
+		query.append("SELECT * FROM TBARCHIVO WHERE NOTRABAJADOR = ");
+		query.append(noTrabajador);
+		query.append(" AND NOBENEFICIARIO = ");
+		query.append(noBeneficiario);
+		query.append(" AND NOPARENTESCO = ");
+		query.append(noParentesco);
+		query.append(" AND NOTARCHIVO = ");
+		query.append(noTArchivo);
+				
 		Archivo archive = null;
 		try {
 			archive =  mysqlTemplate.queryForObject(query.toString(), new ArchivoRowMapper());
@@ -47,11 +52,11 @@ public class ArchivoDB {
 	 * Regresamos la descripcion del tipo de documento por id
 	 */
 	
-	public String getTipoArchivoByParentescoAndId(long idParentesco, long id) {
+	public String getTipoArchivoByParentesco(long idParentesco, long idTipoArchivo) {
 		StringBuilder query = new StringBuilder();
 		query.append("SELECT TA.NOMBRE AS ARCHIVO FROM PARENTESCOTARCHIVO P, TIPOARCHIVO TA");
-		query.append(" WHERE P.NOTARCHIVO = ");
-		query.append(id);
+		query.append(" WHERE P.NOTARCHIVO = TA.NOARCHIVO AND P.NOTARCHIVO = ");
+		query.append(idTipoArchivo);
 		query.append(" AND NOPARENTESCO = ");
 		query.append(idParentesco);
 		
@@ -63,51 +68,29 @@ public class ArchivoDB {
 		}
 		return null;
 	}
-	
-	public List<Archivo> getArchivosByUsuario(long idIsuario) {
-		StringBuilder query = new StringBuilder();
-		query.append("SELECT D.ID, D.TIPODOCTO, TD.DESCRIPCION AS DESTIPODOCTO, D.URLDOCTO, D.NOMBREDOCTO, D.FECHAREGISTRO, D.ESTATUS "
-				+ "FROM DOCTO D, TIPODOCTO TD WHERE D.TIPODOCTO = TD.ID AND D.ID IN"
-				+ "(SELECT MAX(D.ID) AS ID " + 
-				"FROM DOCTO D, TIPODOCTO TD, IUSUARIODOCTO IUD " + 
-				"WHERE D.TIPODOCTO = TD.ID " + 
-				"AND D.ID = IUD.DOCTO " + 
-				"AND IUD.USUARIO = ");
 		
-		query.append(idIsuario);
-		query.append(" GROUP BY D.TIPODOCTO)");
-		
-		List<Archivo> archivos = new ArrayList<Archivo>();
-		try {
-			archivos =  mysqlTemplate.query(query.toString(), new ArchivoRowMapper());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return archivos;
-	}
 	
-	
-	public List<Archivo> getArchivosByParentesco(long idParentesco) {
+	public List<DocumentosByParentesco> getDocumentosByParentesco(long idParentesco) {
 		StringBuilder query = new StringBuilder("SELECT P.*, TA.NOMBRE AS ARCHIVO FROM PARENTESCOTARCHIVO P, TIPOARCHIVO TA ");
 		query.append("WHERE P.NOTARCHIVO = TA.NOARCHIVO AND NOPARENTESCO =");
 		
 		query.append(idParentesco);
-		query.append(" ORDER BY ARCHIVO)");
+		query.append(" ORDER BY ARCHIVO");
 		
-		List<Archivo> archivos = new ArrayList<Archivo>();
+		List<DocumentosByParentesco> documentos = new ArrayList<DocumentosByParentesco>();
 		try {
-			archivos =  mysqlTemplate.query(query.toString(), new ArchivoRowMapper());
+			documentos =  mysqlTemplate.query(query.toString(), new ParentescoTipoArchivoRowMapper());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return archivos;
+		return documentos;
 	}
 	
 	public long insertarArchivo (Archivo archivo) {
 		StringBuilder query = new StringBuilder();
-		query.append("INSERT INTO DOCTO "
-				+ "(TIPODOCTO, URLDOCTO, NOMBREDOCTO, FECHAREGISTRO, ESTATUS)"
-				+ " VALUES(?,?,?,?,?)");
+		query.append("INSERT INTO TBARCHIVO "
+				+ "(NOTRABAJADOR, NOBENEFICIARIO, NOPARENTESCO, NOTARCHIVO, NOMBRE, URLARCHIVO, VALIDADO, FECHAREGISTRO, ACTIVO)"
+				+ " VALUES(?,?,?,?,?,?,?,?)");
 
 		System.out.println(query.toString());
 		
@@ -117,11 +100,15 @@ public class ArchivoDB {
 	    	    new PreparedStatementCreator() {
 	    	        public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
 	    	            PreparedStatement pst = con.prepareStatement(query.toString(), new String[] {"id"});
-	    	            pst.setLong(1, archivo.getTipoDocto());
-	    	            pst.setString(2, archivo.getUrlDocto());
-	    	            pst.setString(3, archivo.getNombreDocto());
-	    	            pst.setTimestamp(4, archivo.getFechaRegistro());
-	    	            pst.setInt(5, archivo.getEstatus());
+	    	            pst.setLong(1, archivo.getNoTrabajador());
+	    	            pst.setLong(2, archivo.getNoBeneficiario());
+	    	            pst.setLong(3, archivo.getNoParentesco());
+	    	            pst.setLong(4, archivo.getNoTArchivo());
+	    	            pst.setString(5, archivo.getNombre());
+	    	            pst.setString(6, archivo.getUrlArchivo());
+	    	            pst.setInt(7, archivo.getValidado());
+	    	            pst.setTimestamp(8, archivo.getFechaRegistro());
+	    	            pst.setInt(9, archivo.getActivo());
 	    	            return pst;
 	    	        }
 	    	    },
@@ -135,7 +122,43 @@ public class ArchivoDB {
 		return 0;
 	}
 	
-	public long insertarUsuarioArchivo (long idUsuario, long idArchivo) {
+	public void delete (Archivo archivo) {
+		StringBuilder query = new StringBuilder();
+		query.append("UPDATE USUARIO SET ROL = ?, PASSWORD = ?, TOKEN = ?, ULTIMOREGISTRO = ?, ESTATUS = ? WHERE USUARIO = ? ");
+			
+		System.out.println(query.toString());
+		
+		try {
+			  mysqlTemplate.update(query.toString(), new Object[] { 
+					
+			});
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	
+	public List<Archivo> getArchivos(long idTrabajador, long idBeneficiario, long idParentesco) {
+		StringBuilder query = new StringBuilder();
+		query.append("SELECT * FROM TBARCHIVO ");
+		query.append(" WHERE NOTRABAJADOR = ");
+		query.append(idTrabajador);
+		query.append(" AND NOBENEFICIARIO = ");
+		query.append(idBeneficiario);
+		query.append(" AND NOPARENTESCO  = ");
+		query.append(idParentesco);
+		
+		List<Archivo> archivos = new ArrayList<Archivo>();
+		try {
+			archivos =  mysqlTemplate.query(query.toString(), new ArchivoRowMapper());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return archivos;
+	}
+
+    /* public long insertarUsuarioArchivo (long idUsuario, long idArchivo) {
 		StringBuilder query = new StringBuilder();
 		query.append("INSERT INTO IUSUARIODOCTO "
 				+ "(DOCTO, USUARIO, ESTATUS)"
@@ -162,24 +185,9 @@ public class ArchivoDB {
 			e.printStackTrace();
 		}
 		return 0;
-	}
-	
-	public void delete (Archivo archivo) {
-		StringBuilder query = new StringBuilder();
-		query.append("UPDATE USUARIO SET ROL = ?, PASSWORD = ?, TOKEN = ?, ULTIMOREGISTRO = ?, ESTATUS = ? WHERE USUARIO = ? ");
-			
-		System.out.println(query.toString());
-		
-		try {
-			  mysqlTemplate.update(query.toString(), new Object[] { 
-					
-			});
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-	}
-	
+	} */
+
+    
 	
 }
 
@@ -188,23 +196,25 @@ class ArchivoRowMapper implements RowMapper<Archivo> {
     public Archivo mapRow(ResultSet rs, int rowNum) throws SQLException {
     	Archivo archive = new Archivo();
  
-    	archive.setId(rs.getLong("ID"));
-    	archive.setNombreDocto(rs.getString("NOMBREDOCTO"));
-    	archive.setTipoDocto(rs.getInt("TIPODOCTO"));
-    	archive.setDesTipoDocto(rs.getString("DESTIPODOCTO"));
-        archive.setUrlDocto(rs.getString("URLDOCTO"));
-        archive.setFechaRegistro(rs.getTimestamp("FECHAREGISTRO"));
-        archive.setActivo(rs.getInt("ACTIVO"));
+    	archive.setNoTrabajador(rs.getLong("NOTRABAJADOR"));
+    	archive.setNoBeneficiario(rs.getLong("NOBENEFICIARIO"));
+    	archive.setNoParentesco(rs.getLong("NOPARENTESCO"));
+    	archive.setNoTArchivo(rs.getLong("NOTARCHIVO"));
+    	archive.setNombre(rs.getString("NOMBRE"));
+    	archive.setUrlArchivo(rs.getString("URLARCHIVO"));
+    	archive.setValidado(rs.getInt("VALIDADO"));
+    	archive.setFechaRegistro(rs.getTimestamp("FECHAREGISTRO"));
+    	archive.setActivo(rs.getInt("ACTIVO"));
        
  
         return archive;
     }
 }
 
-class ParentescoTipoArchivoRowMapper implements RowMapper<ParentescoTipoArchivo> {
+class ParentescoTipoArchivoRowMapper implements RowMapper<DocumentosByParentesco> {
     @Override
-    public ParentescoTipoArchivo mapRow(ResultSet rs, int rowNum) throws SQLException {
-    	ParentescoTipoArchivo parentescoTipoArchivo = new ParentescoTipoArchivo();
+    public DocumentosByParentesco mapRow(ResultSet rs, int rowNum) throws SQLException {
+    	DocumentosByParentesco parentescoTipoArchivo = new DocumentosByParentesco();
  
     	parentescoTipoArchivo.setNoTArchivo(rs.getLong("NOTARCHIVO"));
     	parentescoTipoArchivo.setObligatorio(rs.getLong("OBLIGATORIO"));

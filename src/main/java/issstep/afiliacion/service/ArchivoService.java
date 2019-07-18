@@ -57,35 +57,38 @@ public class ArchivoService{
    @Autowired
    UsuarioDB usuarioDB;
 
-	public ResponseEntity<?> uploadDocto(int idParentesco, int noTipoArchivo, long idUsuario, MultipartFile uploadedFile, HttpServletResponse response) {
+	public ResponseEntity<?> uploadDocumento(long idTrabajador, long idBeneficiario, long idParentesco, long noTipoArchivo,  MultipartFile uploadedFile, HttpServletResponse response) {
 		try{
 			long idArchivoRegistrado;
-			String desTipoDocto = archivoDB.getTipoArchivoByParentescoAndId(idParentesco, noTipoArchivo);
+			String desTipoDocto = archivoDB.getTipoArchivoByParentesco(idParentesco, noTipoArchivo);
 			
 			if(uploadedFile.getOriginalFilename().length()>60)  
-				return new ResponseEntity<>(new Mensaje("Nombre de archivo demaciado largo"), HttpStatus.CONFLICT);
+				return new ResponseEntity<>(new Mensaje("Nombre de archivo demasiado largo"), HttpStatus.CONFLICT);
 			
 			else if(desTipoDocto == null)
 				return new ResponseEntity<>(new Mensaje("No existe el tipo de documento"), HttpStatus.CONFLICT);
 				
 			else {
 					
-				String resultado = UtilsImage.uploadFileToServer(UtilsImage.toPrettyURL(desTipoDocto), (MultipartFile) uploadedFile, "Persona"+idUsuario+"-"+UtilsImage.toPrettyURL(desTipoDocto));
+				String resultado = UtilsImage.uploadFileToServer(UtilsImage.toPrettyURL(desTipoDocto), (MultipartFile) uploadedFile, "Persona"+idTrabajador+idBeneficiario+idParentesco+noTipoArchivo+"-"+UtilsImage.toPrettyURL(desTipoDocto));
 				
 				Archivo archivo = new Archivo();
 						
-						archivo.setNoTrabajador(idUsuario);
+						archivo.setNoTrabajador(idTrabajador);
 						archivo.setNoBeneficiario(idParentesco);
-						archivo.setUrlDocto(resultado);
-						archivo.setNombreDocto(uploadedFile.getOriginalFilename());
+						archivo.setNoParentesco(idTrabajador);
+						archivo.setNoTArchivo(noTipoArchivo);
+						archivo.setNombre(uploadedFile.getOriginalFilename());
+						archivo.setUrlArchivo(resultado);
+						archivo.setValidado(0);
 						archivo.setFechaRegistro(new Timestamp(new Date().getTime()));
-						archivo.setEstatus(1);
+						archivo.setActivo(1);
 		
 				idArchivoRegistrado = archivoDB.insertarArchivo(archivo);
 				
-				archivoDB.insertarUsuarioArchivo(idUsuario, idArchivoRegistrado);
+				/* archivoDB.insertarArchivo(idUsuario, idArchivoRegistrado); */
 				
-				return new ResponseEntity<>(archivoDB.getArchivoById(idArchivoRegistrado), HttpStatus.OK);
+				return new ResponseEntity<>(archivo, HttpStatus.OK);
 			
 			}
 			
@@ -99,13 +102,13 @@ public class ArchivoService{
 		}
 	}
 
-	public ResponseEntity<?> dowloadDocumento(long idArchivo,HttpServletResponse response) {
+	public ResponseEntity<?> dowloadDocumento(long idTrabajador, long idBeneficiario, long idParentesco, long noTipoArchivo, HttpServletResponse response) {
 		try {
 			
-			Archivo archivo = archivoDB.getArchivoById(idArchivo);
+			Archivo archivo = archivoDB.getArchivo(idTrabajador, idBeneficiario, idParentesco, noTipoArchivo);
 			if(archivo != null) {
 			
-				String nombreTemp = archivo.getUrlDocto();
+				String nombreTemp = archivo.getUrlArchivo();
 				InputStream imputStream = new FileInputStream(new File(nombreTemp));
 				byte[] document = IOUtils.toByteArray(imputStream);
 				String ext = FilenameUtils.getExtension(nombreTemp);
@@ -131,7 +134,7 @@ public class ArchivoService{
 			//Usuario usuario = usuarioDB.getUsuarioById(idParentesco);
 			
 			// if(usuario != null) {
-				return new ResponseEntity<>(archivoDB.getArchivosByParentesco(idParentesco),  HttpStatus.OK);
+				return new ResponseEntity<>(archivoDB.getDocumentosByParentesco(idParentesco),  HttpStatus.OK);
 			// }
 			// return new ResponseEntity<>(new Mensaje("No existe el usuario"), HttpStatus.CONFLICT);
 		
@@ -142,15 +145,32 @@ public class ArchivoService{
 		}
 	}
 	
-	/*public ResponseEntity<?> deleteDocumento(long idArchivo, HttpServletResponse response) {
+	public ResponseEntity<?> listaArchivos(long idTrabajador, long idBeneficiario, long idParentesco, HttpServletResponse response) {
 		try {
 			
-			Archivo archivo = archivoRepository.findOne(idArchivo);
+			//Usuario usuario = usuarioDB.getUsuarioById(idParentesco);
+			
+			// if(usuario != null) {
+				return new ResponseEntity<>(archivoDB.getArchivos(idTrabajador, idBeneficiario, idParentesco),  HttpStatus.OK);
+			// }
+			// return new ResponseEntity<>(new Mensaje("No existe el usuario"), HttpStatus.CONFLICT);
+		
+		} catch (Exception ex) {
+			System.err.println("Exception ArchivoService.downloadDocumento");
+			ex.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	public ResponseEntity<?> deleteDocumento(long idTrabajador, long idBeneficiario, long idParentesco, long noTipoArchivo, HttpServletResponse response) {
+		try {
+			
+			/* Archivo archivo = archivoRepository.findOne(idArchivo);
 			if(archivo != null) {
-				UtilsImage.deleteDocto(archivo.getUrlDocto());
+				UtilsImage.deleteDocto(archivo.getUrlArchivo());
 				archivoRepository.delete(archivo);
 			
-			}
+			}*/
 			return new ResponseEntity<>(new Mensaje("Eliminacion correcta"), HttpStatus.NO_CONTENT);
 		
 		} catch (Exception ex) {
@@ -158,7 +178,7 @@ public class ArchivoService{
 			ex.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-	}*/
+	}
 	
 	
 	

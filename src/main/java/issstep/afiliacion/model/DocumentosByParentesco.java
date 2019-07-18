@@ -1,6 +1,6 @@
 package issstep.afiliacion.model;
 
-public class ParentescoTipoArchivo {
+public class DocumentosByParentesco {
 	private long noTArchivo;
 	private long obligatorio;
 	private String archivo;

@@ -24,15 +24,23 @@ public class ArchivoController {
 	ArchivoService archivoService;
 
 	 //@JsonView(Archivo.Views.Simple.class)
-	 @RequestMapping(value="/uploadDocto/{idParentesco}/{tipoDocto}/{idUsuario}", method = RequestMethod.POST, consumes="multipart/form-data")
-	 public ResponseEntity<?> uploadDoctos(@PathVariable("idParentesco") int idParentesco, @PathVariable("tipoDocto") int tipoDocto, @PathVariable("idUsuario") long idUsuario, @RequestParam("file") MultipartFile uploadingFiles, HttpServletResponse response) throws Exception {	       
-	 	return archivoService.uploadDocto(idParentesco, tipoDocto, idUsuario, uploadingFiles, response );		
+	 @RequestMapping(value="/uploadDocto/{idTrabajador}/{idBeneficiario}/{idParentesco}/{tipoDocto}", method = RequestMethod.POST, consumes="multipart/form-data")
+	 public ResponseEntity<?> uploadDoctos(	@PathVariable("idTrabajador") long idTrabajador, 
+			 								@PathVariable("idBeneficiario") long idBeneficiario, 
+			 								@PathVariable("idParentesco") long idParentesco, 
+			 								@PathVariable("tipoDocto") long tipoDocto, 
+			 								@RequestParam("file") MultipartFile uploadingFiles, HttpServletResponse response) throws Exception {	       
+	 	return archivoService.uploadDocumento(idTrabajador, idBeneficiario, idParentesco, tipoDocto, uploadingFiles, response );		
 	 }
 	
 	//@JsonView(Archivo.Views.Simple.class)
-	@RequestMapping(value="/downloadDocto/{idDocto}", method = RequestMethod.GET)
-		public ResponseEntity<?> bajaDoto(@PathVariable("idDocto") long idDocto, HttpServletResponse response) throws Exception {   
-	 		return archivoService.dowloadDocumento(idDocto, response );	
+	@RequestMapping(value="/downloadDocto/{idTrabajador}/{idBeneficiario}/{idParentesco}/{tipoDocto}", method = RequestMethod.GET)
+		public ResponseEntity<?> bajaDoto(	@PathVariable("idTrabajador") long idTrabajador, 
+											@PathVariable("idBeneficiario") long idBeneficiario, 
+											@PathVariable("idParentesco") long idParentesco, 
+											@PathVariable("tipoDocto") long tipoDocto,  
+											HttpServletResponse response) throws Exception {   
+	 		return archivoService.dowloadDocumento(idTrabajador, idBeneficiario, idParentesco, tipoDocto, response );	
 	}
 	
 	//@JsonView(Archivo.Views.Simple.class)
@@ -41,17 +49,30 @@ public class ArchivoController {
 	 		return archivoService.listaDocumentos(idUsuario, response );	
 	}*/
 	
-	/*@RequestMapping(value="/deleteDocto/{idDocto}", method = RequestMethod.DELETE)
-		public ResponseEntity<?> deletefoto(@PathVariable("idDocto") long idDocto, HttpServletResponse response) throws Exception {   
-	 		return archivoService.deleteDocumento(idDocto, response );	
-	}*/
+	@RequestMapping(value="/deleteDocto/{idTrabajador}/{idBeneficiario}/{idParentesco}/{tipoDocto}", method = RequestMethod.DELETE)
+		public ResponseEntity<?> deletefoto(@PathVariable("idTrabajador") long idTrabajador, 
+											@PathVariable("idBeneficiario") long idBeneficiario, 
+											@PathVariable("idParentesco") long idParentesco, 
+											@PathVariable("tipoDocto") long tipoDocto,
+											HttpServletResponse response) throws Exception {   
+	 		return archivoService.deleteDocumento(idTrabajador, idBeneficiario, idParentesco, tipoDocto, response );	
+	}
 	
 	
 	//@JsonView(Archivo.Views.Simple.class)
-	@RequestMapping(value="/listadoByidParentesco/{idControl}/{idParentesco}", method = RequestMethod.GET)
-		public ResponseEntity<?> listaDoctos(@PathVariable("idControl") long idParentesco, HttpServletResponse response) throws Exception {   
+	@RequestMapping(value="/listadoByidParentesco/{idParentesco}", method = RequestMethod.GET)
+		public ResponseEntity<?> listaDoctos(@PathVariable("idParentesco") long idParentesco, HttpServletResponse response) throws Exception {   
 	 		return archivoService.listaDocumentos( idParentesco, response );	
 	}
+	
+	//@JsonView(Archivo.Views.Simple.class)
+		@RequestMapping(value="/listadoArchivos/{idTrabajador}/{idBeneficiario}/{idParentesco}", method = RequestMethod.GET)
+			public ResponseEntity<?> listaArchivos(@PathVariable("idTrabajador") long idTrabajador, 
+												 @PathVariable("idBeneficiario") long idBeneficiario, 
+												 @PathVariable("idParentesco") long idParentesco,  
+												 HttpServletResponse response) throws Exception {   
+		 		return archivoService.listaArchivos( idTrabajador, idBeneficiario, idParentesco, response );	
+		}
 
 }
 

@@ -10,7 +10,7 @@ public class Archivo {
 	long noTArchivo;
 	String nombre;
 	String urlArchivo;
-	long valido ;
+	int validado ;
 	Timestamp fechaRegistro;
 	int activo;
 	
@@ -61,12 +61,12 @@ public class Archivo {
 		this.urlArchivo = urlArchivo;
 	}
 	
-	public long getValido() {
-		return valido;
+	public int getValidado() {
+		return validado;
 	}
 	
-	public void setValido(long valido) {
-		this.valido = valido;
+	public void setValidado(int validado) {
+		this.validado = validado;
 	}
 	
 	public Timestamp getFechaRegistro() {
