@@ -177,7 +177,11 @@
 		  <version>3.0.7.RELEASE</version>
 		</dependency>
         
-		
+		<dependency>
+	        <groupId>org.projectlombok</groupId>
+	        <artifactId>lombok</artifactId>
+	        <version>1.18.4</version>
+	   </dependency>
 	</dependencies>
 
 	<build>

@@ -1,7 +1,7 @@
 package issstep.afiliacion.cons;
 
 
-public class PersonaCONST {
+public class DerechohabienteCONST {
 	
 	
 	

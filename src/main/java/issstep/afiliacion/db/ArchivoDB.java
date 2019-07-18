@@ -109,6 +109,7 @@ public class ArchivoDB {
 	    	            pst.setInt(7, archivo.getValidado());
 	    	            pst.setTimestamp(8, archivo.getFechaRegistro());
 	    	            pst.setInt(9, archivo.getActivo());
+
 	    	            return pst;
 	    	        }
 	    	    },
@@ -196,6 +197,7 @@ class ArchivoRowMapper implements RowMapper<Archivo> {
     public Archivo mapRow(ResultSet rs, int rowNum) throws SQLException {
     	Archivo archive = new Archivo();
  
+
     	archive.setNoTrabajador(rs.getLong("NOTRABAJADOR"));
     	archive.setNoBeneficiario(rs.getLong("NOBENEFICIARIO"));
     	archive.setNoParentesco(rs.getLong("NOPARENTESCO"));
@@ -205,6 +207,7 @@ class ArchivoRowMapper implements RowMapper<Archivo> {
     	archive.setValidado(rs.getInt("VALIDADO"));
     	archive.setFechaRegistro(rs.getTimestamp("FECHAREGISTRO"));
     	archive.setActivo(rs.getInt("ACTIVO"));
+
        
  
         return archive;

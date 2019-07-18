@@ -83,7 +83,7 @@ public class ArchivoService{
 						archivo.setValidado(0);
 						archivo.setFechaRegistro(new Timestamp(new Date().getTime()));
 						archivo.setActivo(1);
-		
+
 				idArchivoRegistrado = archivoDB.insertarArchivo(archivo);
 				
 				/* archivoDB.insertarArchivo(idUsuario, idArchivoRegistrado); */
@@ -118,6 +118,7 @@ public class ArchivoService{
 				header.set("Content-Disposition", "inline; filename=" + nombreTemp);
 				header.setContentLength(document.length);
 				return new ResponseEntity<>(document, header, HttpStatus.OK);
+
 			}
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		

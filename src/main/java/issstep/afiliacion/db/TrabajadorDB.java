@@ -9,16 +9,16 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
-import issstep.afiliacion.model.Persona;
+import issstep.afiliacion.model.Derechohabiente;
 
 @Component
-public class PersonaDB {
+public class TrabajadorDB {
 
 	@Autowired
 	@Qualifier("mysqlJdbcTemplate")
 	private JdbcTemplate mysqlTemplate;
 
-	public Persona getPersonaByColumnaStringValor(String columna, String valor) {
+	public Derechohabiente getPersonaByColumnaStringValor(String columna, String valor) {
 		StringBuilder query = new StringBuilder();
 		query.append("SELECT P.*, EF.NOMBRE AS ENTIDAD, M.NOMBRE AS MUNICIPIO, L.NOMBRE AS LOCALIDAD "
 						+ "FROM PERSONA P, ENTIDADFEDERATIVA EF, MUNICIPIO M, LOCALIDAD L "
@@ -33,7 +33,7 @@ public class PersonaDB {
 		
 		System.out.println("Consulta ==> " + query.toString());
 		
-		Persona persona = null;
+		Derechohabiente persona = null;
 		try {
 			persona =  mysqlTemplate.queryForObject(query.toString(), new PersonaRowMapper());
 		} catch (Exception e) {
@@ -42,7 +42,7 @@ public class PersonaDB {
 		return persona;
 	}
 	
-	public Persona getPersonaById(long noControl) {
+	public Derechohabiente getPersonaById(long noControl) {
 		StringBuilder query = new StringBuilder();
 		query.append("SELECT P.*, EF.NOMBRE AS ENTIDAD, M.NOMBRE AS MUNICIPIO, L.NOMBRE AS LOCALIDAD "
 				+ "FROM PERSONA P, ENTIDADFEDERATIVA EF, MUNICIPIO M, LOCALIDAD L "
@@ -55,7 +55,7 @@ public class PersonaDB {
 				
 		System.out.println(query.toString());
 		
-		Persona persona = null;
+		Derechohabiente persona = null;
 		try {
 			persona =  mysqlTemplate.queryForObject(query.toString(), new PersonaRowMapper());
 		} catch (Exception e) {
@@ -104,7 +104,7 @@ public class PersonaDB {
 		return persona;
 	}*/
 	
-	public void actualiza (Persona persona) {
+	public void actualiza (Derechohabiente persona) {
 		StringBuilder query = new StringBuilder();
 		query.append("UPDATE PERSONA SET NOMBRE= ?, PATERNO= ?, MATERNO = ?, EMAIL= ?, FECHAREGISTRO= ?, SITUACION= ? WHERE NOCONTROL = ? ");
 					
@@ -121,13 +121,13 @@ public class PersonaDB {
 	}	
 }
 
-class PersonaRowMapper implements RowMapper<Persona> {
+class PersonaRowMapper implements RowMapper<Derechohabiente> {
     @Override
-    public Persona mapRow(ResultSet rs, int rowNum) throws SQLException {
-    	Persona persona = new Persona();
+    public Derechohabiente mapRow(ResultSet rs, int rowNum) throws SQLException {
+    	Derechohabiente persona = new Derechohabiente();
  
     	persona.setNoControl(rs.getLong("NOCONTROL"));
-    	persona.setNoAfiliacion(rs.getLong("NOAFILIACION"));
+    	persona.setNoPreAfiliacion(rs.getLong("NOAFILIACION"));
         persona.setNombre(rs.getString("NOMBRE"));
         persona.setPaterno(rs.getString("PATERNO"));
         persona.setMaterno(rs.getString("MATERNO"));
@@ -139,11 +139,11 @@ class PersonaRowMapper implements RowMapper<Persona> {
         persona.setFechaRegistro(rs.getTimestamp("FECHAREGISTRO"));
         persona.setFechaModificacion(rs.getTimestamp("FECHAMODIFICACION"));
         persona.setSituacion(rs.getInt("SITUACION"));
-        persona.setNoEntidad(rs.getLong("NOENTIDADFEDERATIVA"));
-        persona.setEntidad(rs.getString("ENTIDAD"));
-        persona.setNoMunicipio(rs.getLong("NOMUNICIPIO"));
+        persona.setClaveEstado(rs.getLong("NOENTIDADFEDERATIVA"));
+        persona.setEstado(rs.getString("ENTIDAD"));
+        persona.setClaveMunicipio(rs.getLong("NOMUNICIPIO"));
         persona.setMunicipio(rs.getString("MUNICIPIO"));
-        persona.setNoLocalidad(rs.getLong("NOLOCALIDAD"));
+        persona.setClaveLocalidad(rs.getLong("NOLOCALIDAD"));
         persona.setLocalidad(rs.getString("LOCALIDAD"));
         
         return persona;
