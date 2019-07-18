@@ -16,21 +16,21 @@ import org.springframework.stereotype.Service;
 import com.google.common.base.Charsets;
 import com.google.common.hash.Hashing;
 
-import issstep.afiliacion.db.PersonaDB;
+import issstep.afiliacion.db.TrabajadorDB;
 import issstep.afiliacion.db.UsuarioDB;
 import issstep.afiliacion.model.Mensaje;
-import issstep.afiliacion.model.Persona;
+import issstep.afiliacion.model.Derechohabiente;
 import issstep.afiliacion.model.Usuario;
 import issstep.afiliacion.utils.Utils;
 
 
 
 @Service
-public class PersonaService {
-	private static final Logger logger = LoggerFactory.getLogger(PersonaService.class);	
+public class DerechohabienteService {
+	private static final Logger logger = LoggerFactory.getLogger(DerechohabienteService.class);	
 	
 	@Autowired
-	PersonaDB personaDB;
+	TrabajadorDB personaDB;
 	
 	@Autowired
 	UsuarioDB usuarioDB;
@@ -39,7 +39,7 @@ public class PersonaService {
 	MailService mailService;
 		
 	public ResponseEntity<?> getPersonaByCurp(String curp) {
-		Persona persona =  personaDB.getPersonaByColumnaStringValor("CURP", curp);
+		Derechohabiente persona =  personaDB.getPersonaByColumnaStringValor("CURP", curp);
 		System.out.println("Terminacion");
 		if (persona != null)
 			return new ResponseEntity<>(persona, HttpStatus.OK);
@@ -50,7 +50,7 @@ public class PersonaService {
     }
 	
 	public ResponseEntity<?> getPersonaById(long id) {
-		Persona persona =  personaDB.getPersonaById(id);
+		Derechohabiente persona =  personaDB.getPersonaById(id);
 	
 		if (persona != null)
 			return new ResponseEntity<>(persona, HttpStatus.OK);
@@ -61,9 +61,9 @@ public class PersonaService {
     }
 	
 	
-	public ResponseEntity<?> registraUsuario(boolean registroOnline, Persona persona){
+	public ResponseEntity<?> registraUsuario(boolean registroOnline, Derechohabiente persona){
 		try{
-			Persona oldPersona = personaDB.getPersonaByColumnaStringValor("CURP", persona.getCurp());
+			Derechohabiente oldPersona = personaDB.getPersonaByColumnaStringValor("CURP", persona.getCurp());
 			/*if(persona.getCurp() != null && !(personaDB.getPersonaByCurp(persona.getCurp())!= null)){
 				return new ResponseEntity<>(new Mensaje("La CURP ya está registrada."), HttpStatus.CONFLICT);
 			}
@@ -79,10 +79,10 @@ public class PersonaService {
 			Usuario usuario = new Usuario();
 			
 			usuario.setNoControl(oldPersona.getNoControl());
-			usuario.setNoAfiliacion(oldPersona.getNoAfiliacion());
+			usuario.setNoAfiliacion(oldPersona.getNoPreAfiliacion());
 			usuario.setNoRol(2);
-			usuario.setLogin(persona.getUsuario().getLogin());
-			usuario.setPasswd(Hashing.sha256().hashString(persona.getUsuario().getPasswd(), Charsets.UTF_8).toString());
+			//usuario.setLogin(persona.getUsuario().getLogin());
+			//usuario.setPasswd(Hashing.sha256().hashString(persona.getUsuario().getPasswd(), Charsets.UTF_8).toString());
 			usuario.setToken(token);
 			usuario.setActivo(-1);
 			usuario.setFechaRegistro(new Timestamp(new Date().getTime()));
@@ -97,7 +97,7 @@ public class PersonaService {
 				
 					personaDB.actualiza(oldPersona);
 				
-					oldPersona.setUsuario(usuarioDB.getUsuarioById(oldPersona.getNoControl()));
+					//oldPersona.setUsuario(usuarioDB.getUsuarioById(oldPersona.getNoControl()));
 				
     		         mailService.prepareAndSendBienvenida("issstepregistro@gmail.com", oldPersona.getNombreCompleto() ,
     		        		  oldPersona.getEmail(), usuario.getToken(), oldPersona.getNoControl());
