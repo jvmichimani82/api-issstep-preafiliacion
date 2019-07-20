@@ -18,6 +18,9 @@ import lombok.Setter;
 public class Derechohabiente {
 
 	@JsonView({Derechohabiente.Views.Simple.class, Derechohabiente.Views.RegistroUsuario.class})
+	long id;
+	
+	@JsonView({Derechohabiente.Views.Simple.class})
 	long noControl;
 	
 	@JsonView({Derechohabiente.Views.Simple.class, Derechohabiente.Views.RegistroUsuario.class})
@@ -114,7 +117,10 @@ public class Derechohabiente {
 	String estadoCivil;
 	
 	@JsonView({Derechohabiente.Views.Simple.class})	
-	String nombreCompleto;
+	String nombreComDerechohabientepleto;
+	
+	@JsonView({Derechohabiente.Views.RegistroUsuario.class})
+	Usuario usuario;
 
 
 	public String getNombreCompleto() {

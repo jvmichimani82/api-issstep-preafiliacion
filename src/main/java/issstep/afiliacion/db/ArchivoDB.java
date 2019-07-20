@@ -71,11 +71,13 @@ public class ArchivoDB {
 		
 	
 	public List<DocumentosByParentesco> getDocumentosByParentesco(long idParentesco) {
-		StringBuilder query = new StringBuilder("SELECT P.*, TA.NOMBRE AS ARCHIVO FROM PARENTESCOTARCHIVO P, TIPOARCHIVO TA ");
-		query.append("WHERE P.NOTARCHIVO = TA.NOARCHIVO AND NOPARENTESCO =");
+		StringBuilder query = new StringBuilder("SELECT P.*, TA.DESCRIPCION AS ARCHIVO FROM KPARENTESCOTIPOARCHIVO P, KTIPOARCHIVO TA ");
+		query.append("WHERE P.CLAVETIPOARCHIVO = TA.CLAVETIPOARCHIVO AND P.CLAVEPARENTESCO = ");
 		
 		query.append(idParentesco);
 		query.append(" ORDER BY ARCHIVO");
+		
+		System.out.println(query.toString());
 		
 		List<DocumentosByParentesco> documentos = new ArrayList<DocumentosByParentesco>();
 		try {
@@ -219,8 +221,9 @@ class ParentescoTipoArchivoRowMapper implements RowMapper<DocumentosByParentesco
     public DocumentosByParentesco mapRow(ResultSet rs, int rowNum) throws SQLException {
     	DocumentosByParentesco parentescoTipoArchivo = new DocumentosByParentesco();
  
-    	parentescoTipoArchivo.setNoTArchivo(rs.getLong("NOTARCHIVO"));
-    	parentescoTipoArchivo.setObligatorio(rs.getLong("OBLIGATORIO"));
+    	parentescoTipoArchivo.setClaveParentesco(rs.getLong("CLAVEPARENTESCO"));
+    	parentescoTipoArchivo.setClaveTipoArchivo(rs.getLong("CLAVETIPOARCHIVO"));
+    	parentescoTipoArchivo.setEsObligatorio(rs.getLong("ESOBLIGATORIO"));
     	parentescoTipoArchivo.setArchivo(rs.getString("ARCHIVO"));
     	
         return parentescoTipoArchivo;

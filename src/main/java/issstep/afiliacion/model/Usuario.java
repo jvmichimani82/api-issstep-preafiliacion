@@ -11,21 +11,27 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Usuario implements Serializable, UserDetails {
 	private static final long serialVersionUID = 1L;
-
-	public Usuario() {
-	}
-
-	@JsonView({Usuario.Views.Simple.class, Usuario.Views.RegistroUsuario.class})
-	long noUsuario;
 	
-	long noRol;
+	@JsonView({Usuario.Views.Simple.class, Usuario.Views.RegistroUsuario.class})
+	long claveUsuario;
+	
+	long claveRol;
 	
 	long noControl;
-	
-	long noAfiliacion;
 	
 	@JsonView({Usuario.Views.Simple.class, Usuario.Views.RegistroUsuario.class})
 	String login;
@@ -42,87 +48,10 @@ public class Usuario implements Serializable, UserDetails {
 	Timestamp fechaUltimoAcceso;
 	
 	@JsonView({Usuario.Views.Simple.class, Usuario.Views.RegistroUsuario.class})
-	int activo;
-
-	public long getNoUsuario() {
-		return noUsuario;
-	}
-
-	public void setNoUsuario(long noUsuario) {
-		this.noUsuario = noUsuario;
-	}
+	int estatus;
 	
-	public long getNoControl() {
-		return noControl;
-	}
-
-	public void setNoControl(long noControl) {
-		this.noControl = noControl;
-	}
-
-	public long getNoAfiliacion() {
-		return noAfiliacion;
-	}
-
-	public void setNoAfiliacion(long noAfiliacion) {
-		this.noAfiliacion = noAfiliacion;
-	}
-
-	public String getLogin() {
-		return login;
-	}
-
-	public void setLogin(String nombre) {
-		this.login = nombre;
-	}
-
-	public long getNoRol() {
-		return noRol;
-	}
-
-	public void setNoRol(long noRol) {
-		this.noRol = noRol;
-	}
-
-	public String getPasswd() {
-		return passwd;
-	}
-
-	public void setPasswd(String passwd) {
-		this.passwd = passwd;
-	}
-
-	public String getToken() {
-		return token;
-	}
-
-	public void setToken(String token) {
-		this.token = token;
-	}
-
-	public Timestamp getFechaRegistro() {
-		return fechaRegistro;
-	}
-
-	public void setFechaRegistro(Timestamp fechaRegistro) {
-		this.fechaRegistro = fechaRegistro;
-	}
-
-	public Timestamp getFechaUltimoAcceso() {
-		return fechaUltimoAcceso;
-	}
-
-	public void setFechaUltimoAcceso(Timestamp fechaUltimoAcceso) {
-		this.fechaUltimoAcceso = fechaUltimoAcceso;
-	}
-
-	public int getActivo() {
-		return activo;
-	}
-
-	public void setActivo(int activo) {
-		this.activo = activo;
-	}
+	@JsonView({Usuario.Views.Simple.class, Usuario.Views.RegistroUsuario.class})
+	long noAfiliacion;
 
 	@JsonIgnore
 	@Override

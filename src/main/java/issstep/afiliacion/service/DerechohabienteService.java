@@ -78,14 +78,17 @@ public class DerechohabienteService {
 	
 			Usuario usuario = new Usuario();
 			
+			// usuario.setClaveUsuario(oldPersona.getClaveUsuarioRegistro());
+			usuario.setClaveRol(2);
 			usuario.setNoControl(oldPersona.getNoControl());
-			usuario.setNoAfiliacion(oldPersona.getNoPreAfiliacion());
-			usuario.setNoRol(2);
-			//usuario.setLogin(persona.getUsuario().getLogin());
-			//usuario.setPasswd(Hashing.sha256().hashString(persona.getUsuario().getPasswd(), Charsets.UTF_8).toString());
+			usuario.setLogin(persona.getUsuario().getLogin());
+			usuario.setPasswd(Hashing.sha256().hashString(persona.getUsuario().getPasswd(), Charsets.UTF_8).toString());
 			usuario.setToken(token);
-			usuario.setActivo(-1);
 			usuario.setFechaRegistro(new Timestamp(new Date().getTime()));
+			usuario.setEstatus(-1);
+			usuario.setNoAfiliacion(oldPersona.getNoPreAfiliacion());
+			
+			// usuario.setNoAfiliacion(oldPersona.getNoPreAfiliacion());
 					
 			if(registroOnline && usuarioDB.insertar(usuario) == 1) {
 				//if (Utils.loadPropertie("ambiente").equals(PRODUCCION) || Utils.loadPropertie("ambiente").equals(PRUEBAS)){
@@ -123,9 +126,9 @@ public class DerechohabienteService {
 		try{	
 			Usuario usuario = usuarioDB.getUsuarioByToken(token);
 			if(usuario != null){
-				if(usuario.getActivo() <= 0){
+				if(usuario.getEstatus() <= 0){
 					
-					usuario.setActivo(1);
+					usuario.setEstatus(1);
 					usuario.setFechaUltimoAcceso(new Timestamp(new Date().getTime()));
 					usuario.setToken(null);
 					usuarioDB.actualiza(usuario);

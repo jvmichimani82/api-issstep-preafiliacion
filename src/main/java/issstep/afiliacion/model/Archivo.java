@@ -2,86 +2,48 @@ package issstep.afiliacion.model;
 
 import java.sql.Timestamp;
 
-public class Archivo {
+import com.fasterxml.jackson.annotation.JsonView;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Archivo {
+	@JsonView({Archivo.Views.Simple.class})
 	long noTrabajador;
+	
+	@JsonView({Archivo.Views.Simple.class})
 	long noBeneficiario;
+	
+	@JsonView({Archivo.Views.Simple.class})
 	long noParentesco;
+	
+	@JsonView({Archivo.Views.Simple.class})
 	long noTArchivo;
+	
+	@JsonView({Archivo.Views.Simple.class})
 	String nombre;
+	
+	@JsonView({Archivo.Views.Simple.class})
 	String urlArchivo;
+	
+	@JsonView({Archivo.Views.Simple.class})
 	int validado ;
+	
+	@JsonView({Archivo.Views.Simple.class})
 	Timestamp fechaRegistro;
+	
+	@JsonView({Archivo.Views.Simple.class})
 	int activo;
 	
-	public long getNoTrabajador() {
-		return noTrabajador;
+	public static final class Views {
+		public interface Simple {}
 	}
-	
-	public void setNoTrabajador(long noTrabajador) {
-		this.noTrabajador = noTrabajador;
-	}
-	
-	public long getNoBeneficiario() {
-		return noBeneficiario;
-	}
-	
-	public void setNoBeneficiario(long noBeneficiario) {
-		this.noBeneficiario = noBeneficiario;
-	}
-	
-	public long getNoParentesco() {
-		return noParentesco;
-	}
-	
-	public void setNoParentesco(long noParentesco) {
-		this.noParentesco = noParentesco;
-	}
-	
-	public long getNoTArchivo() {
-		return noTArchivo;
-	}
-	public void setNoTArchivo(long noTArchivo) {
-		this.noTArchivo = noTArchivo;
-	}
-	
-	public String getNombre() {
-		return nombre;
-	}
-	
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
-	}
-	
-	public String getUrlArchivo() {
-		return urlArchivo;
-	}
-	
-	public void setUrlArchivo(String urlArchivo) {
-		this.urlArchivo = urlArchivo;
-	}
-	
-	public int getValidado() {
-		return validado;
-	}
-	
-	public void setValidado(int validado) {
-		this.validado = validado;
-	}
-	
-	public Timestamp getFechaRegistro() {
-		return fechaRegistro;
-	}
-	
-	public void setFechaRegistro(Timestamp fechaRegistro) {
-		this.fechaRegistro = fechaRegistro;
-	}
-	public int getActivo() {
-		return activo;
-	}
-	
-	public void setActivo(int activo) {
-		this.activo = activo;
-	}	
-	
 }

@@ -1,31 +1,36 @@
 package issstep.afiliacion.model;
 
+import java.sql.Timestamp;
+
+import com.fasterxml.jackson.annotation.JsonView;
+
+import issstep.afiliacion.model.Archivo.ArchivoBuilder;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class DocumentosByParentesco {
-	private long noTArchivo;
-	private long obligatorio;
-	private String archivo;
+	@JsonView({DocumentosByParentesco.Views.Simple.class})
+	long claveParentesco;
 	
-	public long getNoTArchivo() {
-		return noTArchivo;
-	}
+	@JsonView({DocumentosByParentesco.Views.Simple.class})
+	long claveTipoArchivo;
 	
-	public void setNoTArchivo(long noTArchivo) {
-		this.noTArchivo = noTArchivo;
-	}
+	@JsonView({DocumentosByParentesco.Views.Simple.class})
+	long esObligatorio;
 	
-	public long getObligatorio() {
-		return obligatorio;
-	}
+	@JsonView({DocumentosByParentesco.Views.Simple.class})
+	String archivo;
 	
-	public void setObligatorio(long obligatorio) {
-		this.obligatorio = obligatorio;
-	}
-	public String getArchivo() {
-		return archivo;
-	}
-	
-	public void setArchivo(String archivo) {
-		this.archivo = archivo;
+	public static final class Views {
+		public interface Simple {}
 	}
 
 }
