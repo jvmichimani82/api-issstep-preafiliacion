@@ -17,16 +17,22 @@ import lombok.Setter;
 @Builder
 public class Archivo {
 	@JsonView({Archivo.Views.Simple.class})
-	long noTrabajador;
+	long claveDocumento;
+	
+	@JsonView({Archivo.Views.Simple.class})
+	long noControl;
+	
+	@JsonView({Archivo.Views.Simple.class})
+	long noPreAfiliacion;
 	
 	@JsonView({Archivo.Views.Simple.class})
 	long noBeneficiario;
 	
 	@JsonView({Archivo.Views.Simple.class})
-	long noParentesco;
+	long claveParentesco;
 	
 	@JsonView({Archivo.Views.Simple.class})
-	long noTArchivo;
+	long claveTipoArchivo;
 	
 	@JsonView({Archivo.Views.Simple.class})
 	String nombre;
@@ -35,13 +41,19 @@ public class Archivo {
 	String urlArchivo;
 	
 	@JsonView({Archivo.Views.Simple.class})
-	int validado ;
+	int esValido ;
+	
+	@JsonView({Archivo.Views.Simple.class})
+	long claveUsuarioRegistro;
 	
 	@JsonView({Archivo.Views.Simple.class})
 	Timestamp fechaRegistro;
 	
 	@JsonView({Archivo.Views.Simple.class})
-	int activo;
+	long claveUsuarioModificacion;
+	
+	@JsonView({Archivo.Views.Simple.class})
+	int estatus ;
 	
 	public static final class Views {
 		public interface Simple {}

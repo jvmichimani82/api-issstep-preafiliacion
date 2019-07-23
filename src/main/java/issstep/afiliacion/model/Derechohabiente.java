@@ -17,13 +17,13 @@ import lombok.Setter;
 @Builder
 public class Derechohabiente {
 
-	@JsonView({Derechohabiente.Views.Simple.class, Derechohabiente.Views.RegistroUsuario.class})
+	@JsonView({Derechohabiente.Views.Simple.class, Derechohabiente.Views.RegistroDerechohabiente.class})
 	long id;
 	
 	@JsonView({Derechohabiente.Views.Simple.class})
 	long noControl;
 	
-	@JsonView({Derechohabiente.Views.Simple.class, Derechohabiente.Views.RegistroUsuario.class})
+	@JsonView({Derechohabiente.Views.Simple.class, Derechohabiente.Views.RegistroDerechohabiente.class})
 	long noPreAfiliacion;
 	
 	@JsonView({Derechohabiente.Views.Simple.class})
@@ -35,7 +35,7 @@ public class Derechohabiente {
 	@JsonView({Derechohabiente.Views.Simple.class})
 	String materno;
 	
-	@JsonView({Derechohabiente.Views.Simple.class, Derechohabiente.Views.RegistroUsuario.class})
+	@JsonView({Derechohabiente.Views.Simple.class, Derechohabiente.Views.RegistroDerechohabiente.class})
 	String email;
 		
 	@JsonView({Derechohabiente.Views.Simple.class})
@@ -44,7 +44,7 @@ public class Derechohabiente {
 	@JsonView({Derechohabiente.Views.Simple.class})
 	String sexo;	
 	
-	@JsonView({Derechohabiente.Views.Simple.class, Derechohabiente.Views.RegistroUsuario.class})
+	@JsonView({Derechohabiente.Views.Simple.class, Derechohabiente.Views.RegistroDerechohabiente.class})
 	String curp;
 	
 	@JsonView({Derechohabiente.Views.Simple.class})
@@ -119,7 +119,7 @@ public class Derechohabiente {
 	@JsonView({Derechohabiente.Views.Simple.class})	
 	String nombreComDerechohabientepleto;
 	
-	@JsonView({Derechohabiente.Views.RegistroUsuario.class})
+	@JsonView({Derechohabiente.Views.RegistroDerechohabiente.class})
 	Usuario usuario;
 
 
@@ -129,7 +129,7 @@ public class Derechohabiente {
 	
 	public static final class Views {
 		public interface Simple {}
-		public interface RegistroUsuario extends Usuario.Views.RegistroUsuario {}
+		public interface RegistroDerechohabiente {}
 	}
 
 }

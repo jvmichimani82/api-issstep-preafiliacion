@@ -27,16 +27,11 @@ public class ArchivoDB {
 	private JdbcTemplate mysqlTemplate;
 
 	
-	public Archivo getArchivo(long noTrabajador, long noBeneficiario, long noParentesco, long noTArchivo) {
+	public Archivo getArchivo(long claveDocumento) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT * FROM TBARCHIVO WHERE NOTRABAJADOR = ");
-		query.append(noTrabajador);
-		query.append(" AND NOBENEFICIARIO = ");
-		query.append(noBeneficiario);
-		query.append(" AND NOPARENTESCO = ");
-		query.append(noParentesco);
-		query.append(" AND NOTARCHIVO = ");
-		query.append(noTArchivo);
+		query.append("SELECT * FROM DOCUMENTO WHERE CLAVEDOCUMENTO = ");
+		query.append(claveDocumento);
+		
 				
 		Archivo archive = null;
 		try {
@@ -54,10 +49,10 @@ public class ArchivoDB {
 	
 	public String getTipoArchivoByParentesco(long idParentesco, long idTipoArchivo) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT TA.NOMBRE AS ARCHIVO FROM PARENTESCOTARCHIVO P, TIPOARCHIVO TA");
-		query.append(" WHERE P.NOTARCHIVO = TA.NOARCHIVO AND P.NOTARCHIVO = ");
+		query.append("SELECT TA.DESCRIPCION AS ARCHIVO FROM KPARENTESCOTIPOARCHIVO P, KTIPOARCHIVO TA");
+		query.append(" WHERE P.CLAVETIPOARCHIVO = TA.CLAVETIPOARCHIVO AND P.CLAVETIPOARCHIVO = ");
 		query.append(idTipoArchivo);
-		query.append(" AND NOPARENTESCO = ");
+		query.append(" AND P.CLAVEPARENTESCO = ");
 		query.append(idParentesco);
 		
 		try {
@@ -90,9 +85,11 @@ public class ArchivoDB {
 	
 	public long insertarArchivo (Archivo archivo) {
 		StringBuilder query = new StringBuilder();
-		query.append("INSERT INTO TBARCHIVO "
-				+ "(NOTRABAJADOR, NOBENEFICIARIO, NOPARENTESCO, NOTARCHIVO, NOMBRE, URLARCHIVO, VALIDADO, FECHAREGISTRO, ACTIVO)"
-				+ " VALUES(?,?,?,?,?,?,?,?)");
+		query.append("INSERT INTO DOCUMENTO "
+				+ "( NOCONTROL, NOPREAFILIACION, NOBENEFICIARIO, CLAVEPARENTESCO, "
+				+ "CLAVETIPOARCHIVO, NOMBRE, URLARCHIVO, ESVALIDO, CLAVEUSUARIOREGISTRO, "
+				+ "FECHAREGISTRO, CLAVEUSUARIOMODIFICACION, ESTATUS)"
+				+ " VALUES(?,?,?,?,?,?,?,?,?,?,?,?)");
 
 		System.out.println(query.toString());
 		
@@ -102,15 +99,18 @@ public class ArchivoDB {
 	    	    new PreparedStatementCreator() {
 	    	        public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
 	    	            PreparedStatement pst = con.prepareStatement(query.toString(), new String[] {"id"});
-	    	            pst.setLong(1, archivo.getNoTrabajador());
-	    	            pst.setLong(2, archivo.getNoBeneficiario());
-	    	            pst.setLong(3, archivo.getNoParentesco());
-	    	            pst.setLong(4, archivo.getNoTArchivo());
-	    	            pst.setString(5, archivo.getNombre());
-	    	            pst.setString(6, archivo.getUrlArchivo());
-	    	            pst.setInt(7, archivo.getValidado());
-	    	            pst.setTimestamp(8, archivo.getFechaRegistro());
-	    	            pst.setInt(9, archivo.getActivo());
+	    	            pst.setLong(1, archivo.getNoControl());
+	    	            pst.setLong(2, archivo.getNoPreAfiliacion());
+	    	            pst.setLong(3, archivo.getNoBeneficiario());
+	    	            pst.setLong(4, archivo.getClaveParentesco());
+	    	            pst.setLong(5, archivo.getClaveTipoArchivo());
+	    	            pst.setString(6, archivo.getNombre());
+	    	            pst.setString(7, archivo.getUrlArchivo());
+	    	            pst.setInt(8, archivo.getEsValido());
+	    	            pst.setLong(9, archivo.getClaveUsuarioRegistro());
+	    	            pst.setTimestamp(10, archivo.getFechaRegistro());
+	    	            pst.setLong(11, archivo.getClaveUsuarioModificacion());
+	    	            pst.setInt(12, archivo.getEstatus());
 
 	    	            return pst;
 	    	        }
@@ -142,15 +142,17 @@ public class ArchivoDB {
 	}
 	
 	
-	public List<Archivo> getArchivos(long idTrabajador, long idBeneficiario, long idParentesco) {
+	public List<Archivo> getArchivos(long noControl, long noPreAfiliacion, long noBeneficiario, long claveParentesco) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT * FROM TBARCHIVO ");
-		query.append(" WHERE NOTRABAJADOR = ");
-		query.append(idTrabajador);
-		query.append(" AND NOBENEFICIARIO = ");
-		query.append(idBeneficiario);
-		query.append(" AND NOPARENTESCO  = ");
-		query.append(idParentesco);
+		query.append("SELECT * FROM DOCUMENTO ");
+		query.append(" WHERE NOCONTROL = ");
+		query.append(noControl);
+		query.append(" AND NOPREAFILIACION = ");
+		query.append(noPreAfiliacion);
+		query.append(" AND NOBENEFICIARIO  = ");
+		query.append(noBeneficiario);
+		query.append(" AND CLAVEPARENTESCO  = ");
+		query.append(claveParentesco);
 		
 		List<Archivo> archivos = new ArrayList<Archivo>();
 		try {
@@ -199,18 +201,18 @@ class ArchivoRowMapper implements RowMapper<Archivo> {
     public Archivo mapRow(ResultSet rs, int rowNum) throws SQLException {
     	Archivo archive = new Archivo();
  
-
-    	archive.setNoTrabajador(rs.getLong("NOTRABAJADOR"));
-    	archive.setNoBeneficiario(rs.getLong("NOBENEFICIARIO"));
-    	archive.setNoParentesco(rs.getLong("NOPARENTESCO"));
-    	archive.setNoTArchivo(rs.getLong("NOTARCHIVO"));
-    	archive.setNombre(rs.getString("NOMBRE"));
-    	archive.setUrlArchivo(rs.getString("URLARCHIVO"));
-    	archive.setValidado(rs.getInt("VALIDADO"));
-    	archive.setFechaRegistro(rs.getTimestamp("FECHAREGISTRO"));
-    	archive.setActivo(rs.getInt("ACTIVO"));
-
-       
+    	archive.setClaveDocumento(rs.getLong("claveDocumento"));
+    	archive.setNoControl(rs.getLong("noControl"));
+    	archive.setNoPreAfiliacion(rs.getLong("noPreAfiliacion"));
+    	archive.setNoBeneficiario(rs.getLong("noBeneficiario"));
+    	archive.setClaveParentesco(rs.getLong("claveParentesco"));
+    	archive.setClaveTipoArchivo(rs.getLong("claveTipoArchivo"));
+    	archive.setNombre(rs.getString("nombre"));
+    	archive.setUrlArchivo(rs.getString("urlArchivo"));
+    	archive.setEsValido(rs.getInt("esValido"));
+    	archive.setClaveUsuarioRegistro(rs.getLong("claveUsuarioRegistro")); 
+    	archive.setFechaRegistro(rs.getTimestamp("fechaRegistro"));
+    	archive.setClaveUsuarioModificacion(rs.getLong("claveUsuarioModificacion"));
  
         return archive;
     }

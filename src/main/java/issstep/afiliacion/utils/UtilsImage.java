@@ -60,7 +60,7 @@ public class UtilsImage {
 			if(getTipoDeSO().startsWith("Windows"))
 				return getURLBySO() + origen + "\\" + (imgs ? "imagenes\\" : "doctos\\");
 			else
-				return "/repo_app/" + origen + "/" + (imgs ? "imagenes/" : "doctos/");
+				return "/home/ruben/repo_app/" + origen + "/" + (imgs ? "imagenes/" : "doctos/");
 		}
 		
 		public static String getURLBySO() {

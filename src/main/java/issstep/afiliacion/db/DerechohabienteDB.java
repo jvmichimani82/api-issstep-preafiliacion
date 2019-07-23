@@ -1,18 +1,25 @@
 package issstep.afiliacion.db;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
 import issstep.afiliacion.model.Derechohabiente;
 
 @Component
-public class TrabajadorDB {
+public class DerechohabienteDB {
 
 	@Autowired
 	@Qualifier("mysqlJdbcTemplate")
@@ -39,8 +46,13 @@ public class TrabajadorDB {
 		Derechohabiente persona = null;
 		try {
 			persona =  mysqlTemplate.queryForObject(query.toString(), new PersonaRowMapper());
-		} catch (Exception e) {
+		}
+		catch (EmptyResultDataAccessException e) {
+			return null;
+		}
+		catch (Exception e) {
 			e.printStackTrace();
+			return null;
 		}
 		return persona;
 	}
@@ -63,7 +75,11 @@ public class TrabajadorDB {
 		Derechohabiente persona = null;
 		try {
 			persona =  mysqlTemplate.queryForObject(query.toString(), new PersonaRowMapper());
-		} catch (Exception e) {
+		} 
+		catch (EmptyResultDataAccessException e) {
+			return null;
+		}
+		catch (Exception e) {
 			e.printStackTrace();
 		}
 		return persona;
@@ -123,6 +139,72 @@ public class TrabajadorDB {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}		
+	}
+	
+	public long createDerechohabiente( long claveParentesco, Derechohabiente derechohabiente ) {
+		return createOrDeleteDerechohabiente( claveParentesco, derechohabiente, 0, "create");
+	}
+	
+	public long deleteDerechohabiente(  long claveParentesco, long noControl ) {
+		return createOrDeleteDerechohabiente( claveParentesco, null, noControl,"delete");
+	}
+	
+	public long createOrDeleteDerechohabiente(  long claveParentesco, Derechohabiente derechohabiente, long noControl, String opcion) {
+		StringBuilder query = new StringBuilder();
+		
+		
+		if (opcion.equals("create")) {
+			StringBuilder queryUsuario = new StringBuilder();
+			
+			queryUsuario.append("INSERT INTO ");
+		
+			query.append("INSERT INTO DERECHOHABIENTE (NOCONTROL, NOPREAFILIACION, NOMBRE, PATERNO, MATERNO, "
+					+ "EMAIL, FECHANACIMIENTO, SEXO, CURP, RFC, DOMICILIO, "
+					+ "CODIGOPOSTAL, TELEFONOCASA, TELEFONOCELULAR, FECHAPREAFILIACION, SITUACION, "
+					+ "CLAVEUSUARIOREGISTRO, FECHAREGISTRO, CLAVEUSUARIOMODIFICACION, "
+					+ "CLAVEESTADOCIVIL, CLAVECOLONIA, "
+					+ "CLAVECLINICASERVICIO, CLAVELOCALIDAD, CLAVEMUNICIPIO, CLAVEESTADO) VALUES (" 
+					+ derechohabiente.getNoControl() + ", " + derechohabiente.getNoPreAfiliacion()  
+					+ ", '" + derechohabiente.getNombre() + "'" + ", '" + derechohabiente.getPaterno() + "'"
+					+ ", '" + derechohabiente.getMaterno() + "'" + ", '" + derechohabiente.getEmail() + "', '"
+					+ derechohabiente.getFechaNacimiento()+ "', '"  + derechohabiente.getSexo()
+					+ "', '" + derechohabiente.getCurp() + "'" + ", '" + derechohabiente.getRfc() + "'"
+					+ ", '" + derechohabiente.getDomicilio() + "'" + ", '" + derechohabiente.getCodigoPostal() + "'"
+					+ ", '" + derechohabiente.getTelefonoCasa() + "', '" + derechohabiente.getTelefonoCelular() + "', '"
+					+ derechohabiente.getFechaPreAfiliacion() + "', "  + derechohabiente.getSituacion() + ", " 
+					+ derechohabiente.getClaveUsuarioRegistro() + ", '"  + derechohabiente.getFechaRegistro() + "', " 
+					+ derechohabiente.getClaveUsuarioModificacion() + ", "  
+					+ derechohabiente.getClaveEstadoCivil() + ", "  + derechohabiente.getClaveColonia() + ", " 
+					+ derechohabiente.getClaveClinicaServicio() + ", "  + derechohabiente.getClaveLocalidad() + ", " 
+					+ derechohabiente.getClaveMunicipio() + ", "  + derechohabiente.getClaveEstado() + ")" );
+		}
+		else 
+			query.append("DELETE FROM DERECHOHABIENTE WHERE noControl = " + noControl);
+		
+		System.out.println(query.toString());
+		
+		try {
+			KeyHolder keyHolder = new GeneratedKeyHolder();
+			mysqlTemplate.update(
+	    	    new PreparedStatementCreator() {
+	    	        public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+	    	            PreparedStatement pst = con.prepareStatement(query.toString(), new String[] {"noControl"});
+	    	            return pst;
+	    	        }
+	    	    },
+	    	    keyHolder);
+			
+			return (opcion.equals("create")) ? (long) derechohabiente.getNoControl() : (long) 1;		
+	    	
+		} 
+		catch (DataIntegrityViolationException e) {
+			return (long) -1;
+	    }
+		catch (Exception e) {
+			e.printStackTrace();
+			return (long) 0;
+		}
+		
 	}	
 }
 
