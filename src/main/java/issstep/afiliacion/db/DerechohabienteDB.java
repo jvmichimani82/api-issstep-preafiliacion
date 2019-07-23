@@ -141,15 +141,15 @@ public class DerechohabienteDB {
 		}		
 	}
 	
-	public long createDerechohabiente( long claveParentesco, Derechohabiente derechohabiente ) {
-		return createOrDeleteDerechohabiente( claveParentesco, derechohabiente, 0, "create");
+	public long createDerechohabiente( Derechohabiente derechohabiente ) {
+		return createOrDeleteDerechohabiente( derechohabiente, 0, "create");
 	}
 	
-	public long deleteDerechohabiente(  long claveParentesco, long noControl ) {
-		return createOrDeleteDerechohabiente( claveParentesco, null, noControl,"delete");
+	public long deleteDerechohabiente(  long noControl ) {
+		return createOrDeleteDerechohabiente( null, noControl,"delete");
 	}
 	
-	public long createOrDeleteDerechohabiente(  long claveParentesco, Derechohabiente derechohabiente, long noControl, String opcion) {
+	public long createOrDeleteDerechohabiente(  Derechohabiente derechohabiente, long noControl, String opcion) {
 		StringBuilder query = new StringBuilder();
 		
 		

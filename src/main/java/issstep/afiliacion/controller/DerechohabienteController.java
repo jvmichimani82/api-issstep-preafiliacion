@@ -61,12 +61,11 @@ public class DerechohabienteController {
     
     @ApiOperation(value = "Registro de derechohabiente")
     @JsonView(Derechohabiente.Views.RegistroDerechohabiente.class)
-    @RequestMapping(value = "/registro/{claveParentesco}", method = RequestMethod.POST)
-    public ResponseEntity<?> registraDerechohabiente(@PathVariable long claveParentesco, 
-    												 @ApiParam(value = DerechohabienteCONST.registroDerechohabiente, required = true)@RequestBody Derechohabiente derechohabiente,
+    @RequestMapping(value = "/registro", method = RequestMethod.POST)
+    public ResponseEntity<?> registraDerechohabiente(@ApiParam(value = DerechohabienteCONST.registroDerechohabiente, required = true)@RequestBody Derechohabiente derechohabiente,
     												 HttpServletResponse response) {
    
-    	return derechohabienteService.registraDerechohabiente(claveParentesco, derechohabiente);
+    	return derechohabienteService.registraDerechohabiente(derechohabiente);
     }
     
 }

@@ -162,7 +162,7 @@ public class DerechohabienteService {
 	}
 	
 	
-	public ResponseEntity<?> registraDerechohabiente(long claveParentesco, Derechohabiente derechohabiente) {
+	public ResponseEntity<?> registraDerechohabiente( Derechohabiente derechohabiente ) {
 		try{
 			
 			Derechohabiente oldderechohabiente = personaDB.getPersonaByColumnaStringValor("CURP", derechohabiente.getCurp());
@@ -189,7 +189,7 @@ public class DerechohabienteService {
 			derechohabiente.setClaveUsuarioRegistro(claveUsuario); */
 			derechohabiente.setFechaRegistro(new Timestamp(new Date().getTime()));
 			derechohabiente.setFechaPreAfiliacion(new Timestamp(new Date().getTime()));
-			long estatusRegistro = personaDB.createDerechohabiente(claveParentesco, derechohabiente);
+			long estatusRegistro = personaDB.createDerechohabiente( derechohabiente);
 			
 			if (estatusRegistro == 0) {
 				System.out.println("No registrado");
@@ -201,9 +201,9 @@ public class DerechohabienteService {
 				return new ResponseEntity<>(new Mensaje("No de control y no de pre-aficiliacion duplicados"), HttpStatus.CONFLICT);
 			}
 			
-			return registraUsuario( false, derechohabiente, claveParentesco );
+			// return registraUsuario( false, derechohabiente, claveParentesco );
 			
-			// return new ResponseEntity<>(derechohabiente, HttpStatus.CREATED);					
+			return new ResponseEntity<>(derechohabiente, HttpStatus.CREATED);					
 			
 		}
 		catch(DataIntegrityViolationException e){
