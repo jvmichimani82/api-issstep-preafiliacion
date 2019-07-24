@@ -155,6 +155,23 @@ public class UsuarioDB {
 		
 	}
 	
+	public void actualizaToken (String token, long noControl, long noAfiliacion) {
+		StringBuilder query = new StringBuilder();
+		query.append("UPDATE USUARIO SET TOKEN = ? WHERE NOCONTROL = ? AND NOAFILIACION = ? ");
+			
+		System.out.println(query.toString());
+		
+		try {
+			  mysqlTemplate.update(query.toString(), new Object[] { 
+					token, noControl, noAfiliacion
+			});
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
 	public long createUsuario( long claveParentesco, Usuario usuario ) {
 		return createOrDeleteUsuario( claveParentesco, usuario, 0, "create");
 	}

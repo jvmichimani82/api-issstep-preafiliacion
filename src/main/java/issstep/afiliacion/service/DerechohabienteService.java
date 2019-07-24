@@ -303,4 +303,21 @@ public class DerechohabienteService {
 		}
 	}
 	
+	public ResponseEntity<?> solicitudRecuperarPassword(String email) {
+		Derechohabiente derechohabiente = personaDB.getPersonaByColumnaStringValor("EMAIL", email);
+		
+		if (derechohabiente != null) {
+			String token = Utils.sha256(email);
+			
+			usuarioDB.actualizaToken( token, derechohabiente.getNoControl(), derechohabiente.getNoPreAfiliacion());
+			
+			mailService.prepareAndSendResetPass("issstepregistro@gmail.com", derechohabiente.getNombreCompleto(), token);
+			
+			return new ResponseEntity<>(new Mensaje("Solicitud de actualización enviada."), HttpStatus.OK);
+		}
+		else
+			return new ResponseEntity<>(new Mensaje("El correo electrónico no existe."), HttpStatus.CONFLICT);
+		
+	}
+	
 }

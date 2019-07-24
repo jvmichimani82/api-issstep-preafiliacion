@@ -67,6 +67,7 @@ public class DerechohabienteCONST {
 			"			    \"password\": \"nuevoPassword\"\n" +
 			"			    }" ;
 
-		
+	public static final String email ="{\"email\":\"email@correo.com\"}";
+	
 	public static final String curp ="{\"curp\":\"VAMJ820830HPLLCS07\"}";
 }
