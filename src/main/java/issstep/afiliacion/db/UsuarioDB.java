@@ -85,6 +85,28 @@ public class UsuarioDB {
 		return user;
 	}
 	
+	public Usuario getUsuarioByColumnaStringValor(String campo, String valor) {
+		StringBuilder query = new StringBuilder();
+		query.append("SELECT CLAVEUSUARIO, CLAVEROL, LOGIN, TOKEN, PASSWORD, FECHAREGISTRO, "
+				+ "FECHAULTIMOACCESO, ESTATUS, NOCONTROL, NOAFILIACION FROM USUARIO WHERE "
+				+ campo + " = '" + valor +"'");
+	
+		System.out.println(query.toString());
+		
+		Usuario user = null;
+		try {
+			user =  mysqlTemplate.queryForObject(query.toString(), new UsuarioRowMapper());
+			return user;
+		} 
+		catch (EmptyResultDataAccessException e) {
+			return null;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
 	public int insertar (Derechohabiente derechohabiente, Usuario usuario, long claveParentesco) {
 		StringBuilder query = new StringBuilder();
 		

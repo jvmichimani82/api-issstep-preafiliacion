@@ -66,6 +66,12 @@ public class DerechohabienteCONST {
 			"			    \"token\": \"5c7096378ade17e9cf5b53ac6490d0e431ea5a99e6d01ba81f257f03a95b70ef\",\n" + 
 			"			    \"password\": \"nuevoPassword\"\n" +
 			"			    }" ;
+	
+	public static final String actualizarPassword="Json para Actualizar password\n\n"+"{"
+			+"\n" + 
+			"			    \"email\": \"email@correo.com\",\n" + 
+			"			    \"password\": \"nuevoPassword\"\n" +
+			"			    }" ;
 
 	public static final String email ="{\"email\":\"email@correo.com\"}";
 	

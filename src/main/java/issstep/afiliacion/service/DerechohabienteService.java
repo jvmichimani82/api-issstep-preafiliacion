@@ -25,7 +25,9 @@ import issstep.afiliacion.model.Mensaje;
 import issstep.afiliacion.model.ResetPassword;
 import issstep.afiliacion.model.Derechohabiente;
 import issstep.afiliacion.model.Usuario;
+import issstep.afiliacion.model.ActualizarPassword;
 import issstep.afiliacion.model.Beneficiario;
+import issstep.afiliacion.model.CatalogoGenerico;
 import issstep.afiliacion.utils.Utils;
 
 
@@ -319,5 +321,19 @@ public class DerechohabienteService {
 			return new ResponseEntity<>(new Mensaje("El correo electrónico no existe."), HttpStatus.CONFLICT);
 		
 	}
+	
+	public ResponseEntity<?> actualizarPassword( ActualizarPassword actualizarPassword) {	
+		
+		Usuario usuario = usuarioDB.getUsuarioByColumnaStringValor("LOGIN", actualizarPassword.getEmail());
+		
+		if (usuario == null)
+			return new ResponseEntity<>(new Mensaje("No existe el usuario con email: " + actualizarPassword.getEmail()), HttpStatus.CONFLICT);		
+				
+		usuario.setPasswd(Hashing.sha256().hashString(actualizarPassword.getPassword(), Charsets.UTF_8).toString());
+		usuarioDB.actualiza(usuario);
+		
+		return new ResponseEntity<>(usuario , HttpStatus.OK);	
+				
+    }
 	
 }
