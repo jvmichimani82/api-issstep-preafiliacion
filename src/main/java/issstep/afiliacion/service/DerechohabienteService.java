@@ -144,7 +144,7 @@ public class DerechohabienteService {
 		try{	
 			Usuario usuario = usuarioDB.getUsuarioByToken(token);
 			if(usuario != null){
-				if(usuario.getEstatus() <= 0){
+				if(usuario.getEstatus() == -1){
 					
 					usuario.setEstatus(1);
 					usuario.setFechaUltimoAcceso(new Timestamp(new Date().getTime()));
@@ -153,10 +153,15 @@ public class DerechohabienteService {
 					
 					return new ResponseEntity<>(new Mensaje("Usuario activado correctamente"), HttpStatus.OK);
 					
-				}else{
+				}
+				else {
+					usuario.setFechaUltimoAcceso(new Timestamp(new Date().getTime()));
+					usuario.setToken(null);
+					usuarioDB.actualiza(usuario);
 					return new ResponseEntity<>(new Mensaje("Usuario previamente activo"), HttpStatus.CONFLICT);
 				}	
-			}else{
+			}
+			else {
 				return new ResponseEntity<>(new Mensaje("Token invalido"), HttpStatus.CONFLICT);
 			}
 		}catch (Exception ex){

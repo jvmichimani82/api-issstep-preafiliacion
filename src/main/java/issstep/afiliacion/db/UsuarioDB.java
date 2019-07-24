@@ -137,15 +137,15 @@ public class UsuarioDB {
 	
 	public void actualiza (Usuario usuario) {
 		StringBuilder query = new StringBuilder();
-		query.append("UPDATE USUARIO SET ROL = ?, PASSWORD = ?, TOKEN = ?, ULTIMOREGISTRO = ?, ESTATUS = ? WHERE USUARIO = ? ");
+		query.append("UPDATE USUARIO SET CLAVEROL = ?, PASSWORD = ?, TOKEN = ?, FECHAULTIMOACCESO = ?, ESTATUS = ? WHERE CLAVEUSUARIO = ? ");
 			
 		System.out.println(query.toString());
 		
 		try {
-			  /*mysqlTemplate.update(query.toString(), new Object[] { 
-					usuario.getRol(), usuario.getPasswd(), usuario.getToken(), 
-					usuario.getUltimaModificacion(),usuario.getEstatus(), usuario.getId()
-			});*/
+			  mysqlTemplate.update(query.toString(), new Object[] { 
+					usuario.getClaveRol(), usuario.getPasswd(), usuario.getToken(), 
+					usuario.getFechaUltimoAcceso(),usuario.getEstatus(), usuario.getClaveUsuario()
+			});
 		} 
 		catch (EmptyResultDataAccessException e) {
 		}
