@@ -13,14 +13,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.ApiParam;
-import issstep.afiliacion.cons.DerechohabienteCONST;
-import issstep.afiliacion.model.Derechohabiente;
 import issstep.afiliacion.model.Mensaje;
-import issstep.afiliacion.model.ResetPassword;
 import issstep.afiliacion.model.Usuario;
 import issstep.afiliacion.security.JwtAuthenticationRequest;
 import issstep.afiliacion.security.JwtAuthenticationResponse;
@@ -29,7 +25,6 @@ import issstep.afiliacion.service.DerechohabienteService;
 import issstep.afiliacion.service.TokenAuthenticationService;
 
 import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletResponse;
 
 @RestController
 public class AuthenticationRestController {
@@ -76,12 +71,6 @@ public class AuthenticationRestController {
 	public ResponseEntity<?> activarRegistro(@ApiParam(value = "Token", required = true) @PathVariable String token) {
 
     	return derechohabienteService.activarRegistro(token);
-	}
-    
-    @RequestMapping(value = "/recuperar/password", method=RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> recuperarPassword(@ApiParam(value = DerechohabienteCONST.recuperarPassword, required = true)@RequestBody ResetPassword resetPassword, HttpServletResponse response ){
-
-    	return derechohabienteService.recuperarPassword(resetPassword);
 	}
     
 }

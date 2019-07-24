@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiParam;
 import issstep.afiliacion.cons.DerechohabienteCONST;
 import issstep.afiliacion.model.Curp;
 import issstep.afiliacion.model.Derechohabiente;
+import issstep.afiliacion.model.ResetPassword;
 import issstep.afiliacion.model.Usuario;
 import issstep.afiliacion.model.Beneficiario;
 import issstep.afiliacion.service.DerechohabienteService;
@@ -84,5 +85,12 @@ public class DerechohabienteController {
    
     	return derechohabienteService.asignarBeneficiario( beneficiario );
     }
+    
+    @ApiOperation(value = "Resetear password")
+    @RequestMapping(value = "/recuperar/password", method=RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> recuperarPassword(@ApiParam(value = DerechohabienteCONST.recuperarPassword, required = true)@RequestBody ResetPassword resetPassword, HttpServletResponse response ){
+
+    	return derechohabienteService.recuperarPassword(resetPassword);
+	}
     
 }
