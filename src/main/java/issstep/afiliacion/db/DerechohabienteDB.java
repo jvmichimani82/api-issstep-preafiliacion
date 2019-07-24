@@ -4,11 +4,16 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
@@ -24,6 +29,8 @@ public class DerechohabienteDB {
 	@Autowired
 	@Qualifier("mysqlJdbcTemplate")
 	private JdbcTemplate mysqlTemplate;
+	
+	SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
 	public Derechohabiente getPersonaByColumnaStringValor(String columna, String valor) {
 		StringBuilder query = new StringBuilder();
@@ -55,6 +62,59 @@ public class DerechohabienteDB {
 			return null;
 		}
 		return persona;
+	}
+	
+	
+	public Derechohabiente getPersonaByNombre(Derechohabiente persona, HttpServletResponse response) {
+		StringBuilder query = new StringBuilder();
+		query.append( "SELECT DH.*, EF.DESCRIPCION AS ENTIDAD, M.DESCRIPCION AS MUNICIPIO, L.DESCRIPCION AS LOCALIDAD, C.DESCRIPCION AS COLONIA, EDOCVIL.DESCRIPCION AS ESTADOCIVIL, CSERV.DESCRIPCION AS CLINICA  "
+					+ "FROM DERECHOHABIENTE DH, KESTADO EF, KMUNICIPIO M, KLOCALIDAD L, KCOLONIA AS C, KESTADOCIVIL EDOCVIL, KCLINICASERVICIO CSERV "
+					+ "WHERE DH.CLAVEESTADO = EF.CLAVEESTADO AND "
+					+ "DH.CLAVEMUNICIPIO = M.CLAVEMUNICIPIO AND "
+					+ "DH.CLAVECOLONIA = C.CLAVECOLONIA AND "
+					+ "DH.CLAVECLINICASERVICIO = CSERV.CLAVECLINICASERVICIO AND "
+					+ "DH.CLAVEESTADOCIVIL = EDOCVIL.CLAVEESTADOCIVIL AND "
+					+ "DH.CLAVEMUNICIPIO = L.CLAVEMUNICIPIO AND DH.CLAVELOCALIDAD = L.CLAVELOCALIDAD AND ");
+		
+		query.append("DH.PATERNO");
+		query.append(" LIKE '%");
+		query.append(persona.getPaterno());
+		query.append("%'");
+		query.append(" AND ");
+		query.append("DH.MATERNO");
+		query.append(" LIKE '%");
+		query.append(persona.getMaterno());
+		query.append("%'");
+		query.append(" AND ");
+		query.append("DH.NOMBRE");
+		query.append(" LIKE '%");
+		query.append(persona.getNombre());
+		query.append("%'");
+		query.append(" AND ");
+		query.append("DH.CLAVEESTADO");
+		query.append("= ");
+		query.append(persona.getClaveEstado());
+		query.append(" AND ");
+		query.append("DH.FECHANACIMIENTO");
+		query.append("= '");
+		query.append(format.format(persona.getFechaNacimiento()));
+		query.append("'");	
+		System.out.println("Consulta ==> " + query.toString());
+		
+		
+		Derechohabiente personaOld = null;
+		try {
+			personaOld =  mysqlTemplate.queryForObject(query.toString().toUpperCase(), new PersonaRowMapper());
+		}
+		catch (EmptyResultDataAccessException e) {
+			return null;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			response.setStatus(429);
+			return null;
+		}
+		return personaOld;
 	}
 	
 	public Derechohabiente getPersonaById(long noControl) {

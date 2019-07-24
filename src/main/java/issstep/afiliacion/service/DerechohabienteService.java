@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import java.sql.Timestamp;
 import java.util.Date;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +53,20 @@ public class DerechohabienteService {
 		
 		else
 			return new ResponseEntity<>(new Mensaje("No existe persona con esa curp"), HttpStatus.CONFLICT);
+		
+    }
+	
+	public ResponseEntity<?> getPersonaByNombre(Derechohabiente persona, HttpServletResponse response) {
+		Derechohabiente personaOld =  personaDB.getPersonaByNombre(persona, response);
+		
+		if (personaOld != null)
+			return new ResponseEntity<>(personaOld, HttpStatus.OK);
+		else {
+			if(response.getStatus() == 429)
+				return new ResponseEntity<>(new Mensaje("Multiples resultados para la busqueda"), HttpStatus.CONFLICT);
+			else
+				return new ResponseEntity<>(new Mensaje("No existe persona con esos datos"), HttpStatus.CONFLICT);	
+		}
 		
     }
 	

@@ -39,6 +39,13 @@ public class DerechohabienteController {
     }
     
     @JsonView(Derechohabiente.Views.Simple.class)
+    @RequestMapping(value = "/validadNombre", method = RequestMethod.POST)
+    public ResponseEntity<?> validaPersonaNombre( @ApiParam(value = DerechohabienteCONST.buscaDerechohabiente, required = true)  @RequestBody Derechohabiente persona, HttpServletResponse response) {
+
+    	return derechohabienteService.getPersonaByNombre(persona, response);
+    }
+    
+    @JsonView(Derechohabiente.Views.Simple.class)
     @RequestMapping(value = "/{idPersona}", method = RequestMethod.GET)
     public ResponseEntity<?> getPersonaById(@ApiParam(value = "idPersona", required = true) @PathVariable long idPersona, HttpServletResponse response) {
 

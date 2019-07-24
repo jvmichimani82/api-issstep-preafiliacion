@@ -43,6 +43,17 @@ public class DerechohabienteCONST {
 			
 			"			    }" ;
 	
+	public static final String buscaDerechohabiente="Json para Busqueda de derechohabiente\n\n"+"{"
+			+"\n" + 
+			"			    \"nombre\": \"JULIAN CAMILO AURELIO\",\n" + 
+			"			    \"paterno\": \"ABAD\",\n" + 
+			"			    \"materno\": \"CAMACHO\",\n" + 
+			"			    \"fechaNacimiento\": \"-544903200000\",\n" +
+			"			    \"sexo\": \"M\",\n" + 
+			"			    \"claveEstado\": 21\n" +
+			
+			"			    }" ;
+	
 	public static final String asignaBeneficiario="Json para Asignar beneficiario a derechohabiente\n\n"+"{"
 			+"\n" + 
 			"			    \"noControl\": 20011,\n" + 
