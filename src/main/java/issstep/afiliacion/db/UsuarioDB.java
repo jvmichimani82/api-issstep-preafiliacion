@@ -7,6 +7,7 @@ import java.sql.SQLException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
@@ -37,10 +38,15 @@ public class UsuarioDB {
 		Usuario user = null;
 		try {
 			user =  mysqlTemplate.queryForObject(query.toString(), new UsuarioRowMapper());
-		} catch (Exception e) {
-			e.printStackTrace();
+			return user;
+		} 
+		catch (EmptyResultDataAccessException e) {
+			return null;
 		}
-		return user;
+		catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	public Usuario getUsuarioById(long id) {
@@ -51,7 +57,11 @@ public class UsuarioDB {
 		Usuario user = null;
 		try {
 			user =  mysqlTemplate.queryForObject(query.toString(), new UsuarioRowMapper());
-		} catch (Exception e) {
+		} 
+		catch (EmptyResultDataAccessException e) {
+			return null;
+		}
+		catch (Exception e) {
 			e.printStackTrace();
 		}
 		return user;
@@ -65,7 +75,11 @@ public class UsuarioDB {
 		Usuario user = null;
 		try {
 			user =  mysqlTemplate.queryForObject(query.toString(), new UsuarioRowMapper());
-		} catch (Exception e) {
+		} 
+		catch (EmptyResultDataAccessException e) {
+			return null;
+		}
+		catch (Exception e) {
 			e.printStackTrace();
 		}
 		return user;
@@ -86,8 +100,13 @@ public class UsuarioDB {
 				return  mysqlTemplate.update(query.toString(), new Object[] { usuario.getNoControl(),
 						usuario.getClaveRol(), usuario.getLogin(), usuario.getPasswd(), usuario.getToken(), 
 						usuario.getFechaRegistro(), usuario.getEstatus(), usuario.getNoAfiliacion()});
-			} catch (Exception e) {
+			} 
+			catch (EmptyResultDataAccessException e) {
+				return 0;
+			}
+			catch (Exception e) {
 				e.printStackTrace();
+				return 0;
 			}			
 		};		
 		return 0;
@@ -105,7 +124,11 @@ public class UsuarioDB {
 			return  mysqlTemplate.update(query.toString(), new Object[] { derechohabiente.getNoControl(),
 					derechohabiente.getNoPreAfiliacion(), claveParentesco, derechohabiente.getFechaPreAfiliacion(),
 					1, derechohabiente.getClaveUsuarioRegistro(), derechohabiente.getFechaRegistro() });
-		} catch (Exception e) {
+		} 
+		catch (EmptyResultDataAccessException e) {
+			return 0;
+		}
+		catch (Exception e) {
 			e.printStackTrace();
 			return 0;
 		}
@@ -114,16 +137,19 @@ public class UsuarioDB {
 	
 	public void actualiza (Usuario usuario) {
 		StringBuilder query = new StringBuilder();
-		query.append("UPDATE USUARIO SET ROL = ?, PASSWORD = ?, TOKEN = ?, ULTIMOREGISTRO = ?, ESTATUS = ? WHERE USUARIO = ? ");
+		query.append("UPDATE USUARIO SET CLAVEROL = ?, PASSWORD = ?, TOKEN = ?, FECHAULTIMOACCESO = ?, ESTATUS = ? WHERE CLAVEUSUARIO = ? ");
 			
 		System.out.println(query.toString());
 		
 		try {
-			  /*mysqlTemplate.update(query.toString(), new Object[] { 
-					usuario.getRol(), usuario.getPasswd(), usuario.getToken(), 
-					usuario.getUltimaModificacion(),usuario.getEstatus(), usuario.getId()
-			});*/
-		} catch (Exception e) {
+			  mysqlTemplate.update(query.toString(), new Object[] { 
+					usuario.getClaveRol(), usuario.getPasswd(), usuario.getToken(), 
+					usuario.getFechaUltimoAcceso(),usuario.getEstatus(), usuario.getClaveUsuario()
+			});
+		} 
+		catch (EmptyResultDataAccessException e) {
+		}
+		catch (Exception e) {
 			e.printStackTrace();
 		}
 		
