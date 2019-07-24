@@ -49,6 +49,12 @@ public class DerechohabienteCONST {
 			"			    \"noPreAfiliacion\": 20011,\n" +
 			"			    \"claveParentesco\": 1\n" +
 			"			    }" ;
+	
+	public static final String recuperarPassword="Json para Recuperar password\n\n"+"{"
+			+"\n" + 
+			"			    \"token\": \"5c7096378ade17e9cf5b53ac6490d0e431ea5a99e6d01ba81f257f03a95b70ef\",\n" + 
+			"			    \"password\": \"nuevoPassword\"\n" +
+			"			    }" ;
 
 		
 	public static final String curp ="{\"curp\":\"VAMJ820830HPLLCS07\"}";

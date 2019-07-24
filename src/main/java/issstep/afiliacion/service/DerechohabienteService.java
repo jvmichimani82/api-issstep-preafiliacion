@@ -20,6 +20,7 @@ import issstep.afiliacion.db.DerechohabienteDB;
 import issstep.afiliacion.db.UsuarioDB;
 import issstep.afiliacion.db.BeneficiarioDB;
 import issstep.afiliacion.model.Mensaje;
+import issstep.afiliacion.model.ResetPassword;
 import issstep.afiliacion.model.Derechohabiente;
 import issstep.afiliacion.model.Usuario;
 import issstep.afiliacion.model.Beneficiario;
@@ -171,6 +172,28 @@ public class DerechohabienteService {
 		}
 	}
 	
+	public ResponseEntity<?> recuperarPassword(ResetPassword resetPassword){
+		try{	
+			Usuario usuario = usuarioDB.getUsuarioByToken(resetPassword.getToken());
+			if(usuario != null){
+					usuario.setFechaUltimoAcceso(new Timestamp(new Date().getTime()));
+					usuario.setToken(null);
+					usuario.setPasswd(Hashing.sha256().hashString(resetPassword.getPassword(), Charsets.UTF_8).toString());
+					usuarioDB.actualiza(usuario);
+					
+					return new ResponseEntity<>(new Mensaje("Password actualizado correctamente"), HttpStatus.OK);
+					
+			}
+			else {
+				return new ResponseEntity<>(new Mensaje("Token invalido"), HttpStatus.CONFLICT);
+			}
+		}
+		catch (Exception ex){
+			ex.printStackTrace();
+			System.err.println("Exception recuperarPassword");
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 	
 	public ResponseEntity<?> registraDerechohabiente( Derechohabiente derechohabiente ) {
 		try{
