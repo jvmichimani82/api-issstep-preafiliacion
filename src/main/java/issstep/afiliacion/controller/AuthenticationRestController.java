@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import issstep.afiliacion.model.Mensaje;
 import issstep.afiliacion.model.Usuario;
 import issstep.afiliacion.security.JwtAuthenticationRequest;
 import issstep.afiliacion.security.JwtAuthenticationResponse;
@@ -49,11 +50,19 @@ public class AuthenticationRestController {
 	        Usuario usuarioDetails = (Usuario) authentication.getPrincipal();
 	        System.out.println("Usuario ==> ");
 	        System.out.println(usuarioDetails.getNoControl());
+	        System.out.println(usuarioDetails.getEstatus());
+	        
+	        if (usuarioDetails.getEstatus() == -1 )
+	        	return new ResponseEntity<>(new Mensaje("Usuario no activo"), HttpStatus.CONFLICT);
+	        
+	        if (usuarioDetails.getEstatus() == 0 )
+	        	return new ResponseEntity<>(new Mensaje("Usuario no desactivado"), HttpStatus.CONFLICT);
+	        
    	        String token = jwtTokenUtil.generateToken(usuarioDetails, device, usuarioDetails);
 		     
 		    return ResponseEntity.ok(new JwtAuthenticationResponse(token));
 	    
     	}
-    	return (ResponseEntity<?>) ResponseEntity.badRequest();
+    	return new ResponseEntity<>(new Mensaje("No existe el usuario"), HttpStatus.BAD_REQUEST);
     }
 }
