@@ -17,9 +17,6 @@ import lombok.Setter;
 @Builder
 public class Derechohabiente {
 
-	@JsonView({Derechohabiente.Views.Simple.class, Derechohabiente.Views.RegistroDerechohabiente.class})
-	long id;
-	
 	@JsonView({Derechohabiente.Views.Simple.class})
 	long noControl;
 	
@@ -117,7 +114,7 @@ public class Derechohabiente {
 	String estadoCivil;
 	
 	@JsonView({Derechohabiente.Views.Simple.class})	
-	String nombreComDerechohabientepleto;
+	String nombreCompleto;
 	
 	@JsonView({Derechohabiente.Views.RegistroDerechohabiente.class})
 	Usuario usuario;
@@ -128,7 +125,7 @@ public class Derechohabiente {
 	}
 	
 	public static final class Views {
-		public interface Simple {}
+		public interface Simple extends Mensaje.Views.Simple {}
 		public interface RegistroDerechohabiente {}
 	}
 
