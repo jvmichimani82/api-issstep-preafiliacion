@@ -19,6 +19,7 @@ import issstep.afiliacion.cons.DerechohabienteCONST;
 import issstep.afiliacion.model.Curp;
 import issstep.afiliacion.model.Derechohabiente;
 import issstep.afiliacion.model.Usuario;
+import issstep.afiliacion.model.Beneficiario;
 import issstep.afiliacion.service.DerechohabienteService;
 import javax.servlet.http.HttpServletResponse;
 
@@ -66,6 +67,15 @@ public class DerechohabienteController {
     												 HttpServletResponse response) {
    
     	return derechohabienteService.registraDerechohabiente(derechohabiente);
+    }
+    
+    @ApiOperation(value = "Asignar beneficiario")
+    @JsonView(Derechohabiente.Views.RegistroDerechohabiente.class)
+    @RequestMapping(value = "/asignar/beneficiario", method = RequestMethod.POST)
+    public ResponseEntity<?> asignarBeneficiario(@ApiParam(value = DerechohabienteCONST.asignaBeneficiario, required = true)@RequestBody Beneficiario beneficiario,
+    											 HttpServletResponse response) {
+   
+    	return derechohabienteService.asignarBeneficiario( beneficiario );
     }
     
 }

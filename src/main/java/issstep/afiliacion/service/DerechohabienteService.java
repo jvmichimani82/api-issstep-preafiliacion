@@ -18,9 +18,11 @@ import com.google.common.hash.Hashing;
 
 import issstep.afiliacion.db.DerechohabienteDB;
 import issstep.afiliacion.db.UsuarioDB;
+import issstep.afiliacion.db.BeneficiarioDB;
 import issstep.afiliacion.model.Mensaje;
 import issstep.afiliacion.model.Derechohabiente;
 import issstep.afiliacion.model.Usuario;
+import issstep.afiliacion.model.Beneficiario;
 import issstep.afiliacion.utils.Utils;
 
 
@@ -34,6 +36,9 @@ public class DerechohabienteService {
 	
 	@Autowired
 	UsuarioDB usuarioDB;
+	
+	@Autowired
+	BeneficiarioDB beneficiarioDB;
 	
 	@Autowired
 	MailService mailService;
@@ -193,7 +198,7 @@ public class DerechohabienteService {
 			
 			if (estatusRegistro == 0) {
 				System.out.println("No registrado");
-				return new ResponseEntity<>(new Mensaje("No fue posible registrar al derechohabiente"), HttpStatus.CONFLICT);
+				return new ResponseEntity<>(new Mensaje("No fue posible registrar al derechohabiente"), HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 			
 			if (estatusRegistro == -1) {
@@ -217,6 +222,41 @@ public class DerechohabienteService {
 			return  new ResponseEntity<>(null,null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}	
 	
+	}
+	
+	public ResponseEntity<?> asignarBeneficiario( Beneficiario beneficiario) {
+		Beneficiario oldBeneficiario = beneficiarioDB.getBeneficiario(beneficiario.getNoControl(), beneficiario.getNoPreAfiliacion(), beneficiario.getClaveParentesco());
+		
+		if (oldBeneficiario != null)
+			return new ResponseEntity<>(new Mensaje("Ya existe el beneficiario"), HttpStatus.CONFLICT);
+		
+		try{
+			Derechohabiente oldPersona = personaDB.getPersonaById(beneficiario.getNoControl());
+			
+			if (oldPersona == null) 
+				return new ResponseEntity<>(new Mensaje("No existe el derechohabiente"), HttpStatus.CONFLICT);
+			
+			oldPersona.setSituacion(1);
+			oldPersona.setFechaRegistro(new Timestamp(new Date().getTime()));
+				
+			long noBeneficiario = beneficiarioDB.createBeneficiario(oldPersona, beneficiario.getClaveParentesco());
+			
+			 if (noBeneficiario == 0)
+				 return new ResponseEntity<>(new Mensaje("No fue posible asignar el beneficiario"), HttpStatus.INTERNAL_SERVER_ERROR);
+			  
+			 return new ResponseEntity<>(noBeneficiario, HttpStatus.CREATED);
+			 	 
+		}
+		catch(DataIntegrityViolationException e){
+			System.err.println("Exception PersonaService.asignarBeneficiario");
+			e.printStackTrace();
+			return  new ResponseEntity<>(null,null, HttpStatus.BAD_REQUEST);
+		}
+		catch(Exception e){
+			System.err.println("Exception PersonaService.asignarBeneficiario");
+			e.printStackTrace();
+			return  new ResponseEntity<>(null,null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 }

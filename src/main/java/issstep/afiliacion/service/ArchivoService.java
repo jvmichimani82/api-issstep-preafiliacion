@@ -111,6 +111,8 @@ public class ArchivoService{
 		try {
 			
 			Archivo archivo = archivoDB.getArchivo(claveDocumento);
+			System.out.println(archivo);
+			
 			if(archivo != null) {
 			
 				String nombreTemp = archivo.getUrlArchivo();
@@ -177,8 +179,8 @@ public class ArchivoService{
 	
 	public ResponseEntity<?> deleteDocumento(long claveDocumento, HttpServletResponse response) {
 		try {
-			
-			/*Archivo archivo = archivoRepository.findOne(claveDocumento);
+			/*
+			Archivo archivo = archivoRepository.findOne(claveDocumento);
 			if(archivo != null) {
 				UtilsImage.deleteDocto(archivo.getUrlArchivo());
 				archivoRepository.delete(archivo);

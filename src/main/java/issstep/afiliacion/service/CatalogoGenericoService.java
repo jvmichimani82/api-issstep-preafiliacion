@@ -1,5 +1,7 @@
 package issstep.afiliacion.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,10 +20,20 @@ public class CatalogoGenericoService {
 	CatalogoGenericoDB catalogoGenericoDB;
 		
 	public ResponseEntity<?> getRegisters( String catalogo ) {	
-		return new ResponseEntity<>(catalogoGenericoDB.getRegistros(catalogo), HttpStatus.OK);	
+		List<CatalogoGenerico> registros = catalogoGenericoDB.getRegistros(catalogo);
+		
+		if (registros == null)
+			return new ResponseEntity<>(new Mensaje("No existe el catalogo: " + catalogo), HttpStatus.NOT_FOUND);
+		
+		return new ResponseEntity<>(registros, HttpStatus.OK);	
     }
 	
-	public ResponseEntity<?> getRegister( String catalogo, long id ) {	
+	public ResponseEntity<?> getRegister( String catalogo, long id ) {
+		List<CatalogoGenerico> registros = catalogoGenericoDB.getRegistros(catalogo);
+		
+		if (registros == null)
+			return new ResponseEntity<>(new Mensaje("No existe el catalogo: " + catalogo), HttpStatus.NOT_FOUND);
+		
 		CatalogoGenerico catalogoGenerico = catalogoGenericoDB.getRegistro(catalogo, id);
 		
 		if (catalogoGenerico != null) 

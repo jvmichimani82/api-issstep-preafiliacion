@@ -26,11 +26,34 @@ public class CatalogoGenericoDB {
 	@Qualifier("mysqlJdbcTemplate")
 	private JdbcTemplate mysqlTemplate;
 	
-	public List<CatalogoGenerico> getRegistros( String catalogo ) {
-		StringBuilder query = new StringBuilder();
-		query.append("SELECT ID, DESCRIPCION FROM " + catalogo + " WHERE ESTATUS = 1");
+	public String getNombreId( String catalogo ) {
+		String nombreId = "";
 		
-		 List<CatalogoGenerico> documentos = null;
+		switch (catalogo) {
+			case "KESTADO": 	 nombreId = "CLAVEESTADO"; break;
+			case "KESTADOCIVIL": nombreId = "CLAVEESTADOcivil"; break;
+			case "KESTATUS": 	 nombreId = "CLAVEESTATUS"; break;
+			case "KPARENTESCO":  nombreId = "CLAVEPARENTESCO"; break;
+			case "KREGION": 	 nombreId = "CLAVEREGION"; break;
+			case "KROL": 		 nombreId = "CLAVEROL"; break;
+			case "KSITUACION":   nombreId = "CLAVESITUACION"; break;
+			case "KTIPOARCHIVO": nombreId = "CLAVETIPOARCHIVO"; break;
+		}
+		
+		return nombreId;
+	}
+	
+	
+	public List<CatalogoGenerico> getRegistros( String catalogo ) {
+		String nombreId = getNombreId(catalogo);
+		
+		if (nombreId == "")
+			return null;
+					
+		StringBuilder query = new StringBuilder();
+		query.append("SELECT " + nombreId + " AS ID, DESCRIPCION FROM " + catalogo);
+		
+		List<CatalogoGenerico> documentos = null;
 		try {
 			documentos = mysqlTemplate.query(query.toString(), new RegistroRowMapper());
 		} catch (Exception e) {
@@ -40,9 +63,14 @@ public class CatalogoGenericoDB {
 	}
 	
 	public CatalogoGenerico getRegistro( String catalogo, long id ) {
+		String nombreId = getNombreId(catalogo);
+		
+		if (nombreId == "")
+			return null;
+		
 		StringBuilder query = new StringBuilder();
 		
-		query.append("SELECT ID, DESCRIPCION FROM "+ catalogo + " WHERE ESTATUS = 1 AND ID = " + id);
+		query.append("SELECT " + nombreId + " AS ID, DESCRIPCION FROM "+ catalogo + " WHERE " + nombreId + "= " + id);
 		
 		CatalogoGenerico registro = null;
 		try {
@@ -55,15 +83,18 @@ public class CatalogoGenericoDB {
 			e.printStackTrace();
 		}
 		
-		System.out.println(registro);
 		return registro;
 	}
 	
 	public int updateRegistro( String catalogo, CatalogoGenerico registro ) {
+		String nombreId = getNombreId(catalogo);
+		
+		if (nombreId == "")
+			return -1;
+		
 		StringBuilder query = new StringBuilder();
 		
-		query.append("UPDATE " + catalogo + " SET descripcion = '" + registro.getDescripcion() + "' WHERE id = ?");
-		System.out.println(query.toString());
+		query.append("UPDATE " + catalogo + " SET descripcion = '" + registro.getDescripcion() + "' WHERE " + nombreId + " = ?");
 		
 		int idRegistro = 0;
 		try {
@@ -88,10 +119,14 @@ public class CatalogoGenericoDB {
 		
 		if (opcion.equals("create"))
 			query.append("INSERT INTO " + catalogo + " (DESCRIPCION, ESTATUS) VALUES ('" + descripcion + "', 1)");
-		else 
-			query.append("DELETE FROM " + catalogo + " WHERE id = " + id);
-		
-		System.out.println(query.toString());
+		else {
+			String nombreId = getNombreId(catalogo);
+			
+			if (nombreId == "")
+				return -1;
+			
+			query.append("DELETE FROM " + catalogo + " WHERE " + nombreId + " = " + id);
+		}
 		
 		try {
 			KeyHolder keyHolder = new GeneratedKeyHolder();

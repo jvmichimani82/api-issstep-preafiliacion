@@ -107,8 +107,8 @@ public class UsuarioDB {
 					1, derechohabiente.getClaveUsuarioRegistro(), derechohabiente.getFechaRegistro() });
 		} catch (Exception e) {
 			e.printStackTrace();
+			return 0;
 		}
-		return 0;
 	
 	}
 	
@@ -170,8 +170,8 @@ public class UsuarioDB {
 	    	
 		} catch (Exception e) {
 			e.printStackTrace();
+			return (long) 0;
 		}
-		return (long) 0;
 		
 	}	
 	

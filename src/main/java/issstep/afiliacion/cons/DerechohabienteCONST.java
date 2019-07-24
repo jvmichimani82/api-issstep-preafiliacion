@@ -43,7 +43,13 @@ public class DerechohabienteCONST {
 			
 			"			    }" ;
 	
+	public static final String asignaBeneficiario="Json para Asignar beneficiario a derechohabiente\n\n"+"{"
+			+"\n" + 
+			"			    \"noControl\": 20011,\n" + 
+			"			    \"noPreAfiliacion\": 20011,\n" +
+			"			    \"claveParentesco\": 1\n" +
+			"			    }" ;
 
 		
-			public static final String curp ="{\"curp\":\"VAMJ820830HPLLCS07\"}";
+	public static final String curp ="{\"curp\":\"VAMJ820830HPLLCS07\"}";
 }
