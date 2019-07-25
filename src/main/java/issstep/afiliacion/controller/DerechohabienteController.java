@@ -21,6 +21,7 @@ import issstep.afiliacion.model.Derechohabiente;
 import issstep.afiliacion.model.Email;
 import issstep.afiliacion.model.ResetPassword;
 import issstep.afiliacion.model.Usuario;
+import issstep.afiliacion.model.ActualizarDireccion;
 import issstep.afiliacion.model.ActualizarPassword;
 import issstep.afiliacion.model.Beneficiario;
 import issstep.afiliacion.service.DerechohabienteService;
@@ -107,6 +108,13 @@ public class DerechohabienteController {
 	public ResponseEntity<?> recuperarPassword( @ApiParam(value = DerechohabienteCONST.actualizarPassword, required = true)@RequestBody ActualizarPassword actualizarPassword, HttpServletResponse response ){
 
     	return derechohabienteService.actualizarPassword(actualizarPassword);
+	}
+    
+    @ApiOperation(value = "Actualizar direccion")
+    @RequestMapping(value = "/actualizar/direccion", method=RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> actualizarDireccion( @ApiParam(value = DerechohabienteCONST.actualizarDireccion, required = true)@RequestBody ActualizarDireccion actualizarDireccion, HttpServletResponse response ){
+
+    	return derechohabienteService.actualizarDireccion(actualizarDireccion);
 	}
     
 }

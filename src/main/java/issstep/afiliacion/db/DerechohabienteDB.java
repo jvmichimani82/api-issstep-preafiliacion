@@ -21,6 +21,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
+import issstep.afiliacion.model.ActualizarDireccion;
 import issstep.afiliacion.model.Derechohabiente;
 
 @Component
@@ -198,6 +199,26 @@ public class DerechohabienteDB {
 			});
 		} catch (Exception e) {
 			e.printStackTrace();
+		}		
+	}
+	
+	public long actualizaDireccion (ActualizarDireccion actualizarDireccion) {
+		StringBuilder query = new StringBuilder();
+		query.append("UPDATE DERECHOHABIENTE SET DOMICILIO = '"
+					+ actualizarDireccion.getDireccion()
+					+ "' WHERE NOCONTROL = "
+					+ actualizarDireccion.getNoControl() 
+					+ " AND NOPREAFILIACION = " 
+					+ actualizarDireccion.getNoPreAfiliacion());
+					
+		System.out.println(query.toString());
+		
+		try {
+			  mysqlTemplate.update(query.toString());
+			  return actualizarDireccion.getNoControl();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return -1;
 		}		
 	}
 	

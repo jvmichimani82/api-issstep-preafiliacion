@@ -72,6 +72,13 @@ public class DerechohabienteCONST {
 			"			    \"email\": \"email@correo.com\",\n" + 
 			"			    \"password\": \"nuevoPassword\"\n" +
 			"			    }" ;
+	
+	public static final String actualizarDireccion="Json para Actualizar direccion\n\n"+"{"
+			+"\n" + 
+			"			    \"noControl\": 20011,\n" + 
+			"			    \"noPreAfiliacion\": 20011,\n" + 
+			"			    \"direccion\": \"nueva direccion\"\n" +
+			"			    }" ;
 
 	public static final String email ="{\"email\":\"email@correo.com\"}";
 	
