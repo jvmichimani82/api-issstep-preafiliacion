@@ -52,17 +52,7 @@ public class ArchivoService{
   
 	public ResponseEntity<?> uploadDocumento( long noControl, long noPreAfiliacion, long claveParentesco, long claveTipoArchivo,  MultipartFile uploadedFile, HttpServletResponse response) {
 		try{
-			
-			
-				Archivo archivoAnt = archivoDB.getArchivoByNoControlAndNoPreAfiliacion(noControl, noPreAfiliacion);
-				
-				if (archivoAnt != null) {
-					System.out.println("Eliminacion de informacion");
-					UtilsImage.deleteDocto(archivoAnt.getUrlArchivo());
-					archivoDB.delete(archivoAnt.getClaveDocumento());
-				}
-		
-			
+						
 			long idArchivoRegistrado;
 			
 			String desTipoDocto = archivoDB.getTipoArchivoByParentesco(claveParentesco, claveTipoArchivo);
@@ -90,7 +80,7 @@ public class ArchivoService{
 					archivo.setClaveTipoArchivo(claveTipoArchivo);
 					archivo.setNombre(uploadedFile.getOriginalFilename());
 					archivo.setUrlArchivo(resultado);
-					archivo.setEsValido(0);
+					archivo.setEsValido(2);
 					archivo.setClaveUsuarioRegistro(beneficiario.getClaveUsuarioRegistro());
 					archivo.setFechaRegistro(new Timestamp(new Date().getTime()));					
 					archivo.setClaveUsuarioModificacion(beneficiario.getClaveUsuarioModificacion());
@@ -137,7 +127,7 @@ public class ArchivoService{
 																 "Persona"+archivo.getNoControl()+archivo.getNoPreAfiliacion()+archivo.getClaveParentesco()+archivo.getClaveTipoArchivo()+"-"+UtilsImage.toPrettyURL(desTipoDocto));
 				archivo.setNombre(uploadedFile.getOriginalFilename());
 				archivo.setUrlArchivo(resultado);
-				archivo.setEsValido(0);
+				archivo.setEsValido(2);
 				archivo.setEstatus(1);
 				archivo.setFechaRegistro(new Timestamp(new Date().getTime()));	
 				
