@@ -50,8 +50,19 @@ public class ArchivoService{
    @Autowired
    BeneficiarioDB beneficiarioDB;
   
-	public ResponseEntity<?> uploadDocumento(long noControl, long noPreAfiliacion, long claveParentesco, long claveTipoArchivo,  MultipartFile uploadedFile, HttpServletResponse response) {
+	public ResponseEntity<?> uploadDocumento( long noControl, long noPreAfiliacion, long claveParentesco, long claveTipoArchivo,  MultipartFile uploadedFile, HttpServletResponse response) {
 		try{
+			
+			
+				Archivo archivoAnt = archivoDB.getArchivoByNoControlAndNoPreAfiliacion(noControl, noPreAfiliacion);
+				
+				if (archivoAnt != null) {
+					System.out.println("Eliminacion de informacion");
+					UtilsImage.deleteDocto(archivoAnt.getUrlArchivo());
+					archivoDB.delete(archivoAnt.getClaveDocumento());
+				}
+		
+			
 			long idArchivoRegistrado;
 			
 			String desTipoDocto = archivoDB.getTipoArchivoByParentesco(claveParentesco, claveTipoArchivo);
@@ -106,7 +117,43 @@ public class ArchivoService{
 
 		}
 	}
+	
+	public ResponseEntity<?> updateDocumento( long claveDocumento,  MultipartFile uploadedFile, HttpServletResponse response) {
+		try{
+			
+			
+				Archivo archivo = archivoDB.getArchivo(claveDocumento);
+				
+				if (archivo == null) 
+					return new ResponseEntity<>(new Mensaje("El archivo no existe"), HttpStatus.NO_CONTENT);
+		
+				System.out.println("Eliminacion de informacion");
+				UtilsImage.deleteDocto(archivo.getUrlArchivo());
+				
+				String desTipoDocto = archivoDB.getTipoArchivoByParentesco(archivo.getClaveParentesco(), archivo.getClaveTipoArchivo());
+				
+				String resultado = UtilsImage.uploadFileToServer(UtilsImage.toPrettyURL(desTipoDocto), 
+																 (MultipartFile) uploadedFile, 
+																 "Persona"+archivo.getNoControl()+archivo.getNoPreAfiliacion()+archivo.getClaveParentesco()+archivo.getClaveTipoArchivo()+"-"+UtilsImage.toPrettyURL(desTipoDocto));
+				archivo.setNombre(uploadedFile.getOriginalFilename());
+				archivo.setUrlArchivo(resultado);
+				archivo.setEsValido(0);
+				archivo.setEstatus(1);
+				archivo.setFechaRegistro(new Timestamp(new Date().getTime()));	
+				
+				if (archivoDB.update(archivo) == -1)
+					return new ResponseEntity<>(new Mensaje("No fue posible elimiar el registro del archivo"), HttpStatus.INTERNAL_SERVER_ERROR);
+				
+				return new ResponseEntity<>(new Mensaje("Archivo actualizado"), HttpStatus.OK);
+		}
+		catch(Exception ex){
+			System.err.println("Exception ArchivoService.uploadDocto ");
+			ex.printStackTrace();
+			return new ResponseEntity<>(new Mensaje("Errot en el servidor"), HttpStatus.INTERNAL_SERVER_ERROR);
 
+		}
+	}
+	
 	public ResponseEntity<?> dowloadDocumento(long claveDocumento, HttpServletResponse response) {
 		try {
 			

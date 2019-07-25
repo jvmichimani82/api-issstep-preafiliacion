@@ -28,6 +28,27 @@ public class ArchivoDB {
 	private JdbcTemplate mysqlTemplate;
 
 	
+	public Archivo getArchivoByNoControlAndNoPreAfiliacion(long noControl, long noPreAfiliacion) {
+		StringBuilder query = new StringBuilder();
+		query.append("SELECT * FROM DOCUMENTO WHERE NOCONTROL = ");
+		query.append(noControl);
+		query.append(" AND NOPREAFILIACION = ");
+		query.append(noPreAfiliacion);
+				
+		Archivo archive = null;
+		try {
+			archive =  mysqlTemplate.queryForObject(query.toString(), new ArchivoRowMapper());
+			return archive;
+		} 
+		catch (EmptyResultDataAccessException e) {
+			return null;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
 	public Archivo getArchivo(long claveDocumento) {
 		StringBuilder query = new StringBuilder();
 		query.append("SELECT * FROM DOCUMENTO WHERE CLAVEDOCUMENTO = ");
@@ -140,6 +161,30 @@ public class ArchivoDB {
 		try {
 			  mysqlTemplate.update(query.toString(), new Object[] { claveDocumento });
 			  return claveDocumento;
+		} 
+		catch (EmptyResultDataAccessException e) {
+			return -1;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return -1;
+		}
+		
+	}
+	
+	public long update (Archivo archivo) {
+		StringBuilder query = new StringBuilder();
+		query.append( "UPDATE DOCUMENTO SET NOMBRE = ?, URLARCHIVO = ?, "
+					+ "ESVALIDO = ?, FECHAREGISTRO = ?, ESTATUS = ? WHERE CLAVEDOCUMENTO = ? ");
+			
+		System.out.println(query.toString());
+		
+		try {
+			  mysqlTemplate.update(query.toString(), new Object[] { archivo.getNombre(),
+					  archivo.getUrlArchivo(), archivo.getEsValido(), archivo.getFechaRegistro(),
+					  archivo.getEstatus(), archivo.getClaveDocumento(),
+					  });
+			  return  archivo.getClaveDocumento();
 		} 
 		catch (EmptyResultDataAccessException e) {
 			return -1;

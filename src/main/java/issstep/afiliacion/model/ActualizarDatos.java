@@ -11,12 +11,16 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ActualizarDireccion {
+public class ActualizarDatos {
 	
 	long noControl;
 	
 	long noPreAfiliacion;
 	
 	String direccion;	
+	
+	String telefonoCasa;
+	
+	String telefonoCelular;
 
 }
