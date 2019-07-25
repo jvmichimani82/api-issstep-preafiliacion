@@ -89,8 +89,10 @@ public class ArchivoService{
 					idArchivoRegistrado = archivoDB.insertarArchivo(archivo);
 					
 					/* archivoDB.insertarArchivo(idUsuario, idArchivoRegistrado); */
-					if (idArchivoRegistrado != 0)
+					if (idArchivoRegistrado != 0) {
+						archivo.setClaveDocumento(idArchivoRegistrado);
 						return new ResponseEntity<>(archivo, HttpStatus.OK);
+					}
 					else 
 						return new ResponseEntity<>(new Mensaje("No fue posible registrar el archivo"), HttpStatus.CONFLICT);
 				}

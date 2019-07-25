@@ -125,7 +125,7 @@ public class ArchivoDB {
 			mysqlTemplate.update(
 	    	    new PreparedStatementCreator() {
 	    	        public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-	    	            PreparedStatement pst = con.prepareStatement(query.toString(), new String[] {"id"});
+	    	            PreparedStatement pst = con.prepareStatement(query.toString(), new String[] {"claveDocumento"});
 	    	            pst.setLong(1, archivo.getNoControl());
 	    	            pst.setLong(2, archivo.getNoPreAfiliacion());
 	    	            pst.setLong(3, archivo.getNoBeneficiario());
