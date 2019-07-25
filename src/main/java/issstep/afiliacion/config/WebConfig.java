@@ -11,6 +11,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -104,14 +105,27 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     }
     
     @Bean(name = "mysqlDb")
+    @Primary
 	@ConfigurationProperties(prefix = "spring.ds_mysql")
 	public DataSource mysqlDataSource() {
 		return DataSourceBuilder.create().build();
 	}
 
 	@Bean(name = "mysqlJdbcTemplate")
-	public JdbcTemplate jdbcTemplate(@Qualifier("mysqlDb") DataSource dsMySQL) {
-		return new JdbcTemplate(dsMySQL);
+	@Primary
+	public JdbcTemplate jdbcTemplate(@Qualifier("mysqlDb") DataSource ds) {
+		return new JdbcTemplate(ds);
+	}
+	
+	@Bean(name = "afiliacionDB")
+	@ConfigurationProperties(prefix = "spring.afiliacion")
+	public DataSource afiliacionDataSource() {
+		return DataSourceBuilder.create().build();
+	}
+
+	@Bean(name = "afiliacionJdbcTemplate")
+	public JdbcTemplate afiliacionJdbcTemplate(@Qualifier("afiliacionDB") DataSource ds) {
+		return new JdbcTemplate(ds);
 	}
 	
 

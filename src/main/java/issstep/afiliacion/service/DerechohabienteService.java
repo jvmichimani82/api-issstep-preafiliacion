@@ -53,7 +53,7 @@ public class DerechohabienteService {
 			return new ResponseEntity<>(persona, HttpStatus.OK);
 		
 		else
-			return new ResponseEntity<>(new Mensaje("No existe persona con esa curp"), HttpStatus.CONFLICT);
+			return new ResponseEntity<>(new Mensaje("No existe persona con esa curp"), HttpStatus.NO_CONTENT);
 		
     }
 	

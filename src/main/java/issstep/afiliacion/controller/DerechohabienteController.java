@@ -32,6 +32,7 @@ public class DerechohabienteController {
     @Autowired
     public DerechohabienteService derechohabienteService;
     
+    //servicio para la validacion por curp de los derechohabientes
     @JsonView(Derechohabiente.Views.Simple.class)
     @RequestMapping(value = "/validadCurp", method = RequestMethod.POST)
     public ResponseEntity<?> validaPersonaCurp( @ApiParam(value = DerechohabienteCONST.curp, required = true)@RequestBody Curp curp, HttpServletResponse response) {
