@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -24,6 +25,7 @@ import issstep.afiliacion.db.BeneficiarioDB;
 import issstep.afiliacion.model.Mensaje;
 import issstep.afiliacion.model.ResetPassword;
 import issstep.afiliacion.model.Derechohabiente;
+import issstep.afiliacion.model.InfoDerechohabiente;
 import issstep.afiliacion.model.Usuario;
 import issstep.afiliacion.model.ActualizarDatos;
 import issstep.afiliacion.model.ActualizarPassword;
@@ -348,6 +350,15 @@ public class DerechohabienteService {
 			return new ResponseEntity<>(new Mensaje("No se pudo actualizar el usuario con número de Control: " + actualizarDatos.getNoControl()), HttpStatus.INTERNAL_SERVER_ERROR);
 		
 		return new ResponseEntity<>(derechohabiente , HttpStatus.OK);				
+    }
+	
+	public ResponseEntity<?> getDerechohabientesPorEstatusDeValidacion( int estatusValidacion) {	
+		if (estatusValidacion < 0 || estatusValidacion > 2)
+			return new ResponseEntity<>(new Mensaje("Estatus de validacion incorrecto"), HttpStatus.BAD_REQUEST);
+		
+		List<InfoDerechohabiente> derechohabientes = personaDB.getDerechohabientesPorEstatusDeValidacion( estatusValidacion );
+			
+		return new ResponseEntity<>(derechohabientes, HttpStatus.OK);	
     }
 	
 }

@@ -83,7 +83,7 @@ public class ArchivoController {
 	 }
 	 
      @ApiOperation(value = "Establece la valiacion de un documento")
-	 @RequestMapping(value="/validacion/{claveDocumento}/{estatusValidacion}", method = RequestMethod.GET)
+	 @RequestMapping(value="/validacion/{claveDocumento}/{estatusValidacion}", method = RequestMethod.PUT)
  		public ResponseEntity<?> updateValidacionDocto( 
  											 @PathVariable("claveDocumento") long claveDocumento,
  											 @ApiParam(value = "1 - Valido, \n  0 - Invalido", required = true)

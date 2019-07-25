@@ -118,4 +118,14 @@ public class DerechohabienteController {
     	return derechohabienteService.actualizarDatos(actualizarDireccion);
 	}
     
+    @ApiOperation(value = "Relación de derechohabientes por estatus de validación")
+    @RequestMapping(value = "/relacion/{estatusValidacion}", method=RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getListaDerechohabientesPorEstatusDeValidacion(@ApiParam(value = "2 - Por validar, \n 1 - Valido, \n  0 - Invalido", required = true)
+	 																		@PathVariable("estatusValidacion") int estatusValidacion,  
+	 																		HttpServletResponse response ){
+
+    	return derechohabienteService.getDerechohabientesPorEstatusDeValidacion(estatusValidacion);
+	}
+    
+    
 }

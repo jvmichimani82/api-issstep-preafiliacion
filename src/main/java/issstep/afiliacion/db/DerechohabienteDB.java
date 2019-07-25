@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -22,7 +23,9 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
 import issstep.afiliacion.model.ActualizarDatos;
+import issstep.afiliacion.model.CatalogoGenerico;
 import issstep.afiliacion.model.Derechohabiente;
+import issstep.afiliacion.model.InfoDerechohabiente;
 
 @Component
 public class DerechohabienteDB {
@@ -290,7 +293,26 @@ public class DerechohabienteDB {
 			return (long) 0;
 		}
 		
-	}	
+	}
+	
+	public List<InfoDerechohabiente> getDerechohabientesPorEstatusDeValidacion( int estatusValidacion) {
+		
+		StringBuilder query = new StringBuilder();
+		query.append("SELECT D.NOCONTROL, D.NOPREAFILIACION, D.NOMBRE, D.PATERNO, D.MATERNO, D.CURP FROM DERECHOHABIENTE D, "
+				+ "(SELECT NOCONTROL, NOPREAFILIACION FROM DOCUMENTO WHERE ESVALIDO = " + estatusValidacion 
+				+ " GROUP BY NOCONTROL, NOPREAFILIACION) DOC" 
+				+ " WHERE D.NOCONTROL = DOC.NOCONTROL AND D.NOPREAFILIACION = DOC.NOPREAFILIACION");
+		
+		List<InfoDerechohabiente> lista = null;
+		
+		try {
+			lista = mysqlTemplate.query(query.toString(), new ListaPersonaRowMapper());
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return lista;
+	}
 }
 
 class PersonaRowMapper implements RowMapper<Derechohabiente> {
@@ -332,6 +354,22 @@ class PersonaRowMapper implements RowMapper<Derechohabiente> {
         persona.setEstadoCivil(rs.getString("ESTADOCIVIL"));
         
         return persona;
+    }
+}
+
+class ListaPersonaRowMapper implements RowMapper<InfoDerechohabiente> {
+    @Override
+    public InfoDerechohabiente mapRow(ResultSet rs, int rowNum) throws SQLException {
+    	InfoDerechohabiente infoDerechohabiente = new InfoDerechohabiente();
+ 
+    	infoDerechohabiente.setNoControl(rs.getLong("NOCONTROL"));
+    	infoDerechohabiente.setNoPreAfiliacion(rs.getLong("NOPREAFILIACION"));
+    	infoDerechohabiente.setNombre(rs.getString("NOMBRE"));
+    	infoDerechohabiente.setPaterno(rs.getString("PATERNO"));
+    	infoDerechohabiente.setMaterno(rs.getString("MATERNO"));
+        infoDerechohabiente.setCurp(rs.getString("CURP"));
+           
+        return infoDerechohabiente;
     }
 }
 
