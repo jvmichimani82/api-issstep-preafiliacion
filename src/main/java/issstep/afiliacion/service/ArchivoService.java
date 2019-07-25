@@ -244,7 +244,29 @@ public class ArchivoService{
 		}
 	}
 	
-	
+	public ResponseEntity<?> updateValidacionDocto( long claveDocumento, int estatusValidacion, HttpServletResponse response) {
+		try {
+			
+			Archivo archivo = archivoDB.getArchivo(claveDocumento);
+			
+			if(archivo == null)
+				return new ResponseEntity<>(new Mensaje("Documento no encontrado"), HttpStatus.NOT_FOUND);
+			
+			archivo.setEsValido(estatusValidacion);
+			
+			if (archivoDB.update(archivo) == -1)
+				return new ResponseEntity<>(new Mensaje("El no pudo actualizar el documento"), HttpStatus.INTERNAL_SERVER_ERROR);
+		
+			return new ResponseEntity<>(new Mensaje("Actualizacion correcta"), HttpStatus.OK);	
+		} 
+		catch (Exception ex) {
+			System.err.println("Exception ArchivoService.updateValidacionDocto");
+			ex.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+
 	
 	
 	

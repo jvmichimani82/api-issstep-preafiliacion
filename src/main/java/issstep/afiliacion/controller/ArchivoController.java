@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import issstep.afiliacion.service.ArchivoService;
 
 import javax.servlet.http.HttpServletResponse;
@@ -80,5 +81,15 @@ public class ArchivoController {
 												HttpServletResponse response) throws Exception {   
 	 		return archivoService.listaArchivos( noControl, noPreAfiliacion, claveParentesco, response );	
 	 }
+	 
+     @ApiOperation(value = "Establece la valiacion de un documento")
+	 @RequestMapping(value="/validacion/{claveDocumento}/{estatusValidacion}", method = RequestMethod.GET)
+ 		public ResponseEntity<?> updateValidacionDocto( 
+ 											 @PathVariable("claveDocumento") long claveDocumento,
+ 											 @ApiParam(value = "1 - Valido, \n  0 - Invalido", required = true)
+ 											 @PathVariable("estatusValidacion") int estatusValidacion,
+ 											 HttpServletResponse response) throws Exception {   
+	 		return archivoService.updateValidacionDocto( claveDocumento, estatusValidacion, response );	
+ 	 }	 
 }
 
