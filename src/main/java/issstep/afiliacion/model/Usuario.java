@@ -31,6 +31,9 @@ public class Usuario implements Serializable, UserDetails {
 	
 	long claveRol;
 	
+	@JsonView({Usuario.Views.Simple.class, Usuario.Views.RegistroUsuario.class})
+	String rol;
+	
 	long noControl;
 	
 	@JsonView({Usuario.Views.Simple.class, Usuario.Views.RegistroUsuario.class})

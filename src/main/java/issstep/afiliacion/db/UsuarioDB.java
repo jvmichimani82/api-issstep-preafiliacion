@@ -28,11 +28,14 @@ public class UsuarioDB {
 
 	public Usuario getSession(String usuario, String passwd) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT CLAVEUSUARIO, CLAVEROL, LOGIN, TOKEN, PASSWORD, FECHAREGISTRO, FECHAULTIMOACCESO, ESTATUS, NOCONTROL, NOPREAFILIACION FROM USUARIO WHERE LOGIN ='");
+		query.append("SELECT U.CLAVEUSUARIO, R.DESCRIPCION, U.CLAVEROL, U.LOGIN, U.TOKEN, U.PASSWORD, U.FECHAREGISTRO, "
+				+ "U.FECHAULTIMOACCESO, U.ESTATUS, U.NOCONTROL, U.NOPREAFILIACION "
+				+ "FROM USUARIO U, KROL R WHERE U.LOGIN ='");
 		query.append(usuario);
-		query.append("' AND PASSWORD ='");
+		query.append("' AND U.PASSWORD ='");
 		query.append(passwd);
 		query.append("'");
+		query.append(" AND U.CLAVEROL=R.CLAVEROL");
 		
 		System.out.println(query.toString());
 		Usuario user = null;
@@ -69,7 +72,9 @@ public class UsuarioDB {
 	
 	public Usuario getUsuarioByToken(String token) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT CLAVEUSUARIO, CLAVEROL, LOGIN, TOKEN, PASSWORD, FECHAREGISTRO, FECHAULTIMOACCESO, ESTATUS, NOCONTROL, NOPREAFILIACION FROM USUARIO WHERE TOKEN = '");
+		query.append("SELECT CLAVEUSUARIO, CLAVEROL, LOGIN, TOKEN, PASSWORD, "
+				+ "FECHAREGISTRO, FECHAULTIMOACCESO, ESTATUS, NOCONTROL, NOPREAFILIACION "
+				+ "FROM USUARIO WHERE TOKEN = '");
 		query.append(token+"'");
 	
 		Usuario user = null;
@@ -249,6 +254,7 @@ class UsuarioRowMapper implements RowMapper<Usuario> {
  
     	usuario.setClaveUsuario(rs.getLong("CLAVEUSUARIO"));
     	usuario.setClaveRol(rs.getLong("CLAVEROL"));
+    	usuario.setRol(rs.getString("DESCRIPCION"));
     	usuario.setLogin(rs.getString("LOGIN"));
     	usuario.setToken(rs.getString("TOKEN"));
     	usuario.setPasswd(rs.getString("PASSWORD"));
