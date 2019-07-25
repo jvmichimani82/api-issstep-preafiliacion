@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
@@ -36,10 +37,15 @@ public class ArchivoDB {
 		Archivo archive = null;
 		try {
 			archive =  mysqlTemplate.queryForObject(query.toString(), new ArchivoRowMapper());
-		} catch (Exception e) {
-			e.printStackTrace();
+			return archive;
+		} 
+		catch (EmptyResultDataAccessException e) {
+			return null;
 		}
-		return archive;
+		catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	
@@ -125,18 +131,22 @@ public class ArchivoDB {
 		return 0;
 	}
 	
-	public void delete (Archivo archivo) {
+	public long delete (long claveDocumento) {
 		StringBuilder query = new StringBuilder();
-		query.append("UPDATE USUARIO SET ROL = ?, PASSWORD = ?, TOKEN = ?, ULTIMOREGISTRO = ?, ESTATUS = ? WHERE USUARIO = ? ");
+		query.append("DELETE FROM DOCUMENTO WHERE CLAVEDOCUMENTO = ? ");
 			
 		System.out.println(query.toString());
 		
 		try {
-			  mysqlTemplate.update(query.toString(), new Object[] { 
-					
-			});
-		} catch (Exception e) {
+			  mysqlTemplate.update(query.toString(), new Object[] { claveDocumento });
+			  return claveDocumento;
+		} 
+		catch (EmptyResultDataAccessException e) {
+			return -1;
+		}
+		catch (Exception e) {
 			e.printStackTrace();
+			return -1;
 		}
 		
 	}

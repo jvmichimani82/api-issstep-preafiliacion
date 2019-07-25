@@ -179,16 +179,18 @@ public class ArchivoService{
 	
 	public ResponseEntity<?> deleteDocumento(long claveDocumento, HttpServletResponse response) {
 		try {
-			/*
-			Archivo archivo = archivoRepository.findOne(claveDocumento);
-			if(archivo != null) {
-				UtilsImage.deleteDocto(archivo.getUrlArchivo());
-				archivoRepository.delete(archivo);
 			
-			}*/
-			return new ResponseEntity<>(new Mensaje("Eliminacion correcta"), HttpStatus.NO_CONTENT);
+			Archivo archivo = archivoDB.getArchivo(claveDocumento);
+			if(archivo == null)
+				return new ResponseEntity<>(new Mensaje("Documento no encontrado"), HttpStatus.NOT_FOUND);
+			
+			UtilsImage.deleteDocto(archivo.getUrlArchivo());
+			if (archivoDB.delete(claveDocumento) == -1)
+				return new ResponseEntity<>(new Mensaje("El documento no se pudo eliminar"), HttpStatus.INTERNAL_SERVER_ERROR);
 		
-		} catch (Exception ex) {
+			return new ResponseEntity<>(new Mensaje("Eliminacion correcta"), HttpStatus.OK);	
+		} 
+		catch (Exception ex) {
 			System.err.println("Exception ArchivoService.descargaDocumento");
 			ex.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
