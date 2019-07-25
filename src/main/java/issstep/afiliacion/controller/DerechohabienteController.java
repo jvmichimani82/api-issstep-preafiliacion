@@ -18,8 +18,11 @@ import io.swagger.annotations.ApiParam;
 import issstep.afiliacion.cons.DerechohabienteCONST;
 import issstep.afiliacion.model.Curp;
 import issstep.afiliacion.model.Derechohabiente;
+import issstep.afiliacion.model.Email;
 import issstep.afiliacion.model.ResetPassword;
 import issstep.afiliacion.model.Usuario;
+import issstep.afiliacion.model.ActualizarDireccion;
+import issstep.afiliacion.model.ActualizarPassword;
 import issstep.afiliacion.model.Beneficiario;
 import issstep.afiliacion.service.DerechohabienteService;
 import javax.servlet.http.HttpServletResponse;
@@ -92,6 +95,27 @@ public class DerechohabienteController {
 	public ResponseEntity<?> recuperarPassword(@ApiParam(value = DerechohabienteCONST.recuperarPassword, required = true)@RequestBody ResetPassword resetPassword, HttpServletResponse response ){
 
     	return derechohabienteService.recuperarPassword(resetPassword);
+	}
+    
+    @ApiOperation(value = "Solicitud para resetear password")
+    @RequestMapping(value = "/solicitud/recuperar/password", method=RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> recuperarPassword( @ApiParam(value = DerechohabienteCONST.email, required = true)@RequestBody Email email, HttpServletResponse response ){
+
+    	return derechohabienteService.solicitudRecuperarPassword(email.getEmail());
+	}
+    
+    @ApiOperation(value = "Actualizar password")
+    @RequestMapping(value = "/actualizar/password", method=RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> recuperarPassword( @ApiParam(value = DerechohabienteCONST.actualizarPassword, required = true)@RequestBody ActualizarPassword actualizarPassword, HttpServletResponse response ){
+
+    	return derechohabienteService.actualizarPassword(actualizarPassword);
+	}
+    
+    @ApiOperation(value = "Actualizar direccion")
+    @RequestMapping(value = "/actualizar/direccion", method=RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> actualizarDireccion( @ApiParam(value = DerechohabienteCONST.actualizarDireccion, required = true)@RequestBody ActualizarDireccion actualizarDireccion, HttpServletResponse response ){
+
+    	return derechohabienteService.actualizarDireccion(actualizarDireccion);
 	}
     
 }

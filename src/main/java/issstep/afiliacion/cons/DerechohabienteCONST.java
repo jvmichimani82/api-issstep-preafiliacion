@@ -66,7 +66,21 @@ public class DerechohabienteCONST {
 			"			    \"token\": \"5c7096378ade17e9cf5b53ac6490d0e431ea5a99e6d01ba81f257f03a95b70ef\",\n" + 
 			"			    \"password\": \"nuevoPassword\"\n" +
 			"			    }" ;
+	
+	public static final String actualizarPassword="Json para Actualizar password\n\n"+"{"
+			+"\n" + 
+			"			    \"email\": \"email@correo.com\",\n" + 
+			"			    \"password\": \"nuevoPassword\"\n" +
+			"			    }" ;
+	
+	public static final String actualizarDireccion="Json para Actualizar direccion\n\n"+"{"
+			+"\n" + 
+			"			    \"noControl\": 20011,\n" + 
+			"			    \"noPreAfiliacion\": 20011,\n" + 
+			"			    \"direccion\": \"nueva direccion\"\n" +
+			"			    }" ;
 
-		
+	public static final String email ="{\"email\":\"email@correo.com\"}";
+	
 	public static final String curp ="{\"curp\":\"VAMJ820830HPLLCS07\"}";
 }

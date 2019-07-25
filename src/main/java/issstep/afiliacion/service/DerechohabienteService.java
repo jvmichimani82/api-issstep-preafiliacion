@@ -25,7 +25,10 @@ import issstep.afiliacion.model.Mensaje;
 import issstep.afiliacion.model.ResetPassword;
 import issstep.afiliacion.model.Derechohabiente;
 import issstep.afiliacion.model.Usuario;
+import issstep.afiliacion.model.ActualizarDireccion;
+import issstep.afiliacion.model.ActualizarPassword;
 import issstep.afiliacion.model.Beneficiario;
+import issstep.afiliacion.model.CatalogoGenerico;
 import issstep.afiliacion.utils.Utils;
 
 
@@ -302,5 +305,49 @@ public class DerechohabienteService {
 			return  new ResponseEntity<>(null,null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	public ResponseEntity<?> solicitudRecuperarPassword(String email) {
+		Derechohabiente derechohabiente = personaDB.getPersonaByColumnaStringValor("EMAIL", email);
+		
+		if (derechohabiente != null) {
+			String token = Utils.sha256(email);
+			
+			usuarioDB.actualizaToken( token, derechohabiente.getNoControl(), derechohabiente.getNoPreAfiliacion());
+			
+			mailService.prepareAndSendResetPass("issstepregistro@gmail.com", derechohabiente.getNombreCompleto(), token);
+			
+			return new ResponseEntity<>(new Mensaje("Solicitud de actualización enviada."), HttpStatus.OK);
+		}
+		else
+			return new ResponseEntity<>(new Mensaje("El correo electrónico no existe."), HttpStatus.CONFLICT);
+		
+	}
+	
+	public ResponseEntity<?> actualizarPassword( ActualizarPassword actualizarPassword) {	
+		
+		Usuario usuario = usuarioDB.getUsuarioByColumnaStringValor("LOGIN", actualizarPassword.getEmail());
+		
+		if (usuario == null)
+			return new ResponseEntity<>(new Mensaje("No existe el usuario con email: " + actualizarPassword.getEmail()), HttpStatus.CONFLICT);		
+				
+		usuario.setPasswd(Hashing.sha256().hashString(actualizarPassword.getPassword(), Charsets.UTF_8).toString());
+		usuarioDB.actualiza(usuario);
+		
+		return new ResponseEntity<>(usuario , HttpStatus.OK);	
+				
+    }
+	
+	public ResponseEntity<?> actualizarDireccion( ActualizarDireccion actualizarDireccion) {	
+		
+		Derechohabiente derechohabiente = personaDB.getPersonaById(actualizarDireccion.getNoControl());
+		
+		if (derechohabiente == null)
+			return new ResponseEntity<>(new Mensaje("No existe el usuario con número de Control: " + actualizarDireccion.getNoControl()), HttpStatus.CONFLICT);		
+			
+		if (personaDB.actualizaDireccion(actualizarDireccion) == -1)
+			return new ResponseEntity<>(new Mensaje("No se pudo actualizar el usuario con número de Control: " + actualizarDireccion.getNoControl()), HttpStatus.INTERNAL_SERVER_ERROR);
+		
+		return new ResponseEntity<>(derechohabiente , HttpStatus.OK);				
+    }
 	
 }

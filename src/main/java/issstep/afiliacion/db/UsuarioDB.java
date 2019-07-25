@@ -85,6 +85,28 @@ public class UsuarioDB {
 		return user;
 	}
 	
+	public Usuario getUsuarioByColumnaStringValor(String campo, String valor) {
+		StringBuilder query = new StringBuilder();
+		query.append("SELECT CLAVEUSUARIO, CLAVEROL, LOGIN, TOKEN, PASSWORD, FECHAREGISTRO, "
+				+ "FECHAULTIMOACCESO, ESTATUS, NOCONTROL, NOAFILIACION FROM USUARIO WHERE "
+				+ campo + " = '" + valor +"'");
+	
+		System.out.println(query.toString());
+		
+		Usuario user = null;
+		try {
+			user =  mysqlTemplate.queryForObject(query.toString(), new UsuarioRowMapper());
+			return user;
+		} 
+		catch (EmptyResultDataAccessException e) {
+			return null;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
 	public int insertar (Derechohabiente derechohabiente, Usuario usuario, long claveParentesco) {
 		StringBuilder query = new StringBuilder();
 		
@@ -149,6 +171,23 @@ public class UsuarioDB {
 		} 
 		catch (EmptyResultDataAccessException e) {
 		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public void actualizaToken (String token, long noControl, long noAfiliacion) {
+		StringBuilder query = new StringBuilder();
+		query.append("UPDATE USUARIO SET TOKEN = ? WHERE NOCONTROL = ? AND NOAFILIACION = ? ");
+			
+		System.out.println(query.toString());
+		
+		try {
+			  mysqlTemplate.update(query.toString(), new Object[] { 
+					token, noControl, noAfiliacion
+			});
+		} 
 		catch (Exception e) {
 			e.printStackTrace();
 		}
