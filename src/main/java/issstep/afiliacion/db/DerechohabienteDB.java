@@ -21,7 +21,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
-import issstep.afiliacion.model.ActualizarDireccion;
+import issstep.afiliacion.model.ActualizarDatos;
 import issstep.afiliacion.model.Derechohabiente;
 
 @Component
@@ -202,20 +202,24 @@ public class DerechohabienteDB {
 		}		
 	}
 	
-	public long actualizaDireccion (ActualizarDireccion actualizarDireccion) {
+	public long actualizaDatos(ActualizarDatos actualizarDatos) {
 		StringBuilder query = new StringBuilder();
-		query.append("UPDATE DERECHOHABIENTE SET DOMICILIO = '"
-					+ actualizarDireccion.getDireccion()
+		query.append("UPDATE DERECHOHABIENTE SET DIRECCION = '"
+					+ actualizarDatos.getDireccion()
+					+ "', TELEFONOCASA = '"
+					+ actualizarDatos.getTelefonoCasa() 
+					+ "', TELEFONOCELULAR = '"
+					+ actualizarDatos.getTelefonoCelular() 
 					+ "' WHERE NOCONTROL = "
-					+ actualizarDireccion.getNoControl() 
+					+ actualizarDatos.getNoControl() 
 					+ " AND NOPREAFILIACION = " 
-					+ actualizarDireccion.getNoPreAfiliacion());
+					+ actualizarDatos.getNoPreAfiliacion());
 					
 		System.out.println(query.toString());
 		
 		try {
 			  mysqlTemplate.update(query.toString());
-			  return actualizarDireccion.getNoControl();
+			  return actualizarDatos.getNoControl();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return -1;
@@ -240,7 +244,7 @@ public class DerechohabienteDB {
 			queryUsuario.append("INSERT INTO ");
 		
 			query.append("INSERT INTO DERECHOHABIENTE (NOCONTROL, NOPREAFILIACION, NOMBRE, PATERNO, MATERNO, "
-					+ "EMAIL, FECHANACIMIENTO, SEXO, CURP, RFC, DOMICILIO, "
+					+ "EMAIL, FECHANACIMIENTO, SEXO, CURP, RFC, DIRECCION, "
 					+ "CODIGOPOSTAL, TELEFONOCASA, TELEFONOCELULAR, FECHAPREAFILIACION, SITUACION, "
 					+ "CLAVEUSUARIOREGISTRO, FECHAREGISTRO, CLAVEUSUARIOMODIFICACION, "
 					+ "CLAVEESTADOCIVIL, CLAVECOLONIA, "
@@ -250,7 +254,7 @@ public class DerechohabienteDB {
 					+ ", '" + derechohabiente.getMaterno() + "'" + ", '" + derechohabiente.getEmail() + "', '"
 					+ derechohabiente.getFechaNacimiento()+ "', '"  + derechohabiente.getSexo()
 					+ "', '" + derechohabiente.getCurp() + "'" + ", '" + derechohabiente.getRfc() + "'"
-					+ ", '" + derechohabiente.getDomicilio() + "'" + ", '" + derechohabiente.getCodigoPostal() + "'"
+					+ ", '" + derechohabiente.getDireccion() + "'" + ", '" + derechohabiente.getCodigoPostal() + "'"
 					+ ", '" + derechohabiente.getTelefonoCasa() + "', '" + derechohabiente.getTelefonoCelular() + "', '"
 					+ derechohabiente.getFechaPreAfiliacion() + "', "  + derechohabiente.getSituacion() + ", " 
 					+ derechohabiente.getClaveUsuarioRegistro() + ", '"  + derechohabiente.getFechaRegistro() + "', " 
@@ -304,7 +308,7 @@ class PersonaRowMapper implements RowMapper<Derechohabiente> {
         persona.setSexo(rs.getString("SEXO"));
         persona.setCurp(rs.getString("CURP"));
         persona.setRfc(rs.getString("RFC"));
-        persona.setDomicilio(rs.getString("DOMICILIO"));
+        persona.setDireccion(rs.getString("DIRECCION"));
         persona.setCodigoPostal(rs.getString("CODIGOPOSTAL"));
         persona.setTelefonoCasa(rs.getString("TELEFONOCASA"));
         persona.setTelefonoCelular(rs.getString("TELEFONOCELULAR"));
