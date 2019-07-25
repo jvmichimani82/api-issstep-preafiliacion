@@ -50,8 +50,9 @@ public class ArchivoService{
    @Autowired
    BeneficiarioDB beneficiarioDB;
   
-	public ResponseEntity<?> uploadDocumento(long noControl, long noPreAfiliacion, long claveParentesco, long claveTipoArchivo,  MultipartFile uploadedFile, HttpServletResponse response) {
+	public ResponseEntity<?> uploadDocumento( long noControl, long noPreAfiliacion, long claveParentesco, long claveTipoArchivo,  MultipartFile uploadedFile, HttpServletResponse response) {
 		try{
+						
 			long idArchivoRegistrado;
 			
 			String desTipoDocto = archivoDB.getTipoArchivoByParentesco(claveParentesco, claveTipoArchivo);
@@ -79,7 +80,7 @@ public class ArchivoService{
 					archivo.setClaveTipoArchivo(claveTipoArchivo);
 					archivo.setNombre(uploadedFile.getOriginalFilename());
 					archivo.setUrlArchivo(resultado);
-					archivo.setEsValido(0);
+					archivo.setEsValido(2);
 					archivo.setClaveUsuarioRegistro(beneficiario.getClaveUsuarioRegistro());
 					archivo.setFechaRegistro(new Timestamp(new Date().getTime()));					
 					archivo.setClaveUsuarioModificacion(beneficiario.getClaveUsuarioModificacion());
@@ -88,8 +89,10 @@ public class ArchivoService{
 					idArchivoRegistrado = archivoDB.insertarArchivo(archivo);
 					
 					/* archivoDB.insertarArchivo(idUsuario, idArchivoRegistrado); */
-					if (idArchivoRegistrado != 0)
+					if (idArchivoRegistrado != 0) {
+						archivo.setClaveDocumento(idArchivoRegistrado);
 						return new ResponseEntity<>(archivo, HttpStatus.OK);
+					}
 					else 
 						return new ResponseEntity<>(new Mensaje("No fue posible registrar el archivo"), HttpStatus.CONFLICT);
 				}
@@ -106,7 +109,43 @@ public class ArchivoService{
 
 		}
 	}
+	
+	public ResponseEntity<?> updateDocumento( long claveDocumento,  MultipartFile uploadedFile, HttpServletResponse response) {
+		try{
+			
+			
+				Archivo archivo = archivoDB.getArchivo(claveDocumento);
+				
+				if (archivo == null) 
+					return new ResponseEntity<>(new Mensaje("El archivo no existe"), HttpStatus.NO_CONTENT);
+		
+				System.out.println("Eliminacion de informacion");
+				UtilsImage.deleteDocto(archivo.getUrlArchivo());
+				
+				String desTipoDocto = archivoDB.getTipoArchivoByParentesco(archivo.getClaveParentesco(), archivo.getClaveTipoArchivo());
+				
+				String resultado = UtilsImage.uploadFileToServer(UtilsImage.toPrettyURL(desTipoDocto), 
+																 (MultipartFile) uploadedFile, 
+																 "Persona"+archivo.getNoControl()+archivo.getNoPreAfiliacion()+archivo.getClaveParentesco()+archivo.getClaveTipoArchivo()+"-"+UtilsImage.toPrettyURL(desTipoDocto));
+				archivo.setNombre(uploadedFile.getOriginalFilename());
+				archivo.setUrlArchivo(resultado);
+				archivo.setEsValido(2);
+				archivo.setEstatus(1);
+				archivo.setFechaRegistro(new Timestamp(new Date().getTime()));	
+				
+				if (archivoDB.update(archivo) == -1)
+					return new ResponseEntity<>(new Mensaje("No fue posible elimiar el registro del archivo"), HttpStatus.INTERNAL_SERVER_ERROR);
+				
+				return new ResponseEntity<>(new Mensaje("Archivo actualizado"), HttpStatus.OK);
+		}
+		catch(Exception ex){
+			System.err.println("Exception ArchivoService.uploadDocto ");
+			ex.printStackTrace();
+			return new ResponseEntity<>(new Mensaje("Errot en el servidor"), HttpStatus.INTERNAL_SERVER_ERROR);
 
+		}
+	}
+	
 	public ResponseEntity<?> dowloadDocumento(long claveDocumento, HttpServletResponse response) {
 		try {
 			
@@ -197,7 +236,29 @@ public class ArchivoService{
 		}
 	}
 	
-	
+	public ResponseEntity<?> updateValidacionDocto( long claveDocumento, int estatusValidacion, HttpServletResponse response) {
+		try {
+			
+			Archivo archivo = archivoDB.getArchivo(claveDocumento);
+			
+			if(archivo == null)
+				return new ResponseEntity<>(new Mensaje("Documento no encontrado"), HttpStatus.NOT_FOUND);
+			
+			archivo.setEsValido(estatusValidacion);
+			
+			if (archivoDB.update(archivo) == -1)
+				return new ResponseEntity<>(new Mensaje("El no pudo actualizar el documento"), HttpStatus.INTERNAL_SERVER_ERROR);
+		
+			return new ResponseEntity<>(new Mensaje("Actualizacion correcta"), HttpStatus.OK);	
+		} 
+		catch (Exception ex) {
+			System.err.println("Exception ArchivoService.updateValidacionDocto");
+			ex.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+
 	
 	
 	

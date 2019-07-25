@@ -28,9 +28,7 @@ public class UsuarioDB {
 
 	public Usuario getSession(String usuario, String passwd) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT U.CLAVEUSUARIO, R.DESCRIPCION, U.CLAVEROL, U.LOGIN, U.TOKEN, U.PASSWORD, U.FECHAREGISTRO, "
-				+ "U.FECHAULTIMOACCESO, U.ESTATUS, U.NOCONTROL, U.NOPREAFILIACION "
-				+ "FROM USUARIO U, KROL R WHERE U.LOGIN ='");
+		query.append("SELECT CLAVEUSUARIO, CLAVEROL, LOGIN, TOKEN, PASSWORD, FECHAREGISTRO, FECHAULTIMOACCESO, ESTATUS, NOCONTROL, NOAFILIACION FROM USUARIO WHERE LOGIN ='");
 		query.append(usuario);
 		query.append("' AND U.PASSWORD ='");
 		query.append(passwd);
@@ -72,9 +70,8 @@ public class UsuarioDB {
 	
 	public Usuario getUsuarioByToken(String token) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT CLAVEUSUARIO, CLAVEROL, LOGIN, TOKEN, PASSWORD, "
-				+ "FECHAREGISTRO, FECHAULTIMOACCESO, ESTATUS, NOCONTROL, NOPREAFILIACION "
-				+ "FROM USUARIO WHERE TOKEN = '");
+
+		query.append("SELECT CLAVEUSUARIO, CLAVEROL, LOGIN, TOKEN, PASSWORD, FECHAREGISTRO, FECHAULTIMOACCESO, ESTATUS, NOCONTROL, NOAFILIACION FROM USUARIO WHERE TOKEN = '");
 		query.append(token+"'");
 	
 		Usuario user = null;
@@ -116,7 +113,7 @@ public class UsuarioDB {
 		StringBuilder query = new StringBuilder();
 		
 		query.append("INSERT INTO USUARIO "
-				+ "(NOCONTROL, CLAVEROL, LOGIN, PASSWORD, TOKEN, FECHAREGISTRO, ESTATUS, NOPREAFILIACION )"
+				+ "(NOCONTROL, CLAVEROL, LOGIN, PASSWORD, TOKEN, FECHAREGISTRO, ESTATUS, NOAFILIACION )"
 				+ " VALUES(?,?,?,?,?,?,?,?)");
 
 		System.out.println(query.toString());
@@ -143,7 +140,7 @@ public class UsuarioDB {
 		StringBuilder query = new StringBuilder();
 		
 		query.append("INSERT INTO BENEFICIARIO "
-				+ "(NOCONTROL, NOPREAFILIACION, CLAVEPARENTESCO, FECHAAFILIACION, SITUACION, CLAVEUSUARIOREGISTRO, FECHAREGISTRO) "
+				+ "(NOCONTROL, NOAFILIACION, CLAVEPARENTESCO, FECHAAFILIACION, SITUACION, CLAVEUSUARIOREGISTRO, FECHAREGISTRO) "
 				+ "VALUES(?,?,?,?,?,?,?)");
 		
 		try {
@@ -262,7 +259,7 @@ class UsuarioRowMapper implements RowMapper<Usuario> {
     	usuario.setFechaUltimoAcceso(rs.getTimestamp("FECHAULTIMOACCESO"));
     	usuario.setEstatus(rs.getInt("ESTATUS")); 	
     	usuario.setNoControl(rs.getLong("NOCONTROL"));
-    	usuario.setNoAfiliacion(rs.getLong("NOPREAFILIACION"));
+    	usuario.setNoAfiliacion(rs.getLong("NOAFILIACION"));
     	
         return usuario;
     }

@@ -11,12 +11,23 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ActualizarDireccion {
-	
+public class InfoDerechohabiente {
 	long noControl;
 	
 	long noPreAfiliacion;
 	
-	String direccion;	
-
+	String nombre;
+	
+	String paterno;
+	
+	String materno;
+	
+	String curp;
+	
+	String nombreCompleto;
+	
+	public String getNombreCompleto() {
+		return this.nombre.trim() + " " + this.paterno.trim() + " " + this.materno.trim();	
+	}
+	
 }

@@ -70,14 +70,16 @@ public class DerechohabienteCONST {
 	public static final String actualizarPassword="Json para Actualizar password\n\n"+"{"
 			+"\n" + 
 			"			    \"email\": \"email@correo.com\",\n" + 
-			"			    \"password\": \"nuevoPassword\"\n" +
+			"			    \"password\": \"nuevoPassword\"\n" +	
 			"			    }" ;
 	
-	public static final String actualizarDireccion="Json para Actualizar direccion\n\n"+"{"
+	public static final String actualizarDatos="Json para Actualizar direccion\n\n"+"{"
 			+"\n" + 
 			"			    \"noControl\": 20011,\n" + 
 			"			    \"noPreAfiliacion\": 20011,\n" + 
-			"			    \"direccion\": \"nueva direccion\"\n" +
+			"			    \"direccion\": \"nueva direccion\",\n" +
+			"			    \"telefonoCasa\": \"1234567890\",\n" + 
+			"			    \"telefonoCelular\": \"1234567890\"\n" + 
 			"			    }" ;
 
 	public static final String email ="{\"email\":\"email@correo.com\"}";

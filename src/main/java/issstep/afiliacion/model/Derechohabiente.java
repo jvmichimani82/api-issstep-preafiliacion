@@ -48,7 +48,7 @@ public class Derechohabiente {
 	String rfc;
 	
 	@JsonView({Derechohabiente.Views.Simple.class})
-	String domicilio;
+	String direccion;
 	
 	@JsonView({Derechohabiente.Views.Simple.class})
 	String codigoPostal;
