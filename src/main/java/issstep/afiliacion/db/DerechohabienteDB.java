@@ -191,14 +191,15 @@ public class DerechohabienteDB {
 	
 	public void actualiza (Derechohabiente persona) {
 		StringBuilder query = new StringBuilder();
-		query.append("UPDATE DERECHOHABIENTE SET NOMBRE= ?, PATERNO= ?, MATERNO = ?, EMAIL= ?, FECHAREGISTRO= ?, SITUACION= ? WHERE NOCONTROL = ? ");
+		query.append("UPDATE DERECHOHABIENTE SET NOMBRE= ?, PATERNO= ?, MATERNO = ?, EMAIL= ?, FECHAREGISTRO= ?, SITUACION= ?, CLAVEUSUARIOREGISTRO= ? WHERE NOCONTROL = ? ");
 					
 		System.out.println(query.toString());
 		
 		try {
 			  mysqlTemplate.update(query.toString(), new Object[] { 
 					  persona.getNombre(), persona.getPaterno(), persona.getMaterno(), 
-					  persona.getEmail(), persona.getFechaRegistro(), persona.getSituacion(), persona.getNoControl()
+					  persona.getEmail(), persona.getFechaRegistro(), persona.getSituacion(), 
+					  persona.getClaveUsuarioRegistro(),persona.getNoControl()
 			});
 		} catch (Exception e) {
 			e.printStackTrace();
