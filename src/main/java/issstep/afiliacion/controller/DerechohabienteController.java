@@ -62,7 +62,7 @@ public class DerechohabienteController {
     @JsonView(Derechohabiente.Views.Simple.class)
     @RequestMapping(value = "/beneficiarios", method = RequestMethod.GET)
     public ResponseEntity<?> getBeneficiarios(HttpServletResponse response) {
-    	System.out.println(SecurityContextHolder.getContext().getAuthentication());
+    	
     	return derechohabienteService.getBeneficiarios();
     }
     

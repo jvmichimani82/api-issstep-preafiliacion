@@ -24,6 +24,9 @@ public class Derechohabiente {
 	long noPreAfiliacion;
 	
 	@JsonView({Derechohabiente.Views.Simple.class})
+	long noBeneficiario;
+	
+	@JsonView({Derechohabiente.Views.Simple.class})
 	String nombre;
 	
 	@JsonView({Derechohabiente.Views.Simple.class})

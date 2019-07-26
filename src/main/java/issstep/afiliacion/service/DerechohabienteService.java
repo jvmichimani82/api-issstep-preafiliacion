@@ -24,6 +24,7 @@ import com.google.common.hash.Hashing;
 import issstep.afiliacion.db.DerechohabienteDB;
 import issstep.afiliacion.db.UsuarioDB;
 import issstep.afiliacion.db.BeneficiarioDB;
+import issstep.afiliacion.db.CatalogoGenericoDB;
 import issstep.afiliacion.model.Mensaje;
 import issstep.afiliacion.model.ResetPassword;
 import issstep.afiliacion.model.Derechohabiente;
@@ -49,6 +50,9 @@ public class DerechohabienteService {
 	
 	@Autowired
 	BeneficiarioDB beneficiarioDB;
+	
+	@Autowired
+	CatalogoGenericoDB catalogoGenericoDB;
 	
 	@Autowired
 	MailService mailService;
@@ -77,6 +81,10 @@ public class DerechohabienteService {
 		}
 		
     }
+	
+	void fillDerechohabiente(Derechohabiente derechohabiente){
+		
+	}
 	
 	public ResponseEntity<?> getPersonaById(long id) {
 		Derechohabiente persona =  personaDB.getPersonaById(id);
@@ -372,8 +380,11 @@ public class DerechohabienteService {
 	// funcion que regrerara los beneficiarios de algun trabador
 		public ResponseEntity<?> getBeneficiarios() {
 			String user = (String) SecurityContextHolder.getContext().getAuthentication().getName();
+			Usuario usuario =  usuarioDB.getUsuarioByColumnaStringValor("LOGIN", user);
 			
-			List<Derechohabiente> listaBeneficiarios = null;// personaDB.getPersonaById(id);
+			
+			
+			List<Derechohabiente> listaBeneficiarios = personaDB.getPersonasByTrabajador(usuario.getNoControl(), usuario.getNoAfiliacion());
 		
 			if (listaBeneficiarios != null)
 				return new ResponseEntity<>(listaBeneficiarios, HttpStatus.OK);

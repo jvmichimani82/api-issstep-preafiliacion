@@ -86,6 +86,30 @@ public class CatalogoGenericoDB {
 		return registro;
 	}
 	
+	public String getDescripcionCatalogo( String catalogo, long id ) {
+		String nombreId = getNombreId(catalogo);
+		
+		if (nombreId == "")
+			return null;
+		
+		StringBuilder query = new StringBuilder();
+		
+		query.append("SELECT " + nombreId + " AS ID, DESCRIPCION FROM "+ catalogo + " WHERE " + nombreId + "= " + id);
+		
+		CatalogoGenerico registro = null;
+		try {
+			registro = mysqlTemplate.queryForObject(query.toString(), new RegistroRowMapper());
+		}
+		catch (EmptyResultDataAccessException e) {
+			return null;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
 	public int updateRegistro( String catalogo, CatalogoGenerico registro ) {
 		String nombreId = getNombreId(catalogo);
 		
