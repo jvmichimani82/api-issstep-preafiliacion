@@ -371,7 +371,7 @@ public class DerechohabienteDB {
 					+ "BE.CLAVEUSUARIOREGISTRO = ");			
 		query.append(claveUsuario);
 		
-		if (incluirTitular)
+		if (!incluirTitular)
 			query.append(" AND DH.NOCONTROL != 100 AND DH.NOPREAFILIACION != 100");
 				
 		System.out.println("Parentescos ==> " + query.toString());
