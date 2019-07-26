@@ -58,12 +58,12 @@ public class DerechohabienteController {
     	return derechohabienteService.getPersonaById(idPersona);
     }
     
-    //regresamos los beneficiarios del trabajador
+    @ApiOperation(value = "Relación de beneficiarios de un derechohabiente")
     @JsonView(Derechohabiente.Views.Simple.class)
-    @RequestMapping(value = "/beneficiarios", method = RequestMethod.GET)
-    public ResponseEntity<?> getBeneficiarios(HttpServletResponse response) {
+    @RequestMapping(value = "/beneficiarios/{claveUsuarioRegistro}", method = RequestMethod.GET)
+    public ResponseEntity<?> getBeneficiarios(@PathVariable("claveUsuarioRegistro") long claveUsuarioRegistro, HttpServletResponse response) {
     	
-    	return derechohabienteService.getBeneficiarios();
+    	return derechohabienteService.getBeneficiarios(false, claveUsuarioRegistro);
     }
     
     
