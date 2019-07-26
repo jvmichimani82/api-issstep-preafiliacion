@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -127,8 +128,9 @@ public class DerechohabienteService {
 			usuario.setNoAfiliacion(oldPersona.getNoPreAfiliacion());
 			
 			// usuario.setNoAfiliacion(oldPersona.getNoPreAfiliacion());
+			long claveUsuario = usuarioDB.createUsuario( claveParentesco, usuario );
 					
-			if(usuarioDB.insertar(oldPersona, usuario, claveParentesco) == 1) {
+			if(claveUsuario > 1) {
 				//if (Utils.loadPropertie("ambiente").equals(PRODUCCION) || Utils.loadPropertie("ambiente").equals(PRUEBAS)){
     		     //   mailService.prepareAndSendBienvenida(persona.getEmail(),persona.getNombreCompleto() ,persona.getEmail(),persona.gettUsuario().getToken(),persona.gettUsuario().getId());
     		    //}else{
@@ -137,7 +139,7 @@ public class DerechohabienteService {
 					oldPersona.setEmail(persona.getEmail());
 					
 					
-				
+					oldPersona.setClaveUsuarioRegistro(claveUsuario);
 					personaDB.actualiza(oldPersona);
 				
 					//oldPersona.setUsuario(usuarioDB.getUsuarioById(oldPersona.getNoControl()));
@@ -287,6 +289,7 @@ public class DerechohabienteService {
 			
 			oldPersona.setSituacion(1);
 			oldPersona.setFechaRegistro(new Timestamp(new Date().getTime()));
+			oldPersona.setClaveUsuarioRegistro(7);  // Cambiarlo por la de la informacion del logeo
 				
 			long noBeneficiario = beneficiarioDB.createBeneficiario(oldPersona, beneficiario.getClaveParentesco());
 			
@@ -353,6 +356,10 @@ public class DerechohabienteService {
     }
 	
 	public ResponseEntity<?> getDerechohabientesPorEstatusDeValidacion( int estatusValidacion) {	
+		String user = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		
+		System.out.println("User ===> "+ user);
+		
 		if (estatusValidacion < 0 || estatusValidacion > 2)
 			return new ResponseEntity<>(new Mensaje("Estatus de validacion incorrecto"), HttpStatus.BAD_REQUEST);
 		
