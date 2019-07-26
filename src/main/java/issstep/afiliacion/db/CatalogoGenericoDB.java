@@ -17,6 +17,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
 import issstep.afiliacion.model.CatalogoGenerico;
+import issstep.afiliacion.model.Derechohabiente;
 import issstep.afiliacion.model.Descripcion;
 
 @Component
@@ -31,7 +32,7 @@ public class CatalogoGenericoDB {
 		
 		switch (catalogo) {
 			case "KESTADO": 	 nombreId = "CLAVEESTADO"; break;
-			case "KESTADOCIVIL": nombreId = "CLAVEESTADOcivil"; break;
+			case "KESTADOCIVIL": nombreId = "CLAVEESTADOCIVIL"; break;
 			case "KESTATUS": 	 nombreId = "CLAVEESTATUS"; break;
 			case "KPARENTESCO":  nombreId = "CLAVEPARENTESCO"; break;
 			case "KREGION": 	 nombreId = "CLAVEREGION"; break;
@@ -86,19 +87,48 @@ public class CatalogoGenericoDB {
 		return registro;
 	}
 	
-	public String getDescripcionCatalogo( String catalogo, long id ) {
-		String nombreId = getNombreId(catalogo);
-		
-		if (nombreId == "")
-			return null;
-		
+	public String getDescripcionCatalogo( String catalogo, Derechohabiente derechohabiente) {
 		StringBuilder query = new StringBuilder();
 		
-		query.append("SELECT " + nombreId + " AS ID, DESCRIPCION FROM "+ catalogo + " WHERE " + nombreId + "= " + id);
+		switch (catalogo) {
+			case "KESTADO":
+				query.append("SELECT DESCRIPCION FROM "+ catalogo + " WHERE CLAVEESTADO = " + derechohabiente.getClaveEstado());
+				break;
+			case "KESTADOCIVIL":
+				query.append("SELECT DESCRIPCION FROM "+ catalogo + " WHERE CLAVEESTADOCIVIL = " + derechohabiente.getClaveEstadoCivil());
+				break;
+			case "KMUNICIPIO":
+				query.append("SELECT DESCRIPCION FROM "+ catalogo + " WHERE CLAVEESTADO = " + derechohabiente.getClaveEstado());
+				query.append(" AND CLAVEMUNICIPIO = " + derechohabiente.getClaveMunicipio());
+				break;
+			case "KLOCALIDAD":
+				query.append("SELECT DESCRIPCION FROM "+ catalogo + " WHERE CLAVEESTADO = " + derechohabiente.getClaveEstado());
+				query.append(" AND CLAVEMUNICIPIO = " + derechohabiente.getClaveMunicipio());
+				query.append(" AND CLAVELOCALIDAD = " + derechohabiente.getClaveLocalidad());
+				break;
+			case "KCOLONIA":
+				query.append("SELECT DESCRIPCION FROM "+ catalogo + " WHERE CLAVEESTADO = " + derechohabiente.getClaveEstado());
+				query.append(" AND CLAVEMUNICIPIO = " + derechohabiente.getClaveMunicipio());
+				query.append(" AND CLAVELOCALIDAD = " + derechohabiente.getClaveLocalidad());
+				query.append(" AND CLAVECOLONIA = " + derechohabiente.getClaveColonia());
+				break;
+			case "KCLINICASERVICIO":
+				query.append("SELECT DESCRIPCION FROM "+ catalogo + " WHERE CLAVECLINICASERVICIO = " + derechohabiente.getClaveClinicaServicio());
+				break;
+			case "KSITUACION": 
+				query.append("SELECT DESCRIPCION FROM "+ catalogo + " WHERE CLAVESITUACION = " + derechohabiente.getSituacion());
+				break;
+			case "KPARENTESCO": 
+				query.append("SELECT DESCRIPCION FROM "+ catalogo + " WHERE CLAVEPARENTESCO = " + derechohabiente.getClaveParentesco());
+				break;
+		}
 		
-		CatalogoGenerico registro = null;
+	
+		System.out.println(query.toString());
+		
+		CatalogoGenerico descripcion = null;
 		try {
-			registro = mysqlTemplate.queryForObject(query.toString(), new RegistroRowMapper());
+			descripcion = mysqlTemplate.queryForObject(query.toString(), new DescripcionRowMapper());
 		}
 		catch (EmptyResultDataAccessException e) {
 			return null;
@@ -107,7 +137,7 @@ public class CatalogoGenericoDB {
 			e.printStackTrace();
 		}
 		
-		return null;
+		return descripcion.getDescripcion();
 	}
 	
 	public int updateRegistro( String catalogo, CatalogoGenerico registro ) {
@@ -185,3 +215,15 @@ class RegistroRowMapper implements RowMapper<CatalogoGenerico> {
         return registro;
     }
 }
+
+class DescripcionRowMapper implements RowMapper<CatalogoGenerico> {
+    @Override
+    public CatalogoGenerico mapRow(ResultSet rs, int rowNum) throws SQLException {
+    	
+    	CatalogoGenerico registro= new CatalogoGenerico();
+    	registro.setDescripcion(rs.getString("DESCRIPCION"));
+    	
+        return registro;
+    }
+}
+

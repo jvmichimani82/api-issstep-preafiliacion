@@ -116,15 +116,21 @@ public class Derechohabiente {
 	@JsonView({Derechohabiente.Views.Simple.class})
 	String estadoCivil;
 	
+	@JsonView({Derechohabiente.Views.Simple.class})
+	long claveParentesco;
+	
+	@JsonView({Derechohabiente.Views.Simple.class})
+	String parentesco;
+	
 	@JsonView({Derechohabiente.Views.Simple.class})	
 	String nombreCompleto;
 	
-	@JsonView({Derechohabiente.Views.RegistroDerechohabiente.class})
+	@JsonView({Derechohabiente.Views.Simple.class})
 	Usuario usuario;
 
 
 	public String getNombreCompleto() {
-		return this.nombre +" "+ this.paterno+" "+ this.materno;	
+		return this.nombre.trim() +" "+ this.paterno.trim()+" "+ this.materno.trim();	
 	}
 	
 	public static final class Views {

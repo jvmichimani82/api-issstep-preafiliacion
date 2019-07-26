@@ -7,7 +7,8 @@ public class DerechohabienteCONST {
 	
 	public static final String registroUsuario="Json para Registro Usuario online \n\n"+"{"
 			+"\r\n" + 
-			"			    \"id\": \"18\",\r\n" + 
+			"			    \"nocontrol\": \"100\",\r\n" +
+			"			    \"noAfiliacion\": \"100\",\r\n" + 
 			"			    \"curp\": \"RHUJ820830HPLLCS08\",\r\n" + 
 			"			    \"email\": \"email@correo.com\",\r\n" + 
 			"			    \"usuario\": {\r\n" + 
