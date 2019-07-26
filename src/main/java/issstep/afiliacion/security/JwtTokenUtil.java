@@ -42,11 +42,14 @@ public class JwtTokenUtil implements Serializable {
     public MessageUtils messageUtils = new MessageUtils();
 
     public String getUsernameFromToken(String token) {
+    	 
         String username;
         try {
             final Claims claims = getClaimsFromToken(token);
+            System.out.println(claims.getSubject());
             username = claims.getSubject();
         } catch (Exception e) {
+        	e.printStackTrace();
             username = null;
         }
         return username;
@@ -99,12 +102,12 @@ public class JwtTokenUtil implements Serializable {
     private Claims getClaimsFromToken(String token) {
         Claims claims;
         try {
-            claims = Jwts.parser()
+          claims = Jwts.parser()
                     .setSigningKey(messageUtils.getMessage("secret_jwt_token"))
                     .parseClaimsJws(token)
                     .getBody();
         } catch (Exception e) {
-        	//e.printStackTrace();
+        	e.printStackTrace();
         	//logger.error(token, e.printStackTrace());
             claims = null;
         }
@@ -148,10 +151,9 @@ public class JwtTokenUtil implements Serializable {
         Map<String, Object> claims = new HashMap<>();
         claims.put(CLAIM_KEY_ROL, usuario.getRol());
        // claims.put(CLAIM_KEY_IDUSER, usuario.getNoUsuario() );
-       	claims.put(CLAIM_KEY_USERNAME, userDetails.getUsername());
+       	claims.put(CLAIM_KEY_USERNAME, usuario.getLogin());
        	//claims.put(CLAIM_KEY_ROL, usuario.getRol() != null ?  usuario.getRol().getClave() : "");
        	claims.put(CLAIM_KEY_IDUSER, usuario.getNoControl());
-       	 claims.put(CLAIM_KEY_USERNAME, userDetails.getUsername());
         claims.put(CLAIM_KEY_AUDIENCE, generateAudience(device));
         claims.put(CLAIM_KEY_CREATED, new Date());
         
