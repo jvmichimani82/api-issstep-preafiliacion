@@ -28,7 +28,7 @@ public class UsuarioDB {
 
 	public Usuario getSession(String usuario, String passwd) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT CLAVEUSUARIO, CLAVEROL, LOGIN, TOKEN, PASSWORD, FECHAREGISTRO, FECHAULTIMOACCESO, ESTATUS, NOCONTROL, NOAFILIACION FROM USUARIO WHERE LOGIN ='");
+		query.append("SELECT U.CLAVEUSUARIO, U.CLAVEROL, R.DESCRIPCION, U.LOGIN, U.TOKEN, U.PASSWORD, U.FECHAREGISTRO, U.FECHAULTIMOACCESO, U.ESTATUS, U.NOCONTROL, U.NOPREAFILIACION FROM USUARIO U, KROL R WHERE LOGIN ='");
 		query.append(usuario);
 		query.append("' AND U.PASSWORD ='");
 		query.append(passwd);
@@ -259,7 +259,7 @@ class UsuarioRowMapper implements RowMapper<Usuario> {
     	usuario.setFechaUltimoAcceso(rs.getTimestamp("FECHAULTIMOACCESO"));
     	usuario.setEstatus(rs.getInt("ESTATUS")); 	
     	usuario.setNoControl(rs.getLong("NOCONTROL"));
-    	usuario.setNoAfiliacion(rs.getLong("NOAFILIACION"));
+    	usuario.setNoAfiliacion(rs.getLong("NOPREAFILIACION"));
     	
         return usuario;
     }
