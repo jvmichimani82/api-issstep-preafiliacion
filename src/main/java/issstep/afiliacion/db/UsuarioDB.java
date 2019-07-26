@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 
 import issstep.afiliacion.model.Usuario;
 import issstep.afiliacion.model.Derechohabiente;
-import issstep.afiliacion.model.Descripcion;
 
 @Component
 public class UsuarioDB {
@@ -28,7 +27,7 @@ public class UsuarioDB {
 
 	public Usuario getSession(String usuario, String passwd) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT U.CLAVEUSUARIO, U.CLAVEROL, R.DESCRIPCION, U.LOGIN, U.TOKEN, U.PASSWORD, U.FECHAREGISTRO, U.FECHAULTIMOACCESO, U.ESTATUS, U.NOCONTROL, U.NOPREAFILIACION FROM USUARIO U, KROL R WHERE LOGIN ='");
+		query.append("SELECT U.CLAVEUSUARIO, U.CLAVEROL, R.DESCRIPCION, U.LOGIN, U.TOKEN, U.PASSWORD, U.FECHAREGISTRO, U.FECHAULTIMOACCESO, U.ESTATUS, U.NOCONTROL, U.NOAFILIACION FROM USUARIO U, KROL R WHERE LOGIN ='");
 		query.append(usuario);
 		query.append("' AND U.PASSWORD ='");
 		query.append(passwd);
@@ -259,7 +258,7 @@ class UsuarioRowMapper implements RowMapper<Usuario> {
     	usuario.setFechaUltimoAcceso(rs.getTimestamp("FECHAULTIMOACCESO"));
     	usuario.setEstatus(rs.getInt("ESTATUS")); 	
     	usuario.setNoControl(rs.getLong("NOCONTROL"));
-    	usuario.setNoAfiliacion(rs.getLong("NOPREAFILIACION"));
+    	usuario.setNoAfiliacion(rs.getLong("NOAFILIACION"));
     	
         return usuario;
     }
