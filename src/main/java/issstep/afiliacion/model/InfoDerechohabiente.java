@@ -24,6 +24,8 @@ public class InfoDerechohabiente {
 	
 	String curp;
 	
+	long claveUsuarioRegistro;
+	
 	String nombreCompleto;
 	
 	public String getNombreCompleto() {

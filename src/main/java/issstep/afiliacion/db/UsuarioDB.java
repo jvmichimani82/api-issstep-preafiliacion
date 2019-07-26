@@ -88,12 +88,9 @@ public class UsuarioDB {
 	
 	public Usuario getUsuarioByColumnaStringValor(String campo, String valor) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT U.CLAVEUSUARIO, U.CLAVEROL, R.DESCRIPCION, U.LOGIN, U.TOKEN, U.PASSWORD, U.FECHAREGISTRO, "
-				+ "U.FECHAULTIMOACCESO, U.ESTATUS, U.NOCONTROL, U.NOAFILIACION FROM USUARIO U, KROL R WHERE "
-				+ campo + " = '" + valor +"'");
-		query.append(" AND U.CLAVEROL=R.CLAVEROL");
-		
-		
+		query.append( "SELECT U.CLAVEUSUARIO, U.CLAVEROL, R.DESCRIPCION, U.LOGIN, U.TOKEN, U.PASSWORD, U.FECHAREGISTRO, "
+					+ "U.FECHAULTIMOACCESO, U.ESTATUS, U.NOCONTROL, U.NOAFILIACION FROM USUARIO U, KROL R WHERE "
+					+ campo + " = '" + valor + "' AND U.CLAVEROL = R.CLAVEROL");
 	
 		System.out.println(query.toString());
 		

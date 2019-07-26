@@ -332,7 +332,7 @@ public class DerechohabienteDB {
 	public List<InfoDerechohabiente> getDerechohabientesPorEstatusDeValidacion( int estatusValidacion) {
 		
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT D.NOCONTROL, D.NOPREAFILIACION, D.NOMBRE, D.PATERNO, D.MATERNO, D.CURP FROM DERECHOHABIENTE D, "
+		query.append("SELECT D.NOCONTROL, D.NOPREAFILIACION, D.NOMBRE, D.PATERNO, D.MATERNO, D.CURP, D.CLAVEUSUARIOREGISTRO FROM DERECHOHABIENTE D, "
 				+ "(SELECT NOCONTROL, NOPREAFILIACION FROM DOCUMENTO WHERE ESVALIDO = " + estatusValidacion 
 				+ " GROUP BY NOCONTROL, NOPREAFILIACION) DOC" 
 				+ " WHERE D.NOCONTROL = DOC.NOCONTROL AND D.NOPREAFILIACION = DOC.NOPREAFILIACION");
@@ -348,27 +348,36 @@ public class DerechohabienteDB {
 		return lista;
 	}
 	
-	public List<Derechohabiente> getPersonasByTrabajador(long noControl, long noPreafiliacion) {
+	public List<Derechohabiente> getPersonasByTrabajador(boolean incluirTitular, long claveUsuario) {
 		StringBuilder query = new StringBuilder();
 		query.append( "SELECT DH.*, EF.DESCRIPCION AS ENTIDAD, M.DESCRIPCION AS MUNICIPIO, L.DESCRIPCION AS LOCALIDAD, C.DESCRIPCION AS COLONIA, "
-				+ "EDOCVIL.DESCRIPCION AS ESTADOCIVIL, CSERV.DESCRIPCION AS CLINICA  "
-				+ "FROM DERECHOHABIENTE DH, KESTADO EF, KMUNICIPIO M, KLOCALIDAD L, KCOLONIA AS C, KESTADOCIVIL EDOCVIL, KCLINICASERVICIO CSERV, "
-				+ "BENEFICIARIO BE "
-				+ "WHERE DH.CLAVEESTADO = EF.CLAVEESTADO AND "
-				+ "DH.CLAVEMUNICIPIO = M.CLAVEMUNICIPIO AND "
-				+ "DH.CLAVECOLONIA = C.CLAVECOLONIA AND "
-				+ "DH.CLAVECLINICASERVICIO = CSERV.CLAVECLINICASERVICIO AND "
-				+ "DH.CLAVEESTADOCIVIL = EDOCVIL.CLAVEESTADOCIVIL AND "
-				+ "DH.CLAVEMUNICIPIO = L.CLAVEMUNICIPIO AND DH.CLAVELOCALIDAD = L.CLAVELOCALIDAD AND "
-				+ "DH.NOCONTROL = BE.NOCONTROL AND DH.NOPREAFILIACION = BE.NOPREAFILIACION "
-				+ "AND DH.NOCONTROL =");	
+					+ "EDOCVIL.DESCRIPCION AS ESTADOCIVIL, CSERV.DESCRIPCION AS CLINICA, BE.CLAVEPARENTESCO, PARENT.DESCRIPCION AS PARENTESCO  "
+					+ "FROM DERECHOHABIENTE DH, "
+					+ "KESTADO EF, "
+					+ "KMUNICIPIO M, "
+					+ "KLOCALIDAD L, "
+					+ "KCOLONIA AS C, "
+					+ "KESTADOCIVIL EDOCVIL, "
+					+ "KCLINICASERVICIO CSERV, "
+					+ "BENEFICIARIO BE, "
+					+ "KPARENTESCO PARENT "
+					+ "WHERE DH.CLAVEESTADO = EF.CLAVEESTADO AND "
+					+ "DH.CLAVEMUNICIPIO = M.CLAVEMUNICIPIO AND "
+					+ "DH.CLAVECOLONIA = C.CLAVECOLONIA AND "
+					+ "DH.CLAVECLINICASERVICIO = CSERV.CLAVECLINICASERVICIO AND "
+					+ "DH.CLAVEESTADOCIVIL = EDOCVIL.CLAVEESTADOCIVIL AND "
+					+ "DH.CLAVEMUNICIPIO = L.CLAVEMUNICIPIO AND DH.CLAVELOCALIDAD = L.CLAVELOCALIDAD AND "
+					+ "DH.NOCONTROL = BE.NOCONTROL AND BE.CLAVEPARENTESCO = PARENT.CLAVEPARENTESCO AND "
+					+ "BE.CLAVEUSUARIOREGISTRO = ");			
+		query.append(claveUsuario);
 		
-		query.append(noControl);
-		
-		System.out.println(query.toString());
+		if (incluirTitular)
+			query.append(" AND DH.NOCONTROL != 100 AND DH.NOPREAFILIACION != 100");
+				
+		System.out.println("Parentescos ==> " + query.toString());
 		List<Derechohabiente> beneficiarios = null;
 		try {
-			beneficiarios =  mysqlTemplate.query(query.toString(), new PersonaRowMapper());
+			beneficiarios =  mysqlTemplate.query(query.toString(), new PersonaConParentescoRowMapper());
 		} 
 		catch (EmptyResultDataAccessException e) {
 			return null;
@@ -395,7 +404,7 @@ class PersonaRowMapper implements RowMapper<Derechohabiente> {
         persona.setSexo(rs.getString("SEXO"));
         persona.setCurp(rs.getString("CURP"));
         persona.setRfc(rs.getString("RFC"));
-        persona.setDireccion(rs.getString("DOMICILIO"));
+        persona.setDireccion(rs.getString("DIRECCION"));
         persona.setCodigoPostal(rs.getString("CODIGOPOSTAL"));
         persona.setTelefonoCasa(rs.getString("TELEFONOCASA"));
         persona.setTelefonoCelular(rs.getString("TELEFONOCELULAR"));
@@ -419,10 +428,51 @@ class PersonaRowMapper implements RowMapper<Derechohabiente> {
         persona.setEstadoCivil(rs.getString("ESTADOCIVIL"));
         
         return persona;
-    }
-    
-    
-    
+    }   
+}
+
+class PersonaConParentescoRowMapper implements RowMapper<Derechohabiente> {
+    @Override
+    public Derechohabiente mapRow(ResultSet rs, int rowNum) throws SQLException {
+    	Derechohabiente persona = new Derechohabiente();
+ 
+    	persona.setNoControl(rs.getLong("NOCONTROL"));
+    	persona.setNoPreAfiliacion(rs.getLong("NOPREAFILIACION"));
+        persona.setNombre(rs.getString("NOMBRE"));
+        persona.setPaterno(rs.getString("PATERNO"));
+        persona.setMaterno(rs.getString("MATERNO"));
+        persona.setEmail(rs.getString("EMAIL"));
+        persona.setFechaNacimiento(rs.getTimestamp("FECHANACIMIENTO"));
+        persona.setSexo(rs.getString("SEXO"));
+        persona.setCurp(rs.getString("CURP"));
+        persona.setRfc(rs.getString("RFC"));
+        persona.setDireccion(rs.getString("DIRECCION"));
+        persona.setCodigoPostal(rs.getString("CODIGOPOSTAL"));
+        persona.setTelefonoCasa(rs.getString("TELEFONOCASA"));
+        persona.setTelefonoCelular(rs.getString("TELEFONOCELULAR"));
+        persona.setFechaPreAfiliacion(rs.getTimestamp("FECHAPREAFILIACION"));
+        persona.setSituacion(rs.getInt("SITUACION"));
+        persona.setClaveUsuarioRegistro(rs.getLong("CLAVEUSUARIOREGISTRO"));
+        persona.setFechaRegistro(rs.getTimestamp("FECHAREGISTRO"));
+        persona.setClaveUsuarioModificacion(rs.getLong("CLAVEUSUARIOMODIFICACION"));
+        persona.setFechaModificacion(rs.getTimestamp("FECHAMODIFICACION"));
+        persona.setClaveEstado(rs.getLong("CLAVEESTADO"));
+        persona.setEstado(rs.getString("ENTIDAD"));
+        persona.setClaveMunicipio(rs.getLong("CLAVEMUNICIPIO"));
+        persona.setMunicipio(rs.getString("MUNICIPIO"));
+        persona.setClaveLocalidad(rs.getLong("CLAVELOCALIDAD"));
+        persona.setLocalidad(rs.getString("LOCALIDAD"));
+        persona.setClaveColonia(rs.getLong("CLAVECOLONIA"));
+        persona.setColonia(rs.getString("COLONIA"));
+        persona.setClaveClinicaServicio(rs.getLong("CLAVECLINICASERVICIO"));
+        persona.setClinicaServicio(rs.getString("CLINICA"));        
+        persona.setClaveEstadoCivil(rs.getLong("CLAVEESTADOCIVIL"));
+        persona.setEstadoCivil(rs.getString("ESTADOCIVIL"));
+        persona.setClaveParentesco(rs.getLong("CLAVEPARENTESCO"));
+        persona.setParentesco(rs.getString("PARENTESCO"));
+        
+        return persona;
+    }   
 }
 
 class TrabajadorRowMapper implements RowMapper<Derechohabiente> {
@@ -442,7 +492,7 @@ class TrabajadorRowMapper implements RowMapper<Derechohabiente> {
         persona.setDireccion(rs.getString("DOMICILIO"));
         persona.setCodigoPostal(rs.getString("CODIGOPOSTAL"));
         persona.setTelefonoCasa(rs.getString("TELEFONO"));
-         persona.setFechaPreAfiliacion(rs.getTimestamp("FECHAAFILIACION"));
+        persona.setFechaPreAfiliacion(rs.getTimestamp("FECHAAFILIACION"));
         persona.setSituacion(rs.getInt("SITUACION"));
         persona.setClaveUsuarioRegistro(rs.getLong("CLAVEUSUARIOCAPTURA"));
         persona.setFechaRegistro(rs.getTimestamp("FECHAREGISTRO"));
@@ -473,6 +523,7 @@ class ListaPersonaRowMapper implements RowMapper<InfoDerechohabiente> {
     	infoDerechohabiente.setPaterno(rs.getString("PATERNO"));
     	infoDerechohabiente.setMaterno(rs.getString("MATERNO"));
         infoDerechohabiente.setCurp(rs.getString("CURP"));
+        infoDerechohabiente.setClaveUsuarioRegistro(rs.getLong("CLAVEUSUARIOREGISTRO"));
            
         return infoDerechohabiente;
     }

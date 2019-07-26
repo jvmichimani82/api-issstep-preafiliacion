@@ -150,6 +150,8 @@ public class DerechohabienteService {
 					
 					oldPersona.setClaveUsuarioRegistro(claveUsuario);
 					personaDB.actualiza(oldPersona);
+					
+					usuarioDB.registraBeneficiario(oldPersona, 0);
 				
 					//oldPersona.setUsuario(usuarioDB.getUsuarioById(oldPersona.getNoControl()));
 				
@@ -296,9 +298,12 @@ public class DerechohabienteService {
 			if (oldPersona == null) 
 				return new ResponseEntity<>(new Mensaje("No existe el derechohabiente"), HttpStatus.CONFLICT);
 			
+			String user = (String) SecurityContextHolder.getContext().getAuthentication().getName();
+			Usuario usuario =  usuarioDB.getUsuarioByColumnaStringValor("LOGIN", user);
+			
 			oldPersona.setSituacion(1);
 			oldPersona.setFechaRegistro(new Timestamp(new Date().getTime()));
-			oldPersona.setClaveUsuarioRegistro(7);  // Cambiarlo por la de la informacion del logeo
+			oldPersona.setClaveUsuarioRegistro(usuario.getClaveUsuario());  // Cambiarlo por la de la informacion del logeo
 				
 			long noBeneficiario = beneficiarioDB.createBeneficiario(oldPersona, beneficiario.getClaveParentesco());
 			
@@ -365,10 +370,6 @@ public class DerechohabienteService {
     }
 	
 	public ResponseEntity<?> getDerechohabientesPorEstatusDeValidacion( int estatusValidacion) {	
-		String user = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		
-		System.out.println("User ===> "+ user);
-		
 		if (estatusValidacion < 0 || estatusValidacion > 2)
 			return new ResponseEntity<>(new Mensaje("Estatus de validacion incorrecto"), HttpStatus.BAD_REQUEST);
 		
@@ -378,13 +379,14 @@ public class DerechohabienteService {
     }
 	
 	// funcion que regrerara los beneficiarios de algun trabador
-		public ResponseEntity<?> getBeneficiarios() {
+		public ResponseEntity<?> getBeneficiarios(boolean incluirTitular, long claveUsuarioRegistro) {
 			String user = (String) SecurityContextHolder.getContext().getAuthentication().getName();
 			Usuario usuario =  usuarioDB.getUsuarioByColumnaStringValor("LOGIN", user);
 			
+			/* if (usuario.getClaveRol() == 2 && usuario.getClaveUsuario() != claveUsuarioRegistro)
+				return new ResponseEntity<>(new Mensaje("No tiene permiso para ver la lista"), HttpStatus.BAD_REQUEST); */
 			
-			
-			List<Derechohabiente> listaBeneficiarios = personaDB.getPersonasByTrabajador(usuario.getNoControl(), usuario.getNoAfiliacion());
+			List<Derechohabiente> listaBeneficiarios = personaDB.getPersonasByTrabajador(incluirTitular, claveUsuarioRegistro);
 		
 			if (listaBeneficiarios != null)
 				return new ResponseEntity<>(listaBeneficiarios, HttpStatus.OK);
