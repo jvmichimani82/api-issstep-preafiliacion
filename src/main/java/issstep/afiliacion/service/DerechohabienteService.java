@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -367,5 +368,19 @@ public class DerechohabienteService {
 			
 		return new ResponseEntity<>(derechohabientes, HttpStatus.OK);	
     }
+	
+	// funcion que regrerara los beneficiarios de algun trabador
+		public ResponseEntity<?> getBeneficiarios() {
+			String user = (String) SecurityContextHolder.getContext().getAuthentication().getName();
+			
+			List<Derechohabiente> listaBeneficiarios = null;// personaDB.getPersonaById(id);
+		
+			if (listaBeneficiarios != null)
+				return new ResponseEntity<>(listaBeneficiarios, HttpStatus.OK);
+			
+			else
+				return new ResponseEntity<>(new ArrayList[0] , HttpStatus.OK);
+			
+	    }
 	
 }

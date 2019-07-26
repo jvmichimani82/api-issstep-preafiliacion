@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -55,6 +56,14 @@ public class DerechohabienteController {
     public ResponseEntity<?> getPersonaById(@ApiParam(value = "idPersona", required = true) @PathVariable long idPersona, HttpServletResponse response) {
 
     	return derechohabienteService.getPersonaById(idPersona);
+    }
+    
+    //regresamos los beneficiarios del trabajador
+    @JsonView(Derechohabiente.Views.Simple.class)
+    @RequestMapping(value = "/beneficiarios", method = RequestMethod.GET)
+    public ResponseEntity<?> getBeneficiarios(HttpServletResponse response) {
+    	System.out.println(SecurityContextHolder.getContext().getAuthentication());
+    	return derechohabienteService.getBeneficiarios();
     }
     
     
