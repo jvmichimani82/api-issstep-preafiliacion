@@ -331,10 +331,13 @@ public class DerechohabienteDB {
 	public List<InfoDerechohabiente> getDerechohabientesPorEstatusDeValidacion( int estatusValidacion) {
 		
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT D.NOCONTROL, D.NOPREAFILIACION, D.NOMBRE, D.PATERNO, D.MATERNO, D.CURP, D.CLAVEUSUARIOREGISTRO FROM DERECHOHABIENTE D, "
-				+ "(SELECT NOCONTROL, NOPREAFILIACION FROM DOCUMENTO WHERE ESVALIDO = " + estatusValidacion 
-				+ " GROUP BY NOCONTROL, NOPREAFILIACION) DOC" 
-				+ " WHERE D.NOCONTROL = DOC.NOCONTROL AND D.NOPREAFILIACION = DOC.NOPREAFILIACION");
+		query.append( "SELECT D.NOCONTROL, D.NOPREAFILIACION, D.NOMBRE, D.PATERNO, D.MATERNO, D.CURP, D.CLAVEUSUARIOREGISTRO "
+					+ "FROM DERECHOHABIENTE D, "
+					+ "(SELECT CLAVEUSUARIOREGISTRO FROM DOCUMENTO WHERE ESVALIDO = " + estatusValidacion 
+					+ " GROUP BY CLAVEUSUARIOREGISTRO) DOC" 
+					+ " WHERE D.CLAVEUSUARIOREGISTRO = DOC.CLAVEUSUARIOREGISTRO");
+		
+		System.out.println(query.toString());
 		
 		List<InfoDerechohabiente> lista = null;
 		
