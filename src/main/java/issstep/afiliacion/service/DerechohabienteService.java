@@ -412,9 +412,7 @@ public class DerechohabienteService {
 		public ResponseEntity<?> getBeneficiarios(boolean incluirTitular, long claveUsuarioRegistro) {
 			String user = (String) SecurityContextHolder.getContext().getAuthentication().getName();
 			Usuario usuario =  usuarioDB.getUsuarioByColumnaStringValor("LOGIN", user);
-			
-			System.out.println(usuario.getNoControl());
-
+		
 			List<Derechohabiente> listaBeneficiarios = personaDB.getBeneficiariosByDerechohabiente(usuario.getNoControl());
 			
 			for(Derechohabiente dere: listaBeneficiarios){

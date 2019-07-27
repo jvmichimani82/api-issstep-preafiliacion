@@ -358,6 +358,7 @@ public class DerechohabienteDB {
 				+ "AND DH.NOCONTROL =");
 		query.append(noControl);
 
+
 		System.out.println("Parentescos ==> " + query.toString());
 		List<Derechohabiente> beneficiarios = null;
 		try {
