@@ -51,7 +51,7 @@ public class UsuarioDB {
 	
 	public Usuario getUsuarioById(long id) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT CLAVEUSUARIO, CLAVEROL, LOGIN, TOKEN, PASSWORD, FECHAREGISTRO, FECHAULTIMOACCESO, ESTATUS, NOCONTROL, NOAFILIACION FROM USUARIO WHERE USUARIO = ");
+		query.append("SELECT CLAVEUSUARIO, CLAVEROL, LOGIN, TOKEN, PASSWORD, FECHAREGISTRO, FECHAULTIMOACCESO, ESTATUS, NOCONTROL, NOAFILIACION FROM USUARIO WHERE NOCONTROL = ");
 		query.append(id);
 	
 		Usuario user = null;
@@ -69,8 +69,7 @@ public class UsuarioDB {
 	
 	public Usuario getUsuarioPreafiliacionByNoControlAndNoAfiliacion(long noControl, long noAfiliacion) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT CLAVEUSUARIO, CLAVEROL, LOGIN, TOKEN, PASSWORD, FECHAREGISTRO, FECHAULTIMOACCESO,"
-				+ " ESTATUS, NOCONTROL, NOAFILIACION FROM USUARIO WHERE NOCONTROL = ");
+		query.append("SELECT U.*, R.DESCRIPCION FROM USUARIO U, KROL R WHERE U.CLAVEROL = R.CLAVEROL AND  NOCONTROL =");
 		query.append(noControl);
 		query.append(" AND NOAFILIACION = ");
 		query.append(noAfiliacion);
@@ -96,7 +95,7 @@ public class UsuarioDB {
 		query.append("SELECT U.CLAVEUSUARIO, U.CLAVEROL, R.DESCRIPCION, U.LOGIN, U.TOKEN, U.PASSWORD, U.FECHAREGISTRO, "
 				+"U.FECHAULTIMOACCESO, U.ESTATUS, U.NOCONTROL, U.NOAFILIACION FROM USUARIO U, KROL R WHERE TOKEN = '");
 		query.append(token+"'");
-		query.append(" AND U.CLAVEROL=R.CLAVEROL");
+		query.append(" AND U.CLAVEROL = R.CLAVEROL");
 		
 		System.out.println(query.toString());
 	

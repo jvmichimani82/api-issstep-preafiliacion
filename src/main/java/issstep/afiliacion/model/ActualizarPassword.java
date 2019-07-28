@@ -13,8 +13,8 @@ import lombok.Setter;
 @Builder
 public class ActualizarPassword {
 	
-	String email;
+	String passwordActual;
 	
-	String password;	
+	String passwordNuevo;	
 
 }

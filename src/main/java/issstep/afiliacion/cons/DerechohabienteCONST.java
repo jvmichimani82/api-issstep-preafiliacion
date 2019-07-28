@@ -70,8 +70,8 @@ public class DerechohabienteCONST {
 	
 	public static final String actualizarPassword="Json para Actualizar password\n\n"+"{"
 			+"\n" + 
-			"			    \"email\": \"email@correo.com\",\n" + 
-			"			    \"password\": \"nuevoPassword\"\n" +	
+			"			    \"passwordActual\": \"PasswordActual\",\n" + 
+			"			    \"passwordNuevo\": \"PasswordNuevo\"\n" +	
 			"			    }" ;
 	
 	public static final String actualizarDatos="Json para Actualizar direccion\n\n"+"{"

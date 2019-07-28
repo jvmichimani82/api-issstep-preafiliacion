@@ -373,13 +373,20 @@ public class DerechohabienteService {
 	}
 	
 	public ResponseEntity<?> actualizarPassword( ActualizarPassword actualizarPassword) {	
+		Usuario usuarioLogin = getInfoLogin();
+		if (usuarioLogin == null)
+			return new ResponseEntity<>(new Mensaje("Usuario no autentificado"), HttpStatus.BAD_REQUEST);
 		
-		Usuario usuario = usuarioDB.getUsuarioByColumnaStringValor("LOGIN", actualizarPassword.getEmail());
+		String passwordActual = Hashing.sha256().hashString(actualizarPassword.getPasswordActual(), Charsets.UTF_8).toString();
 		
-		if (usuario == null)
-			return new ResponseEntity<>(new Mensaje("No existe el usuario con email: " + actualizarPassword.getEmail()), HttpStatus.CONFLICT);		
-				
-		usuario.setPasswd(Hashing.sha256().hashString(actualizarPassword.getPassword(), Charsets.UTF_8).toString());
+		Usuario usuario = usuarioDB.getUsuarioPreafiliacionByNoControlAndNoAfiliacion(usuarioLogin.getNoControl(), usuarioLogin.getNoAfiliacion());
+		System.out.println(passwordActual);
+		System.out.println(usuario.getPasswd());
+		
+		if (!usuario.getPasswd().equals(passwordActual)) 
+			return new ResponseEntity<>(new Mensaje("Password actual incorrecto "), HttpStatus.BAD_REQUEST);		
+						
+		usuario.setPasswd(Hashing.sha256().hashString(actualizarPassword.getPasswordNuevo(), Charsets.UTF_8).toString());
 		usuarioDB.actualiza(usuario);
 		
 		return new ResponseEntity<>(usuario , HttpStatus.OK);	
@@ -409,22 +416,40 @@ public class DerechohabienteService {
     }
 	
 	// funcion que regrerara los beneficiarios de algun trabador
-		public ResponseEntity<?> getBeneficiarios(boolean incluirTitular, long claveUsuarioRegistro) {
-			String user = (String) SecurityContextHolder.getContext().getAuthentication().getName();
-			Usuario usuario =  usuarioDB.getUsuarioByColumnaStringValor("LOGIN", user);
-		
-			List<Derechohabiente> listaBeneficiarios = personaDB.getBeneficiariosByDerechohabiente(usuario.getNoControl());
-			
-			for(Derechohabiente dere: listaBeneficiarios){
-				fillDerechohabiente(dere);
-			}
-			
-			if (listaBeneficiarios != null)
-				return new ResponseEntity<>(listaBeneficiarios, HttpStatus.OK);
-			
-			else
-				return new ResponseEntity<>(new ArrayList[0] , HttpStatus.OK);
-			
-	    }
+	public ResponseEntity<?> getBeneficiarios(boolean incluirTitular, long claveUsuarioRegistro) {
+		String user = (String) SecurityContextHolder.getContext().getAuthentication().getName();
+		Usuario usuario =  usuarioDB.getUsuarioByColumnaStringValor("LOGIN", user);
 	
+		List<Derechohabiente> listaBeneficiarios = personaDB.getBeneficiariosByDerechohabiente(usuario.getNoControl());
+		
+		for(Derechohabiente dere: listaBeneficiarios){
+			fillDerechohabiente(dere);
+		}
+		
+		if (listaBeneficiarios != null)
+			return new ResponseEntity<>(listaBeneficiarios, HttpStatus.OK);
+		
+		else
+			return new ResponseEntity<>(new ArrayList[0] , HttpStatus.OK);
+		
+    }
+	
+	Usuario getInfoLogin() {
+		String user = (String) SecurityContextHolder.getContext().getAuthentication().getName();
+		System.out.println("N control ===> ");
+		System.out.println(user);
+		if (user == "anonymousUser") 
+			return null;
+			
+		Usuario usuario =  usuarioDB.getUsuarioByColumnaStringValor("LOGIN", user);
+		
+		
+		return usuario;
+	}
+	
+	boolean esPawwordActual( Usuario usuario, String passwordActual) {
+		
+		return true;
+	}
+
 }

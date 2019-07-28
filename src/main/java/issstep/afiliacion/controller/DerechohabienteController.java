@@ -123,7 +123,7 @@ public class DerechohabienteController {
     
     @ApiOperation(value = "Actualizar password")
     @RequestMapping(value = "/actualizar/password", method=RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> recuperarPassword( @ApiParam(value = DerechohabienteCONST.actualizarPassword, required = true)@RequestBody ActualizarPassword actualizarPassword, HttpServletResponse response ){
+	public ResponseEntity<?> actualizarPassword( @ApiParam(value = DerechohabienteCONST.actualizarPassword, required = true)@RequestBody ActualizarPassword actualizarPassword, HttpServletResponse response ){
 
     	return derechohabienteService.actualizarPassword(actualizarPassword);
 	}
