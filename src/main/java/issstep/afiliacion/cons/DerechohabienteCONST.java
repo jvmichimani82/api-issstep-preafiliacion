@@ -9,14 +9,12 @@ public class DerechohabienteCONST {
 			+"\r\n" + 
 			"			    \"nocontrol\": \"100\",\r\n" +
 			"			    \"noAfiliacion\": \"100\",\r\n" + 
-			"			    \"curp\": \"RHUJ820830HPLLCS08\",\r\n" + 
+			"			    \"curp\": \"AACJ520925HPLBML03\",\r\n" + 
 			"			    \"email\": \"email@correo.com\",\r\n" + 
 			"			    \"usuario\": {\r\n" + 
 			"			      \"login\": \"email@correo.com\",\r\n" + 
-			"			      \"passwd\": \"12345678\"\r\n" + 
-			"			    },\r\n" + 
-		
-		
+			"			      \"passwd\": \"21531apps\"\r\n" + 
+			"			    }\r\n" + 	
 			"			  }";
 	
 	public static final String registroDerechohabiente="Json para Registro de derechohabiente\n\n"+"{"

@@ -43,7 +43,7 @@ public class DerechohabienteDB {
 
 	public Derechohabiente getPersonaByColumnaStringValor(String columna, String valor) {
 		StringBuilder query = new StringBuilder();
-		query.append( "SELECT DH.*, EF.DESCRIPCION AS ENTIDAD, M.DESCRIPCION AS MUNICIPIO, L.DESCRIPCION AS LOCALIDAD, C.DESCRIPCION AS COLONIA,"
+		/*query.append( "SELECT DH.*, EF.DESCRIPCION AS ENTIDAD, M.DESCRIPCION AS MUNICIPIO, L.DESCRIPCION AS LOCALIDAD, C.DESCRIPCION AS COLONIA,"
 				+ " EDOCVIL.DESCRIPCION AS ESTADOCIVIL, CSERV.DESCRIPCION AS CLINICA  "
 					+ "FROM DERECHOHABIENTE DH, KESTADO EF, KMUNICIPIO M, KLOCALIDAD L, KCOLONIA AS C, KESTADOCIVIL EDOCVIL, KCLINICASERVICIO CSERV "
 					+ "WHERE DH.CLAVEESTADO = EF.CLAVEESTADO AND "
@@ -51,7 +51,10 @@ public class DerechohabienteDB {
 					+ "DH.CLAVECOLONIA = C.CLAVECOLONIA AND "
 					+ "DH.CLAVECLINICASERVICIO = CSERV.CLAVECLINICASERVICIO AND "
 					+ "DH.CLAVEESTADOCIVIL = EDOCVIL.CLAVEESTADOCIVIL AND "
-					+ "DH.CLAVEMUNICIPIO = L.CLAVEMUNICIPIO AND DH.CLAVELOCALIDAD = L.CLAVELOCALIDAD AND DH.");
+					+ "DH.CLAVEMUNICIPIO = L.CLAVEMUNICIPIO AND DH.CLAVELOCALIDAD = L.CLAVELOCALIDAD AND DH.");*/
+		
+		query.append( "SELECT DH.*"
+					+ " FROM DERECHOHABIENTE DH WHERE DH.");
 		
 		query.append(columna);
 		query.append("= '");
@@ -286,8 +289,8 @@ public class DerechohabienteDB {
 					+ "CLAVEESTADOCIVIL, CLAVECOLONIA, "
 					+ "CLAVECLINICASERVICIO, CLAVELOCALIDAD, CLAVEMUNICIPIO, CLAVEESTADO) VALUES (" 
 					+ derechohabiente.getNoControl() + ", " + derechohabiente.getNoPreAfiliacion()  
-					+ ", '" + derechohabiente.getNombre() + "'" + ", '" + derechohabiente.getPaterno() + "'"
-					+ ", '" + derechohabiente.getMaterno() + "'" + ", '" + derechohabiente.getEmail() + "', '"
+					+ ", '" + derechohabiente.getNombre().trim() + "'" + ", '" + derechohabiente.getPaterno().toString() + "'"
+					+ ", '" + derechohabiente.getMaterno().toString() + "'" + ", '" + derechohabiente.getEmail() + "', '"
 					+ derechohabiente.getFechaNacimiento()+ "', '"  + derechohabiente.getSexo()
 					+ "', '" + derechohabiente.getCurp() + "'" + ", '" + derechohabiente.getRfc() + "'"
 					+ ", '" + derechohabiente.getDireccion() + "'" + ", '" + derechohabiente.getCodigoPostal() + "'"

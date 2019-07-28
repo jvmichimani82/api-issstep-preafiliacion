@@ -27,6 +27,10 @@ public class CatalogoGenericoDB {
 	@Qualifier("mysqlJdbcTemplate")
 	private JdbcTemplate mysqlTemplate;
 	
+	@Autowired
+	@Qualifier("afiliacionJdbcTemplate")
+	private JdbcTemplate afiliacionDBTemplate;
+	
 	public String getNombreId( String catalogo ) {
 		String nombreId = "";
 		
@@ -128,7 +132,7 @@ public class CatalogoGenericoDB {
 		
 		CatalogoGenerico descripcion = null;
 		try {
-			descripcion = mysqlTemplate.queryForObject(query.toString(), new DescripcionRowMapper());
+			descripcion = afiliacionDBTemplate.queryForObject(query.toString(), new DescripcionRowMapper());
 		}
 		catch (EmptyResultDataAccessException e) {
 			return null;
