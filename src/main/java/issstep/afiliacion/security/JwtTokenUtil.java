@@ -46,10 +46,8 @@ public class JwtTokenUtil implements Serializable {
         String username;
         try {
             final Claims claims = getClaimsFromToken(token);
-            System.out.println(claims.getSubject());
             username = claims.getSubject();
         } catch (Exception e) {
-        	e.printStackTrace();
             username = null;
         }
         return username;
@@ -107,7 +105,6 @@ public class JwtTokenUtil implements Serializable {
                     .parseClaimsJws(token)
                     .getBody();
         } catch (Exception e) {
-        	e.printStackTrace();
         	//logger.error(token, e.printStackTrace());
             claims = null;
         }

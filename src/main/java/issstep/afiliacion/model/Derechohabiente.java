@@ -125,7 +125,7 @@ public class Derechohabiente {
 	@JsonView({Derechohabiente.Views.Simple.class})	
 	String nombreCompleto;
 	
-	@JsonView({Derechohabiente.Views.RegistroDerechohabiente.class})
+	@JsonView({Derechohabiente.Views.Simple.class})
 	Usuario usuario;
 	
 	

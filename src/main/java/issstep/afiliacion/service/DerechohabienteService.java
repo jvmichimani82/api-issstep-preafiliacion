@@ -58,7 +58,16 @@ public class DerechohabienteService {
 	MailService mailService;
 		
 	public ResponseEntity<?> getPersonaByCurp(String curp) {
+		
+		// Revisamos que la persona exista en nuestra base de datos
 		Derechohabiente persona =  personaDB.getPersonaByColumnaStringValor("CURP", curp);
+		
+		// Sino tenemos resultado de nuestra base de datos vamos por los datos a la bd de issstep
+		if(persona == null) 
+			persona = personaDB.getTrabajadorIssstepByColumnaStringValor("CURP", curp);
+		
+		fillDerechohabiente(persona);
+		
 		System.out.println("Terminacion");
 		if (persona != null)
 			return new ResponseEntity<>(persona, HttpStatus.OK);
@@ -84,6 +93,16 @@ public class DerechohabienteService {
 	
 	void fillDerechohabiente(Derechohabiente derechohabiente){
 		
+		derechohabiente.setEstado(catalogoGenericoDB.getDescripcionCatalogo("KESTADO", derechohabiente));
+		derechohabiente.setMunicipio(catalogoGenericoDB.getDescripcionCatalogo("KMUNICIPIO", derechohabiente));
+		derechohabiente.setLocalidad(catalogoGenericoDB.getDescripcionCatalogo("KLOCALIDAD", derechohabiente));
+		derechohabiente.setColonia(catalogoGenericoDB.getDescripcionCatalogo("KCOLONIA", derechohabiente));
+		derechohabiente.setEstadoCivil(catalogoGenericoDB.getDescripcionCatalogo("KESTADOCIVIL", derechohabiente));
+		derechohabiente.setClinicaServicio(catalogoGenericoDB.getDescripcionCatalogo("KCLINICASERVICIO", derechohabiente));
+		derechohabiente.setParentesco(catalogoGenericoDB.getDescripcionCatalogo("KPARENTESCO", derechohabiente));
+		derechohabiente.setUsuario(usuarioDB.getUsuarioPreafiliacionByNoControlAndNoAfiliacion(derechohabiente.getNoControl(), derechohabiente.getNoPreAfiliacion()));
+		
+		
 	}
 	
 	public ResponseEntity<?> getPersonaById(long id) {
@@ -100,65 +119,39 @@ public class DerechohabienteService {
 	
 	public ResponseEntity<?> registraUsuario(boolean registroOnline, Derechohabiente persona, long claveParentesco){
 		try{
-			Derechohabiente oldPersona;
-			
-			oldPersona = personaDB.getPersonaByColumnaStringValor("CURP", persona.getCurp());
-			if (!registroOnline)
-			{
-				Usuario usuario = new Usuario();
-				usuario.setPasswd("");
-				usuario.setLogin("");
+			Derechohabiente oldPersona = null;
+			//Revisamos si el registro trae curp sino haremos la consulta por noControl y NoAfiliacion
+			if(persona.getCurp() != null) {
+				// Revisamos que la persona exista en nuestra base de datos
+				 oldPersona =  personaDB.getPersonaByColumnaStringValor("CURP", persona.getCurp());
 				
-				persona.setUsuario(usuario);		
-			}
-			
-			/*if(persona.getCurp() != null && !(personaDB.getPersonaByCurp(persona.getCurp())!= null)){
-				return new ResponseEntity<>(new Mensaje("La CURP ya está registrada."), HttpStatus.CONFLICT);
-			}
-			if(personaDB.getPersonaByEmail(persona.getEmail()) != null){
-				return new ResponseEntity<>(new Mensaje("Email Duplicado"), HttpStatus.CONFLICT);
-			}*/
-			
-			if(oldPersona == null) 
-				return new ResponseEntity<>(new Mensaje("No existe persona a registrar"), HttpStatus.CONFLICT);
-			
-			String token = Utils.sha256(persona.getEmail());
-	
-			Usuario usuario = new Usuario();
-			
-			// usuario.setClaveUsuario(oldPersona.getClaveUsuarioRegistro());
-			usuario.setClaveRol(2);
-			usuario.setNoControl(oldPersona.getNoControl());
-			usuario.setLogin(persona.getUsuario().getLogin());
-			usuario.setPasswd(Hashing.sha256().hashString(persona.getUsuario().getPasswd(), Charsets.UTF_8).toString());
-			usuario.setToken(token);
-			usuario.setFechaRegistro(new Timestamp(new Date().getTime()));
-			usuario.setEstatus(-1);
-			usuario.setNoAfiliacion(oldPersona.getNoPreAfiliacion());
-			
-			// usuario.setNoAfiliacion(oldPersona.getNoPreAfiliacion());
-			long claveUsuario = usuarioDB.createUsuario( claveParentesco, usuario );
+				// Sin encontramos un resultado en nuestra bd rechacamos la creacion del usuario
+				if(oldPersona != null)
+					return new ResponseEntity<>(new Mensaje("Se encontro un registro en nuestra bd"), HttpStatus.CONFLICT);
+				// Sino hacemos la consulta a la bd de issstep
+				else 
+					oldPersona = personaDB.getTrabajadorIssstepByColumnaStringValor("CURP", persona.getCurp());
 					
-			if(claveUsuario > 1) {
-				//if (Utils.loadPropertie("ambiente").equals(PRODUCCION) || Utils.loadPropertie("ambiente").equals(PRUEBAS)){
-    		     //   mailService.prepareAndSendBienvenida(persona.getEmail(),persona.getNombreCompleto() ,persona.getEmail(),persona.gettUsuario().getToken(),persona.gettUsuario().getId());
-    		    //}else{
-    		        //Manda al correo de fdsditco@gmail.com
-				
-					oldPersona.setEmail(persona.getEmail());
+				//Si encontramos un resultado en la base de datos ISSSTEP procedemos a la creacion del Derechohabiente y su usuario de la plataforma
+				if(oldPersona != null) {
+					if(personaDB.createDerechohabiente(oldPersona) > 0) {
+						if(creaUsuario(oldPersona, persona)>0) {
+							for(Derechohabiente beneficiario : personaDB.getBeneficiariosByTrabajadorIssstep(oldPersona.getNoControl())) {
+								personaDB.createDerechohabiente(beneficiario);
+								beneficiarioDB.createBeneficiario(beneficiario, beneficiario.getClaveParentesco());
+							}
+						}
+						else
+							return new ResponseEntity<>(new Mensaje("Error al registrar al usuario"), HttpStatus.INTERNAL_SERVER_ERROR);
+					}
+					else
+						return new ResponseEntity<>(new Mensaje("Error al registrar al Derechohabiente"), HttpStatus.INTERNAL_SERVER_ERROR);
+				}
 					
-					
-					oldPersona.setClaveUsuarioRegistro(claveUsuario);
-					personaDB.actualiza(oldPersona);
-					
-					usuarioDB.registraBeneficiario(oldPersona, 0);
-				
-					//oldPersona.setUsuario(usuarioDB.getUsuarioById(oldPersona.getNoControl()));
-				
-    		         mailService.prepareAndSendBienvenida("issstepregistro@gmail.com", oldPersona.getNombreCompleto() ,
-    		        		  oldPersona.getEmail(), usuario.getToken(), oldPersona.getNoControl());
-    		     //}	
-
+				// Sino rechacamos la creacion del usuario 
+				else 
+					return new ResponseEntity<>(new Mensaje("No existe persona a registrar"), HttpStatus.CONFLICT);
+			
 			}
 			
 			return  new ResponseEntity<>(oldPersona, HttpStatus.CREATED);
@@ -174,6 +167,43 @@ public class DerechohabienteService {
 			return  new ResponseEntity<>(null,null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}	
 	}
+	
+	
+	public long creaUsuario(Derechohabiente oldPersona , Derechohabiente newPersona) {
+		String token = Utils.sha256(newPersona.getEmail());
+		
+		Usuario usuario = new Usuario();
+		usuario.setClaveRol(2);
+		usuario.setNoControl(oldPersona.getNoControl());
+		usuario.setLogin(newPersona.getEmail());
+		usuario.setPasswd(Hashing.sha256().hashString(newPersona.getUsuario().getPasswd(), Charsets.UTF_8).toString());
+		usuario.setToken(token);
+		usuario.setFechaRegistro(new Timestamp(new Date().getTime()));
+		usuario.setEstatus(-1);
+		usuario.setNoAfiliacion(oldPersona.getNoPreAfiliacion());
+		
+		long claveUsuario = usuarioDB.createUsuario( 0, usuario );
+				
+		if(claveUsuario > 0) {
+			//if (Utils.loadPropertie("ambiente").equals(PRODUCCION) || Utils.loadPropertie("ambiente").equals(PRUEBAS)){
+		     //   mailService.prepareAndSendBienvenida(persona.getEmail(),persona.getNombreCompleto() ,persona.getEmail(),persona.gettUsuario().getToken(),persona.gettUsuario().getId());
+		    //}else{
+		        //Manda al correo de fdsditco@gmail.com
+			
+			    oldPersona.setEmail(newPersona.getEmail());
+				
+				
+			    oldPersona.setClaveUsuarioRegistro(claveUsuario);
+				personaDB.actualiza(oldPersona);
+			
+		         mailService.prepareAndSendBienvenida("issstepregistro@gmail.com", oldPersona.getNombreCompleto() ,
+		        		 oldPersona.getEmail(), usuario.getToken(), oldPersona.getNoControl());
+		     //}	
+
+		}
+		return claveUsuario;
+	}
+	
 	
 	public ResponseEntity<?> activarRegistro(String token){
 		try{	
@@ -382,12 +412,13 @@ public class DerechohabienteService {
 		public ResponseEntity<?> getBeneficiarios(boolean incluirTitular, long claveUsuarioRegistro) {
 			String user = (String) SecurityContextHolder.getContext().getAuthentication().getName();
 			Usuario usuario =  usuarioDB.getUsuarioByColumnaStringValor("LOGIN", user);
-			
-			/* if (usuario.getClaveRol() == 2 && usuario.getClaveUsuario() != claveUsuarioRegistro)
-				return new ResponseEntity<>(new Mensaje("No tiene permiso para ver la lista"), HttpStatus.BAD_REQUEST); */
-			
-			List<Derechohabiente> listaBeneficiarios = personaDB.getPersonasByTrabajador(incluirTitular, claveUsuarioRegistro);
 		
+			List<Derechohabiente> listaBeneficiarios = personaDB.getBeneficiariosByDerechohabiente(usuario.getNoControl());
+			
+			for(Derechohabiente dere: listaBeneficiarios){
+				fillDerechohabiente(dere);
+			}
+			
 			if (listaBeneficiarios != null)
 				return new ResponseEntity<>(listaBeneficiarios, HttpStatus.OK);
 			

@@ -67,6 +67,29 @@ public class UsuarioDB {
 		return user;
 	}
 	
+	public Usuario getUsuarioPreafiliacionByNoControlAndNoAfiliacion(long noControl, long noAfiliacion) {
+		StringBuilder query = new StringBuilder();
+		query.append("SELECT CLAVEUSUARIO, CLAVEROL, LOGIN, TOKEN, PASSWORD, FECHAREGISTRO, FECHAULTIMOACCESO,"
+				+ " ESTATUS, NOCONTROL, NOAFILIACION FROM USUARIO WHERE NOCONTROL = ");
+		query.append(noControl);
+		query.append(" AND NOAFILIACION = ");
+		query.append(noAfiliacion);
+		
+		System.out.println(query.toString());
+		
+		Usuario user = null;
+		try {
+			user =  mysqlTemplate.queryForObject(query.toString(), new UsuarioRowMapper());
+		} 
+		catch (EmptyResultDataAccessException e) {
+			return null;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return user;
+	}
+	
 	public Usuario getUsuarioByToken(String token) {
 		StringBuilder query = new StringBuilder();
 
