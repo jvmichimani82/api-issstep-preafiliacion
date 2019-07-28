@@ -135,6 +135,7 @@ public class DerechohabienteService {
 				//Si encontramos un resultado en la base de datos ISSSTEP procedemos a la creacion del Derechohabiente y su usuario de la plataforma
 				if(oldPersona != null) {
 					if(personaDB.createDerechohabiente(oldPersona) > 0) {
+						beneficiarioDB.createBeneficiario(oldPersona, 0);
 						if(creaUsuario(oldPersona, persona)>0) {
 							for(Derechohabiente beneficiario : personaDB.getBeneficiariosByTrabajadorIssstep(oldPersona.getNoControl())) {
 								personaDB.createDerechohabiente(beneficiario);
