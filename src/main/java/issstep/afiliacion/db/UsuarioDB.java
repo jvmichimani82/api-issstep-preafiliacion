@@ -70,8 +70,12 @@ public class UsuarioDB {
 	public Usuario getUsuarioByToken(String token) {
 		StringBuilder query = new StringBuilder();
 
-		query.append("SELECT CLAVEUSUARIO, CLAVEROL, LOGIN, TOKEN, PASSWORD, FECHAREGISTRO, FECHAULTIMOACCESO, ESTATUS, NOCONTROL, NOAFILIACION FROM USUARIO WHERE TOKEN = '");
+		query.append("SELECT U.CLAVEUSUARIO, U.CLAVEROL, R.DESCRIPCION, U.LOGIN, U.TOKEN, U.PASSWORD, U.FECHAREGISTRO, "
+				+"U.FECHAULTIMOACCESO, U.ESTATUS, U.NOCONTROL, U.NOAFILIACION FROM USUARIO U, KROL R WHERE TOKEN = '");
 		query.append(token+"'");
+		query.append(" AND U.CLAVEROL=R.CLAVEROL");
+		
+		System.out.println(query.toString());
 	
 		Usuario user = null;
 		try {
@@ -139,7 +143,7 @@ public class UsuarioDB {
 		StringBuilder query = new StringBuilder();
 		
 		query.append("INSERT INTO BENEFICIARIO "
-				+ "(NOCONTROL, NOAFILIACION, CLAVEPARENTESCO, FECHAAFILIACION, SITUACION, CLAVEUSUARIOREGISTRO, FECHAREGISTRO) "
+				+ "(NOCONTROL, NOPREAFILIACION, CLAVEPARENTESCO, FECHAAFILIACION, SITUACION, CLAVEUSUARIOREGISTRO, FECHAREGISTRO) "
 				+ "VALUES(?,?,?,?,?,?,?)");
 		
 		try {
