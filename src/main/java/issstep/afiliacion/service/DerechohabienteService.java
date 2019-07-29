@@ -419,11 +419,11 @@ public class DerechohabienteService {
     }
 	
 	// funcion que regrerara los beneficiarios de algun trabador
-	public ResponseEntity<?> getBeneficiarios(boolean incluirTitular, long claveUsuarioRegistro) {
+	public ResponseEntity<?> getBeneficiarios(boolean incluirTitular, long noControl) {
 		String user = (String) SecurityContextHolder.getContext().getAuthentication().getName();
 		Usuario usuario =  usuarioDB.getUsuarioByColumnaStringValor("LOGIN", user);
 	
-		List<Derechohabiente> listaBeneficiarios = personaDB.getBeneficiariosByDerechohabiente(usuario.getNoControl());
+		List<Derechohabiente> listaBeneficiarios = personaDB.getBeneficiariosByDerechohabiente(incluirTitular, noControl);
 		
 		for(Derechohabiente dere: listaBeneficiarios){
 			fillDerechohabiente(dere);

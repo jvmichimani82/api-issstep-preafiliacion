@@ -41,7 +41,7 @@ public class CatalogoGenericoDB {
 			case "KESTADO": 	 nombreId = "CLAVEESTADO"; break;
 			case "KESTADOCIVIL": nombreId = "CLAVEESTADOCIVIL"; break;
 			case "KESTATUS": 	 nombreId = "CLAVEESTATUS"; esDatoLocal = true; break;
-			case "KPARENTESCO":  nombreId = "CLAVEPARENTESCO"; break;
+			case "KPARENTESCO":  nombreId = "CLAVEPARENTESCO"; esDatoLocal = true; break;
 			case "KREGION": 	 nombreId = "CLAVEREGION"; break;
 			case "KROL": 		 nombreId = "CLAVEROL"; esDatoLocal = true; break;
 			case "KSITUACION":   nombreId = "CLAVESITUACION"; break;

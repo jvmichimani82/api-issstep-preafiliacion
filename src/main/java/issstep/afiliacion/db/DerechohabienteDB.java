@@ -337,9 +337,9 @@ public class DerechohabienteDB {
 		StringBuilder query = new StringBuilder();
 		query.append( "SELECT D.NOCONTROL, D.NOPREAFILIACION, D.NOMBRE, D.PATERNO, D.MATERNO, D.CURP, D.CLAVEUSUARIOREGISTRO "
 					+ "FROM DERECHOHABIENTE D, "
-					+ "(SELECT CLAVEUSUARIOREGISTRO FROM DOCUMENTO WHERE ESVALIDO = " + estatusValidacion 
-					+ " GROUP BY CLAVEUSUARIOREGISTRO) DOC" 
-					+ " WHERE D.CLAVEUSUARIOREGISTRO = DOC.CLAVEUSUARIOREGISTRO");
+					+ "(SELECT NOCONTROL FROM DOCUMENTO WHERE ESVALIDO = " + estatusValidacion 
+					+ " GROUP BY NOCONTROL) DOC" 
+					+ " WHERE D.NOCONTROL = DOC.NOCONTROL");
 		
 		System.out.println(query.toString());
 		
@@ -354,7 +354,7 @@ public class DerechohabienteDB {
 		return lista;
 	}
 	
-	public List<Derechohabiente> getBeneficiariosByDerechohabiente(long noControl) {
+	public List<Derechohabiente> getBeneficiariosByDerechohabiente(boolean incluirTitular, long noControl) {
 
 		StringBuilder query = new StringBuilder();
 		query.append( "SELECT DH.*, BE.NOBENEFICIARIO, BE.CLAVEPARENTESCO "
@@ -362,8 +362,11 @@ public class DerechohabienteDB {
 				+ "BENEFICIARIO BE "
 				+ "WHERE "
 				+ "DH.NOCONTROL = BE.NOCONTROL AND DH.NOPREAFILIACION = BE.NOPREAFILIACION "
-				+ "AND DH.NOCONTROL =");
+				+ " AND DH.NOCONTROL =");
 		query.append(noControl);
+		
+		if (!incluirTitular)
+			query.append("AND BE.NOPREAFILIACION != " + noControl);
 
 
 		System.out.println("Parentescos ==> " + query.toString());
