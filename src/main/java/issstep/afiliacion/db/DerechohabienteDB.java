@@ -431,17 +431,17 @@ class PersonaRowMapper implements RowMapper<Derechohabiente> {
         persona.setClaveUsuarioModificacion(rs.getLong("CLAVEUSUARIOMODIFICACION"));
         persona.setFechaModificacion(rs.getTimestamp("FECHAMODIFICACION"));
         persona.setClaveEstado(rs.getLong("CLAVEESTADO"));
-        persona.setEstado(rs.getString("ENTIDAD"));
+        // persona.setEstado(rs.getString("ENTIDAD"));
         persona.setClaveMunicipio(rs.getLong("CLAVEMUNICIPIO"));
-        persona.setMunicipio(rs.getString("MUNICIPIO"));
+        // persona.setMunicipio(rs.getString("MUNICIPIO"));
         persona.setClaveLocalidad(rs.getLong("CLAVELOCALIDAD"));
-        persona.setLocalidad(rs.getString("LOCALIDAD"));
+        // persona.setLocalidad(rs.getString("LOCALIDAD"));
         persona.setClaveColonia(rs.getLong("CLAVECOLONIA"));
-        persona.setColonia(rs.getString("COLONIA"));
+        // persona.setColonia(rs.getString("COLONIA"));
         persona.setClaveClinicaServicio(rs.getLong("CLAVECLINICASERVICIO"));
-        persona.setClinicaServicio(rs.getString("CLINICA"));        
+        // persona.setClinicaServicio(rs.getString("CLINICA"));        
         persona.setClaveEstadoCivil(rs.getLong("CLAVEESTADOCIVIL"));
-        persona.setEstadoCivil(rs.getString("ESTADOCIVIL"));
+        // persona.setEstadoCivil(rs.getString("ESTADOCIVIL"));
         
         return persona;
     }   
@@ -473,19 +473,19 @@ class PersonaConParentescoRowMapper implements RowMapper<Derechohabiente> {
         persona.setClaveUsuarioModificacion(rs.getLong("CLAVEUSUARIOMODIFICACION"));
         persona.setFechaModificacion(rs.getTimestamp("FECHAMODIFICACION"));
         persona.setClaveEstado(rs.getLong("CLAVEESTADO"));
-        persona.setEstado(rs.getString("ENTIDAD"));
+        // persona.setEstado(rs.getString("ENTIDAD"));
         persona.setClaveMunicipio(rs.getLong("CLAVEMUNICIPIO"));
-        persona.setMunicipio(rs.getString("MUNICIPIO"));
+        // persona.setMunicipio(rs.getString("MUNICIPIO"));
         persona.setClaveLocalidad(rs.getLong("CLAVELOCALIDAD"));
-        persona.setLocalidad(rs.getString("LOCALIDAD"));
+        // persona.setLocalidad(rs.getString("LOCALIDAD"));
         persona.setClaveColonia(rs.getLong("CLAVECOLONIA"));
-        persona.setColonia(rs.getString("COLONIA"));
+        // persona.setColonia(rs.getString("COLONIA"));
         persona.setClaveClinicaServicio(rs.getLong("CLAVECLINICASERVICIO"));
-        persona.setClinicaServicio(rs.getString("CLINICA"));        
+        // persona.setClinicaServicio(rs.getString("CLINICA"));        
         persona.setClaveEstadoCivil(rs.getLong("CLAVEESTADOCIVIL"));
-        persona.setEstadoCivil(rs.getString("ESTADOCIVIL"));
+        // persona.setEstadoCivil(rs.getString("ESTADOCIVIL"));
         persona.setClaveParentesco(rs.getLong("CLAVEPARENTESCO"));
-        persona.setParentesco(rs.getString("PARENTESCO"));
+        // persona.setParentesco(rs.getString("PARENTESCO"));
         
         return persona;
     }   

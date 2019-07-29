@@ -61,7 +61,7 @@ public class DerechohabienteService {
 		
 		// Revisamos que la persona exista en nuestra base de datos
 		Derechohabiente persona =  personaDB.getPersonaByColumnaStringValor("CURP", curp);
-		
+			
 		// Sino tenemos resultado de nuestra base de datos vamos por los datos a la bd de issstep
 		if(persona == null) 
 			persona = personaDB.getTrabajadorIssstepByColumnaStringValor("CURP", curp);
