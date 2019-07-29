@@ -25,24 +25,27 @@ public class CatalogoGenericoDB {
 	
 	@Autowired
 	@Qualifier("mysqlJdbcTemplate")
-	private JdbcTemplate mysqlTemplate;
+	JdbcTemplate mysqlTemplate;
 	
 	@Autowired
 	@Qualifier("afiliacionJdbcTemplate")
-	private JdbcTemplate afiliacionDBTemplate;
+	JdbcTemplate afiliacionDBTemplate;
+	
+	boolean esDatoLocal;
 	
 	public String getNombreId( String catalogo ) {
 		String nombreId = "";
+		esDatoLocal = false;
 		
 		switch (catalogo) {
 			case "KESTADO": 	 nombreId = "CLAVEESTADO"; break;
 			case "KESTADOCIVIL": nombreId = "CLAVEESTADOCIVIL"; break;
-			case "KESTATUS": 	 nombreId = "CLAVEESTATUS"; break;
+			case "KESTATUS": 	 nombreId = "CLAVEESTATUS"; esDatoLocal = true; break;
 			case "KPARENTESCO":  nombreId = "CLAVEPARENTESCO"; break;
 			case "KREGION": 	 nombreId = "CLAVEREGION"; break;
-			case "KROL": 		 nombreId = "CLAVEROL"; break;
+			case "KROL": 		 nombreId = "CLAVEROL"; esDatoLocal = true; break;
 			case "KSITUACION":   nombreId = "CLAVESITUACION"; break;
-			case "KTIPOARCHIVO": nombreId = "CLAVETIPOARCHIVO"; break;
+			case "KTIPOARCHIVO": nombreId = "CLAVETIPOARCHIVO"; esDatoLocal = true; break;
 		}
 		
 		return nombreId;
@@ -60,7 +63,10 @@ public class CatalogoGenericoDB {
 		
 		List<CatalogoGenerico> documentos = null;
 		try {
-			documentos = mysqlTemplate.query(query.toString(), new RegistroRowMapper());
+			if (esDatoLocal)
+				documentos = mysqlTemplate.query(query.toString(), new RegistroRowMapper());
+			else
+				documentos = afiliacionDBTemplate.query(query.toString(), new RegistroRowMapper());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -79,7 +85,10 @@ public class CatalogoGenericoDB {
 		
 		CatalogoGenerico registro = null;
 		try {
-			registro = mysqlTemplate.queryForObject(query.toString(), new RegistroRowMapper());
+			if (esDatoLocal)
+				registro = mysqlTemplate.queryForObject(query.toString(), new RegistroRowMapper());
+			else
+				registro = afiliacionDBTemplate.queryForObject(query.toString(), new RegistroRowMapper());
 		}
 		catch (EmptyResultDataAccessException e) {
 			return null;
@@ -132,7 +141,10 @@ public class CatalogoGenericoDB {
 		
 		CatalogoGenerico descripcion = null;
 		try {
-			descripcion = afiliacionDBTemplate.queryForObject(query.toString(), new DescripcionRowMapper());
+			if (esDatoLocal)
+				descripcion = mysqlTemplate.queryForObject(query.toString(), new DescripcionRowMapper());
+			else
+				descripcion = afiliacionDBTemplate.queryForObject(query.toString(), new DescripcionRowMapper());
 		}
 		catch (EmptyResultDataAccessException e) {
 			return null;
@@ -156,7 +168,10 @@ public class CatalogoGenericoDB {
 		
 		int idRegistro = 0;
 		try {
-			idRegistro  = mysqlTemplate.update(query.toString(), new Object[]{registro.getId()});
+			if (esDatoLocal)			
+				idRegistro  = mysqlTemplate.update(query.toString(), new Object[]{registro.getId()});
+			else
+				idRegistro  = afiliacionDBTemplate.update(query.toString(), new Object[]{registro.getId()});
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -188,14 +203,25 @@ public class CatalogoGenericoDB {
 		
 		try {
 			KeyHolder keyHolder = new GeneratedKeyHolder();
-			mysqlTemplate.update(
-	    	    new PreparedStatementCreator() {
-	    	        public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-	    	            PreparedStatement pst = con.prepareStatement(query.toString(), new String[] {"id"});
-	    	            return pst;
-	    	        }
-	    	    },
-	    	    keyHolder);
+			
+			if (esDatoLocal)
+				mysqlTemplate.update(
+		    	    new PreparedStatementCreator() {
+		    	        public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+		    	            PreparedStatement pst = con.prepareStatement(query.toString(), new String[] {"id"});
+		    	            return pst;
+		    	        }
+		    	    },
+		    	    keyHolder);
+	    	else     
+				afiliacionDBTemplate.update(
+		    	    new PreparedStatementCreator() {
+		    	        public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+		    	            PreparedStatement pst = con.prepareStatement(query.toString(), new String[] {"id"});
+		    	            return pst;
+		    	        }
+		    	    },
+		    	    keyHolder);
 			
 			return (opcion.equals("create")) ? (long) keyHolder.getKey() : (long) 1;		
 	    	
