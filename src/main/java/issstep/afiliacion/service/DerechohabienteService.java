@@ -107,6 +107,8 @@ public class DerechohabienteService {
 	
 	public ResponseEntity<?> getPersonaById(long id) {
 		Derechohabiente persona =  personaDB.getPersonaById(id);
+		
+		fillDerechohabiente(persona);
 	
 		if (persona != null)
 			return new ResponseEntity<>(persona, HttpStatus.OK);

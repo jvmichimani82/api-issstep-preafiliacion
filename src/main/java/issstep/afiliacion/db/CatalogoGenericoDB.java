@@ -101,6 +101,8 @@ public class CatalogoGenericoDB {
 	}
 	
 	public String getDescripcionCatalogo( String catalogo, Derechohabiente derechohabiente) {
+		String nombreId = getNombreId(catalogo);
+		
 		StringBuilder query = new StringBuilder();
 		
 		switch (catalogo) {
