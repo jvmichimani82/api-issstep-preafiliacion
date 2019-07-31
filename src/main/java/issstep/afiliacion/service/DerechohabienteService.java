@@ -369,8 +369,8 @@ public class DerechohabienteService {
 			/* if (oldPersona == null) 
 				return new ResponseEntity<>(new Mensaje("No existe el derechohabiente"), HttpStatus.CONFLICT); */
 			
-			String user = (String) SecurityContextHolder.getContext().getAuthentication().getName();
-			Usuario usuario =  usuarioDB.getUsuarioByColumnaStringValor("LOGIN", user);
+			/* String user = (String) SecurityContextHolder.getContext().getAuthentication().getName();
+			Usuario usuario =  usuarioDB.getUsuarioByColumnaStringValor("LOGIN", user);*/ 
 			
 			persona.setSituacion(1);
 			persona.setFechaRegistro(new Timestamp(new Date().getTime()));
@@ -471,8 +471,8 @@ public class DerechohabienteService {
 	
 	// funcion que regrerara los beneficiarios de algun trabador
 	public ResponseEntity<?> getBeneficiarios(boolean incluirTitular, long noControl) {		
-		String user = (String) SecurityContextHolder.getContext().getAuthentication().getName();
-		Usuario usuario =  usuarioDB.getUsuarioByColumnaStringValor("LOGIN", user);
+		/* String user = (String) SecurityContextHolder.getContext().getAuthentication().getName();
+		Usuario usuario =  usuarioDB.getUsuarioByColumnaStringValor("LOGIN", user); */
 	
 		List<Derechohabiente> listaBeneficiarios = personaDB.getBeneficiariosByDerechohabiente(incluirTitular, noControl);
 		

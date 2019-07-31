@@ -100,6 +100,34 @@ public class CatalogoGenericoDB {
 		return registro;
 	}
 	
+	public long getRegistroByDescripcion( String catalogo, String descripcion ) {
+		String nombreId = getNombreId(catalogo);
+		
+		if (nombreId == "")
+			return -1;
+		
+		StringBuilder query = new StringBuilder();
+		
+		query.append("SELECT " + nombreId + " AS ID, DESCRIPCION FROM "+ catalogo + " WHERE DESCRIPCION = '" + descripcion + "'");
+		
+		CatalogoGenerico registro = null;
+		try {
+			if (esDatoLocal)
+				registro = mysqlTemplate.queryForObject(query.toString(), new RegistroRowMapper());
+			else
+				registro = afiliacionDBTemplate.queryForObject(query.toString(), new RegistroRowMapper());
+			return registro.getId();
+		}
+		catch (EmptyResultDataAccessException e) {
+			return 0;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return -2;
+		}
+		
+	}
+	
 	public String getDescripcionCatalogo( String catalogo, Derechohabiente derechohabiente) {
 		String nombreId = getNombreId(catalogo);
 		
@@ -207,19 +235,20 @@ public class CatalogoGenericoDB {
 		return createOrDeleteDocumento( catalogo, "", id, "delete");
 	}
 	
-	public long createOrDeleteDocumento( String catalogo, String descripcion, long id, String opcion) {
+	public long createOrDeleteDocumento( String catalogo, String descripcion, long id, String opcion) {		
+		String nombreId = getNombreId(catalogo);
+		
 		StringBuilder query = new StringBuilder();
 		
-		if (opcion.equals("create"))
-			query.append("INSERT INTO " + catalogo + " (DESCRIPCION, ESTATUS) VALUES ('" + descripcion + "', 1)");
-		else {
-			String nombreId = getNombreId(catalogo);
-			
-			if (nombreId == "")
-				return -1;
-			
+		if (opcion.equals("create")) 
+			if (catalogo.equals("KPARENTESCO") || catalogo.equals("KROL") || catalogo.equals("KTIPOARCHIVO"))
+				query.append("INSERT INTO " + catalogo + " (DESCRIPCION, ESTATUS) VALUES ('" + descripcion + "', 1)");
+			else 
+				query.append("INSERT INTO " + catalogo + " (DESCRIPCION) VALUES ('" + descripcion + "')");
+		else 
 			query.append("DELETE FROM " + catalogo + " WHERE " + nombreId + " = " + id);
-		}
+		
+		System.out.println(query.toString());
 		
 		try {
 			KeyHolder keyHolder = new GeneratedKeyHolder();

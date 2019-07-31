@@ -39,47 +39,72 @@ public class CatalogoGenericoService {
 		if (catalogoGenerico != null) 
 			return new ResponseEntity<>(catalogoGenerico, HttpStatus.OK);		
 		else
-			return new ResponseEntity<>(new Mensaje("No existe registro con el id: " + id), HttpStatus.NO_CONTENT);
+			return new ResponseEntity<>(new Mensaje("No existe registro con id: " + id), HttpStatus.NOT_FOUND);
     }
 	
 	public ResponseEntity<?> updateRegister( String catalogo, CatalogoGenerico catalogoGenerico) {	
+		if (catalogoGenerico.getDescripcion() == null)
+			return new ResponseEntity<>(new Mensaje("El campo descripcion es necesario"), HttpStatus.BAD_REQUEST);
+		
+		if (catalogoGenerico.getId() == 0)
+			return new ResponseEntity<>(new Mensaje("El campo id es necesario "), HttpStatus.BAD_REQUEST);
+		
+		String nombreId = catalogoGenericoDB.getNombreId(catalogo);
+		
+		if (nombreId == "")
+			return new ResponseEntity<>(new Mensaje("No existe el catalogo: " + catalogo), HttpStatus.NOT_FOUND);
+		
 		CatalogoGenerico registro = catalogoGenericoDB.getRegistro(catalogo, catalogoGenerico.getId());
 		
-		if (registro != null) {		
-			int idRegistro = catalogoGenericoDB.updateRegistro(catalogo, catalogoGenerico);
+		if (registro == null) 
+			return new ResponseEntity<>(new Mensaje("No existe registro con el id: " + catalogoGenerico.getId()), HttpStatus.CONFLICT);			
 			
-			if (idRegistro != 0) 
-				return new ResponseEntity<>(catalogoGenerico , HttpStatus.OK);	
-			else 
-				return new ResponseEntity<>(new Mensaje("No se pudo actualizar el registro con id: " + catalogoGenerico.getId()), HttpStatus.SERVICE_UNAVAILABLE);
-		}
-		else
-			return new ResponseEntity<>(new Mensaje("No existe registro con el id: " + catalogoGenerico.getId()), HttpStatus.CONFLICT);
+		int idRegistro = catalogoGenericoDB.updateRegistro(catalogo, catalogoGenerico);
+		
+		if (idRegistro == 0) 
+			return new ResponseEntity<>(new Mensaje("No se pudo actualizar el registro con id: " + catalogoGenerico.getId()), HttpStatus.INTERNAL_SERVER_ERROR);
+						
+		return new ResponseEntity<>(catalogoGenerico , HttpStatus.OK);			
     }
 	
 	public ResponseEntity<?> createRegister( String catalogo, Descripcion descripcion ) {	
-		long idRegistro = catalogoGenericoDB.createRegistro(catalogo, descripcion);
+		if (descripcion.getDescripcion() == null)
+			return new ResponseEntity<>(new Mensaje("El campo descripcion es necesario"), HttpStatus.BAD_REQUEST);
 		
-		if (idRegistro != 0) {
-			Documento documento= new Documento();
-			
-			documento.setDescripcion(descripcion.getDescripcion());
-			documento.setId(idRegistro);
-			
-			return new ResponseEntity<>(documento , HttpStatus.CREATED);					
-		}
-		else
-			return new ResponseEntity<>(new Mensaje("El registro no se pudo crear."), HttpStatus.SERVICE_UNAVAILABLE);
+		long idBusqueda = catalogoGenericoDB.getRegistroByDescripcion( catalogo, descripcion.getDescripcion() );
+				
+		if (idBusqueda == -1)
+			return new ResponseEntity<>(new Mensaje("No existe el catalogo: " + catalogo), HttpStatus.NOT_FOUND);
+		
+		if (idBusqueda > 0 )
+			return new ResponseEntity<>(new Mensaje("Ya existe un registro con esa descripcion"), HttpStatus.CONFLICT);
+				
+		long idRegistro = catalogoGenericoDB.createRegistro(catalogo, descripcion);		
+					
+		if (idRegistro == 0)
+			return new ResponseEntity<>(new Mensaje("El registro no se pudo crear."), HttpStatus.INTERNAL_SERVER_ERROR);
+		
+		Documento documento= new Documento();
+		
+		documento.setDescripcion(descripcion.getDescripcion());
+		documento.setId(idRegistro);
+		
+		return new ResponseEntity<>(documento , HttpStatus.CREATED);					
     }
 	
 	public ResponseEntity<?> deleteRegister( String catalogo, long id ) {
-		CatalogoGenerico registro = catalogoGenericoDB.getRegistro(catalogo, id);
+		String nombreId = catalogoGenericoDB.getNombreId(catalogo);
 		
-		if (registro != null) {	
-			catalogoGenericoDB.deleteRegistro(catalogo, id);
-			return new ResponseEntity<>( HttpStatus.OK);					
-		}
-		else
-			return new ResponseEntity<>(new Mensaje("El registro con id: " + id + ", no existe."), HttpStatus.NOT_FOUND);
+		if (nombreId == "")
+			return new ResponseEntity<>(new Mensaje("No existe el catalogo: " + catalogo), HttpStatus.NOT_FOUND);
+		
+		CatalogoGenerico registro = catalogoGenericoDB.getRegistro(catalogo, id);
+				
+		if (registro == null)
+			return new ResponseEntity<>(new Mensaje("El registro con id: " + id + ", no existe."), HttpStatus.NOT_FOUND);	
+		
+		catalogoGenericoDB.deleteRegistro(catalogo, id);
+		return new ResponseEntity<>( HttpStatus.OK);					
+		
 	}
 }
