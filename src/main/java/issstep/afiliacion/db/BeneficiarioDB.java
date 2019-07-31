@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
@@ -35,39 +36,66 @@ public class BeneficiarioDB {
 		query.append(" AND CLAVEPARENTESCO = ");
 		query.append(claveParentesco);
 		
-		System.out.println(query.toString());
+		System.out.println("getBeneficiario == " + query.toString());
 				
 		// Beneficiario beneficiario = null;
 		try {
 			return  mysqlTemplate.queryForObject(query.toString(), new BeneficiarioRowMapper());
-		} catch (Exception e) {
+		} 
+		
+		catch (EmptyResultDataAccessException e) {
+				return null;
+			}		
+		catch (Exception e) {
 			e.printStackTrace();
 			return null;
 			
 		}
 	}
 	
-	public long createBeneficiario( Derechohabiente derechohabiente, long claveParentesco ) {
-		return createOrDeleteDerechohabiente( derechohabiente, claveParentesco, 0, "create");
+	public Beneficiario getBeneficiarioById(long idBeneficiario) {
+		StringBuilder query = new StringBuilder();
+		query.append("SELECT * FROM BENEFICIARIO WHERE NOBENEFICIARIO = ");
+		query.append(idBeneficiario);
+		
+		System.out.println("getBeneficiario == " + query.toString());
+				
+		// Beneficiario beneficiario = null;
+		try {
+			return  mysqlTemplate.queryForObject(query.toString(), new BeneficiarioRowMapper());
+		} 
+		
+		catch (EmptyResultDataAccessException e) {
+				return null;
+			}		
+		catch (Exception e) {
+			e.printStackTrace();
+			return null;
+			
+		}
 	}
 	
-	public long deleteBeneficiario(  long noBeneficiario ) {
-		return createOrDeleteDerechohabiente( null, 0, noBeneficiario,"delete");
+	public long createBeneficiario(long noControlTitular, Derechohabiente derechohabiente, long claveParentesco ) {
+		return createOrDeleteDerechohabiente( noControlTitular, derechohabiente, claveParentesco, 0, "create");
 	}
 	
-	public long createOrDeleteDerechohabiente(  Derechohabiente derechohabiente, long claveParentesco, long noBeneficiario, String opcion) {
+	public long deleteBeneficiario(long noBeneficiario ) {
+		return createOrDeleteDerechohabiente( 0, null, 0, noBeneficiario,"delete");
+	}
+	
+	public long createOrDeleteDerechohabiente( long noControlTitular, Derechohabiente derechohabiente, long claveParentesco, long noBeneficiario, String opcion) {
 		StringBuilder query = new StringBuilder();
 		
 		
 		if (opcion.equals("create")) 			
 			query.append("INSERT INTO BENEFICIARIO "
 					+ "(NOCONTROL, NOPREAFILIACION, CLAVEPARENTESCO, FECHAAFILIACION, SITUACION, CLAVEUSUARIOREGISTRO, FECHAREGISTRO) VALUES("
-					+ derechohabiente.getNoControl() + ", " +  derechohabiente.getNoPreAfiliacion() + ", "
+					+ noControlTitular + ", " +  derechohabiente.getNoPreAfiliacion() + ", "
 					+ claveParentesco + ", '" + derechohabiente.getFechaPreAfiliacion() + "', 1, " +
 					+ derechohabiente.getClaveUsuarioRegistro() + ", '" + derechohabiente.getFechaRegistro() 
 					+ "')" );
 		else 
-			query.append("DELETE FROM BENEFICIARIO WHERE noControl = " + noBeneficiario);
+			query.append("DELETE FROM BENEFICIARIO WHERE NOBENEFICIARIO = " + noBeneficiario);
 		
 		System.out.println(query.toString());
 		

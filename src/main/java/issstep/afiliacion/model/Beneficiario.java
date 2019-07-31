@@ -23,6 +23,9 @@ public class Beneficiario {
 	long noControl;
 	
 	@JsonView({Beneficiario.Views.Simple.class})
+	long noControlTitular;
+	
+	@JsonView({Beneficiario.Views.Simple.class})
 	long noPreAfiliacion;
 	
 	@JsonView({Beneficiario.Views.Simple.class})

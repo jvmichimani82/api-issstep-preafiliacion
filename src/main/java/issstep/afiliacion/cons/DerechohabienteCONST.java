@@ -55,6 +55,7 @@ public class DerechohabienteCONST {
 	
 	public static final String asignaBeneficiario="Json para Asignar beneficiario a derechohabiente\n\n"+"{"
 			+"\n" + 
+			"			    \"noControlTitular\": 200,\n" + 	
 			"			    \"noControl\": 20011,\n" + 
 			"			    \"noPreAfiliacion\": 20011,\n" +
 			"			    \"claveParentesco\": 1\n" +

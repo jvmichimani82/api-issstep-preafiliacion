@@ -139,7 +139,7 @@ public class CatalogoGenericoDB {
 		}
 		
 	
-		System.out.println(query.toString());
+		// System.out.println(query.toString());
 		
 		CatalogoGenerico descripcion = null;
 		try {
@@ -156,6 +156,24 @@ public class CatalogoGenericoDB {
 		}
 		
 		return descripcion.getDescripcion();
+	}
+	
+	public String getDescripcionParentesco( long claveParentesco ) {
+		StringBuilder query = new StringBuilder();
+		query.append("SELECT DESCRIPCION FROM KPARENTESCO WHERE CLAVEPARENTESCO = " + claveParentesco);
+		
+		CatalogoGenerico descripcion = null;
+		try {
+			descripcion = mysqlTemplate.queryForObject(query.toString(), new DescripcionRowMapper());
+		}
+		catch (EmptyResultDataAccessException e) {
+			return null;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return descripcion.getDescripcion();		
 	}
 	
 	public int updateRegistro( String catalogo, CatalogoGenerico registro ) {

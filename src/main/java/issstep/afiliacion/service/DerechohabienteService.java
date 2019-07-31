@@ -10,6 +10,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.*;
+
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -27,13 +29,14 @@ import issstep.afiliacion.db.BeneficiarioDB;
 import issstep.afiliacion.db.CatalogoGenericoDB;
 import issstep.afiliacion.model.Mensaje;
 import issstep.afiliacion.model.ResetPassword;
+import issstep.afiliacion.model.ResultadoBusqueda;
 import issstep.afiliacion.model.Derechohabiente;
 import issstep.afiliacion.model.InfoDerechohabiente;
 import issstep.afiliacion.model.Usuario;
 import issstep.afiliacion.model.ActualizarDatos;
 import issstep.afiliacion.model.ActualizarPassword;
 import issstep.afiliacion.model.Beneficiario;
-import issstep.afiliacion.model.CatalogoGenerico;
+import issstep.afiliacion.model.DatoABuscar;
 import issstep.afiliacion.utils.Utils;
 
 
@@ -41,6 +44,10 @@ import issstep.afiliacion.utils.Utils;
 @Service
 public class DerechohabienteService {
 	private static final Logger logger = LoggerFactory.getLogger(DerechohabienteService.class);	
+	
+	private static final String expRegParaNumero = "^[0-9]+";
+	//private static final String expRegParaCURP = "^([A-Za-z]{1}[AEIOUaeiou]{1}[A-Za-z]{2}[0-9]{2}(0[1-9]|1[0-2])(0[1-9]|1[0-9]|2[0-9]|3[0-1])[HMhm]{1}([A|a][S|s]|[B|b][C|c]|[B|b][S|s]|[C|c][C|c]|[C|c][S|s]|[C|c][H|h]|[C|c][L|l]|[C|c][M|m]|[D|d][F|f]|[D|d][G|g]|[G|g][T|t]|[G|g][R|r]|[H|h][G|g]|[J|j][C|c]|[M|m][C|c]|[M|m][N|n]|[M|m][S|s]|[N|n][T|t]|[N|n][L|l]|[O|o][C|c]|[P|p][L|l]|[Q|q][T|t]|[Q|q][R|r]|[S|s][P|p]|[S|s][L|l]|[S|s][R|r]|[T|t][C|c]|[T|t][S|s]|[T|t][L|l]|[V|v][Z|z]|[Y|y][N|n]|[Z|z][S|s]|[N|n][E|e])[B-DF-HJ-NP-TV-Zb-df-hj-np-tv-z]{3}[0-9A-Za-z]{2})$";
+	private static final String expRegParaCURP = "^([A-Z]{4}[0-9]{1,6})|([A-Z]{4}[0-9]{6}[A-Z]{1,6})|([A-Z]{4}[0-9]{6}[A-Z]{6}[A-Z0-9]{1,2})$";
 	
 	@Autowired
 	DerechohabienteDB personaDB;
@@ -65,12 +72,12 @@ public class DerechohabienteService {
 		// Sino tenemos resultado de nuestra base de datos vamos por los datos a la bd de issstep
 		if(persona == null) 
 			persona = personaDB.getTrabajadorIssstepByColumnaStringValor("CURP", curp);
-		
-		fillDerechohabiente(persona);
-		
+			
 		System.out.println("Terminacion");
-		if (persona != null)
+		if (persona != null) {
+			fillDerechohabiente(persona);
 			return new ResponseEntity<>(persona, HttpStatus.OK);
+		}
 		
 		else
 			return new ResponseEntity<>(new Mensaje("No existe persona con esa curp"), HttpStatus.NO_CONTENT);
@@ -79,9 +86,11 @@ public class DerechohabienteService {
 	
 	public ResponseEntity<?> getPersonaByNombre(Derechohabiente persona, HttpServletResponse response) {
 		Derechohabiente personaOld =  personaDB.getPersonaByNombre(persona, response);
-		
-		if (personaOld != null)
+				
+		if (personaOld != null) {
+			fillDerechohabiente(personaOld);
 			return new ResponseEntity<>(personaOld, HttpStatus.OK);
+		}
 		else {
 			if(response.getStatus() == 429)
 				return new ResponseEntity<>(new Mensaje("Multiples resultados para la busqueda"), HttpStatus.CONFLICT);
@@ -105,16 +114,32 @@ public class DerechohabienteService {
 		
 	}
 	
-	public ResponseEntity<?> getPersonaById(long id) {
-		Derechohabiente persona =  personaDB.getPersonaById(id);
-		
-		fillDerechohabiente(persona);
 	
-		if (persona != null)
+	public ResponseEntity<?> getPersonaByNoControlNoPreafiliacion(long noControl, long noPreAfiliacion) {
+		Derechohabiente persona =  personaDB.getPersonaByNoControlNoPreafiliacion(noControl, noPreAfiliacion);
+			
+		if (persona != null) {
+			fillDerechohabiente(persona);
 			return new ResponseEntity<>(persona, HttpStatus.OK);
-		
+		}
 		else
 			return new ResponseEntity<>(new Mensaje("No existe esa persona"), HttpStatus.CONFLICT);
+		
+    }
+	
+	public ResponseEntity<?> getAfiliadoByNoControlNoPreafiliacion(long noControl, long noAfiliacion, long claveParentesco) {
+		Derechohabiente afiliado =  personaDB.getAfiliadoByNoControlNoPreafiliacion(noControl, noAfiliacion, claveParentesco);
+		
+		if (afiliado != null) {
+			fillDerechohabiente(afiliado);
+			return new ResponseEntity<>(afiliado, HttpStatus.OK);
+		}
+		
+		else
+			if (claveParentesco == 0)
+				return new ResponseEntity<>(new Mensaje("No existe el titular"), HttpStatus.CONFLICT);
+			else 
+				return new ResponseEntity<>(new Mensaje("No existe el beneficiario"), HttpStatus.CONFLICT);
 		
     }
 	
@@ -136,12 +161,13 @@ public class DerechohabienteService {
 					
 				//Si encontramos un resultado en la base de datos ISSSTEP procedemos a la creacion del Derechohabiente y su usuario de la plataforma
 				if(oldPersona != null) {
-					if(personaDB.createDerechohabiente(oldPersona) > 0) {
-						beneficiarioDB.createBeneficiario(oldPersona, 0);
+					if(personaDB.createDerechohabiente(oldPersona) > 0) { 
+						// Benefiario del trabjador
+						beneficiarioDB.createBeneficiario(oldPersona.getNoControl(),  oldPersona, 0);
 						if(creaUsuario(oldPersona, persona)>0) {
 							for(Derechohabiente beneficiario : personaDB.getBeneficiariosByTrabajadorIssstep(oldPersona.getNoControl())) {
 								personaDB.createDerechohabiente(beneficiario);
-								beneficiarioDB.createBeneficiario(beneficiario, beneficiario.getClaveParentesco());
+								beneficiarioDB.createBeneficiario(oldPersona.getNoControl(), beneficiario, beneficiario.getClaveParentesco());
 							}
 						}
 						else
@@ -319,26 +345,38 @@ public class DerechohabienteService {
 	
 	}
 	
-	public ResponseEntity<?> asignarBeneficiario( Beneficiario beneficiario) {
+	public ResponseEntity<?> asignarBeneficiario(Beneficiario beneficiario) {
+		
+		Derechohabiente persona =  personaDB.getPersonaByNoControlNoPreafiliacion(beneficiario.getNoControl(), beneficiario.getNoPreAfiliacion());
+		
+		// Sino tenemos resultado de nuestra base de datos vamos por los datos a la bd de issstep
+		if(persona == null) {
+			
+			persona = personaDB.getPersonaByNoControlNoAfiliacionIssstep(beneficiario.getNoControl(), beneficiario.getNoPreAfiliacion());
+			persona.setNoControl(beneficiario.getNoControlTitular());
+			personaDB.createDerechohabiente(persona);
+		}
+		
 		Beneficiario oldBeneficiario = beneficiarioDB.getBeneficiario(beneficiario.getNoControl(), beneficiario.getNoPreAfiliacion(), beneficiario.getClaveParentesco());
 		
 		if (oldBeneficiario != null)
 			return new ResponseEntity<>(new Mensaje("Ya existe el beneficiario"), HttpStatus.CONFLICT);
 		
 		try{
-			Derechohabiente oldPersona = personaDB.getPersonaById(beneficiario.getNoControl());
 			
-			if (oldPersona == null) 
-				return new ResponseEntity<>(new Mensaje("No existe el derechohabiente"), HttpStatus.CONFLICT);
+			// Derechohabiente oldPersona = personaDB.getPersonaById(beneficiario.getNoControl());
+			
+			/* if (oldPersona == null) 
+				return new ResponseEntity<>(new Mensaje("No existe el derechohabiente"), HttpStatus.CONFLICT); */
 			
 			String user = (String) SecurityContextHolder.getContext().getAuthentication().getName();
 			Usuario usuario =  usuarioDB.getUsuarioByColumnaStringValor("LOGIN", user);
 			
-			oldPersona.setSituacion(1);
-			oldPersona.setFechaRegistro(new Timestamp(new Date().getTime()));
-			oldPersona.setClaveUsuarioRegistro(usuario.getClaveUsuario());  // Cambiarlo por la de la informacion del logeo
+			persona.setSituacion(1);
+			persona.setFechaRegistro(new Timestamp(new Date().getTime()));
+			// persona.setClaveUsuarioRegistro(usuario.getClaveUsuario());  // Cambiarlo por la de la informacion del logeo
 				
-			long noBeneficiario = beneficiarioDB.createBeneficiario(oldPersona, beneficiario.getClaveParentesco());
+			long noBeneficiario = beneficiarioDB.createBeneficiario(beneficiario.getNoControlTitular(), persona, beneficiario.getClaveParentesco());
 			
 			 if (noBeneficiario == 0)
 				 return new ResponseEntity<>(new Mensaje("No fue posible asignar el beneficiario"), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -356,6 +394,19 @@ public class DerechohabienteService {
 			e.printStackTrace();
 			return  new ResponseEntity<>(null,null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+	}
+	
+	public ResponseEntity<?> eliminarBeneficiario(long  idBeneficiario) {
+		
+		Beneficiario beneficiario = beneficiarioDB.getBeneficiarioById(idBeneficiario);
+		
+		if (beneficiario == null)
+			return new ResponseEntity<>(new Mensaje("No existe el beneficiario"), HttpStatus.BAD_REQUEST);
+		
+		if (beneficiarioDB.deleteBeneficiario( idBeneficiario) != 1)
+			return new ResponseEntity<>(new Mensaje("No se pudo eliminar el beneficiario"), HttpStatus.INTERNAL_SERVER_ERROR);
+		
+		return new ResponseEntity<>(new Mensaje("Beneficiario eliminado"), HttpStatus.OK);
 	}
 	
 	public ResponseEntity<?> solicitudRecuperarPassword(String email) {
@@ -419,7 +470,7 @@ public class DerechohabienteService {
     }
 	
 	// funcion que regrerara los beneficiarios de algun trabador
-	public ResponseEntity<?> getBeneficiarios(boolean incluirTitular, long noControl) {
+	public ResponseEntity<?> getBeneficiarios(boolean incluirTitular, long noControl) {		
 		String user = (String) SecurityContextHolder.getContext().getAuthentication().getName();
 		Usuario usuario =  usuarioDB.getUsuarioByColumnaStringValor("LOGIN", user);
 	
@@ -454,5 +505,44 @@ public class DerechohabienteService {
 		
 		return true;
 	}
+	
+	public ResponseEntity<?> buscarInformacionEnPreafiliacion(boolean enPreafiliacion, DatoABuscar datoABuscar) {
+		Pattern numero = Pattern.compile(expRegParaNumero);
+		Matcher esNumero = numero.matcher(datoABuscar.getDato());
+		String campo = "NOMBRE";
+		boolean esValorNumerico = false;
+		
+		esValorNumerico = esNumero.find();
+		
+		if (esValorNumerico) 
+			campo = "";
+		else {
+			Pattern curp = Pattern.compile(expRegParaCURP);
+			Matcher esCURP = curp.matcher(datoABuscar.getDato());
+			
+			if (esCURP.find())
+				campo = "CURP";
+		}
+		
+		System.out.println("Campo ==> " + campo);
+		List<ResultadoBusqueda> resultadoBusqueda;
+		
+		if (enPreafiliacion)
+			resultadoBusqueda = personaDB.getInformacionPreAfiliaconByCampo(campo, datoABuscar.getDato(), esValorNumerico);
+		else 
+			resultadoBusqueda = personaDB.getInformacionAfiliaconByCampo(campo, datoABuscar.getDato(), esValorNumerico);
+		
+		
+		for(ResultadoBusqueda result: resultadoBusqueda){
+			result.setParentesco(catalogoGenericoDB.getDescripcionParentesco(result.getClaveParentesco()));
+		}
+		
+		if (resultadoBusqueda != null)
+			return new ResponseEntity<>(resultadoBusqueda, HttpStatus.OK);
+		
+		else
+			return new ResponseEntity<>(new ArrayList[0] , HttpStatus.OK);
+		
+    }
 
 }

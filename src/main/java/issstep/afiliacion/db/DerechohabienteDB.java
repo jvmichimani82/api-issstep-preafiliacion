@@ -26,6 +26,7 @@ import issstep.afiliacion.model.ActualizarDatos;
 import issstep.afiliacion.model.CatalogoGenerico;
 import issstep.afiliacion.model.Derechohabiente;
 import issstep.afiliacion.model.InfoDerechohabiente;
+import issstep.afiliacion.model.ResultadoBusqueda;
 
 @Component
 public class DerechohabienteDB {
@@ -108,41 +109,23 @@ public class DerechohabienteDB {
 	
 	public Derechohabiente getPersonaByNombre(Derechohabiente persona, HttpServletResponse response) {
 		StringBuilder query = new StringBuilder();
-		query.append( "SELECT DH.*, EF.DESCRIPCION AS ENTIDAD, M.DESCRIPCION AS MUNICIPIO, L.DESCRIPCION AS LOCALIDAD, C.DESCRIPCION AS COLONIA, EDOCVIL.DESCRIPCION AS ESTADOCIVIL, CSERV.DESCRIPCION AS CLINICA  "
+		/* query.append( "SELECT DH.*, EF.DESCRIPCION AS ENTIDAD, M.DESCRIPCION AS MUNICIPIO, L.DESCRIPCION AS LOCALIDAD, C.DESCRIPCION AS COLONIA, EDOCVIL.DESCRIPCION AS ESTADOCIVIL, CSERV.DESCRIPCION AS CLINICA  "
 					+ "FROM DERECHOHABIENTE DH, KESTADO EF, KMUNICIPIO M, KLOCALIDAD L, KCOLONIA AS C, KESTADOCIVIL EDOCVIL, KCLINICASERVICIO CSERV "
 					+ "WHERE DH.CLAVEESTADO = EF.CLAVEESTADO AND "
 					+ "DH.CLAVEMUNICIPIO = M.CLAVEMUNICIPIO AND "
 					+ "DH.CLAVECOLONIA = C.CLAVECOLONIA AND "
 					+ "DH.CLAVECLINICASERVICIO = CSERV.CLAVECLINICASERVICIO AND "
 					+ "DH.CLAVEESTADOCIVIL = EDOCVIL.CLAVEESTADOCIVIL AND "
-					+ "DH.CLAVEMUNICIPIO = L.CLAVEMUNICIPIO AND DH.CLAVELOCALIDAD = L.CLAVELOCALIDAD AND ");
+					+ "DH.CLAVEMUNICIPIO = L.CLAVEMUNICIPIO AND DH.CLAVELOCALIDAD = L.CLAVELOCALIDAD AND "); */
 		
-		query.append("DH.PATERNO");
-		query.append(" LIKE '%");
-		query.append(persona.getPaterno());
-		query.append("%'");
-		query.append(" AND ");
-		query.append("DH.MATERNO");
-		query.append(" LIKE '%");
-		query.append(persona.getMaterno());
-		query.append("%'");
-		query.append(" AND ");
-		query.append("DH.NOMBRE");
-		query.append(" LIKE '%");
-		query.append(persona.getNombre());
-		query.append("%'");
-		query.append(" AND ");
-		query.append("DH.CLAVEESTADO");
-		query.append("= ");
-		query.append(persona.getClaveEstado());
-		query.append(" AND ");
-		query.append("DH.FECHANACIMIENTO");
-		query.append("= '");
-		query.append(format.format(persona.getFechaNacimiento()));
-		query.append("'");	
+		query.append( "SELECT * FROM DERECHOHABIENTE WHERE PATERNO LIKE '%" + persona.getPaterno() + "%' "
+				    + "AND MATERNO LIKE '%" + persona.getMaterno() 
+				    + "%' AND NOMBRE LIKE '%" + persona.getNombre()
+				    + "%' AND CLAVEESTADO = " + persona.getClaveEstado()
+				    + " AND FECHANACIMIENTO = '" + format.format(persona.getFechaNacimiento()) +"'");	
+		
 		System.out.println("Consulta ==> " + query.toString());
-		
-		
+				
 		Derechohabiente personaOld = null;
 		try {
 			personaOld =  mysqlTemplate.queryForObject(query.toString().toUpperCase(), new PersonaRowMapper());
@@ -171,12 +154,93 @@ public class DerechohabienteDB {
 		
 		query.append( "SELECT * FROM DERECHOHABIENTE WHERE NOCONTROL ="); 
 		query.append(noControl);
+		query.append(" AND NOPREAFILIACION = ");
+		query.append(noControl);
 				
 		System.out.println(query.toString());
 		
 		Derechohabiente persona = null;
 		try {
 			persona =  mysqlTemplate.queryForObject(query.toString(), new PersonaRowMapper());
+		} 
+		catch (EmptyResultDataAccessException e) {
+			return null;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return persona;
+	}
+	
+	public Derechohabiente getPersonaByNoControlNoPreafiliacion(long noControl, long noPreafiliacion) {
+		StringBuilder query = new StringBuilder();
+			query.append( "SELECT * FROM DERECHOHABIENTE WHERE NOCONTROL ="); 
+			query.append(noControl);
+			query.append(" AND NOPREAFILIACION =");
+			query.append(noPreafiliacion);
+				
+		System.out.println(query.toString());
+		
+		Derechohabiente persona = null;
+		try {
+			persona =  mysqlTemplate.queryForObject(query.toString(), new PersonaRowMapper());
+		} 
+		catch (EmptyResultDataAccessException e) {
+			return null;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return persona;
+	}
+	
+	public Derechohabiente getAfiliadoByNoControlNoPreafiliacion(long noControl, long noAafiliacion, long claveParentesco) {
+		boolean esTitular = claveParentesco == 0;
+		
+		StringBuilder query = new StringBuilder();
+		
+		if (esTitular)
+			query.append( "SELECT *, 0 AS CLAVEPARENTESCO FROM  TRABAJADOR  WHERE NOCONTROL = "); 
+		else 
+			query.append( "SELECT * FROM  BENEFICIARIO  WHERE NOCONTROL = ");		
+		query.append(noControl);
+		
+		if (esTitular)
+			query.append(" AND NOAFILIACION = ");	
+		else
+			query.append(" AND NOBENEFICIARIO = ");
+		query.append(noAafiliacion);
+				
+		System.out.println(query.toString());
+		
+		Derechohabiente persona = null;
+		try {
+			if (esTitular)
+				persona =  afiliacionDBTemplate.queryForObject(query.toString(), new TrabajadorRowMapper());
+			else 
+				persona =  afiliacionDBTemplate.queryForObject(query.toString(), new BeneficiarioRowMapper());
+		} 
+		catch (EmptyResultDataAccessException e) {
+			return null;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return persona;
+	}
+	
+	public Derechohabiente getPersonaByNoControlNoAfiliacionIssstep(long noControl, long noAfiliacion) {
+		StringBuilder query = new StringBuilder();
+			query.append( "SELECT * FROM TRABAJADOR WHERE NOCONTROL ="); 
+			query.append(noControl);
+			query.append(" AND NOAFILIACION =");
+			query.append(noAfiliacion);
+				
+		System.out.println(query.toString());
+		
+		Derechohabiente persona = null;
+		try {
+			persona =  afiliacionDBTemplate.queryForObject(query.toString(), new TrabajadorRowMapper());
 		} 
 		catch (EmptyResultDataAccessException e) {
 			return null;
@@ -339,7 +403,7 @@ public class DerechohabienteDB {
 					+ "FROM DERECHOHABIENTE D, "
 					+ "(SELECT NOCONTROL FROM DOCUMENTO WHERE ESVALIDO = " + estatusValidacion 
 					+ " GROUP BY NOCONTROL) DOC" 
-					+ " WHERE D.NOCONTROL = DOC.NOCONTROL");
+					+ " WHERE D.NOCONTROL = DOC.NOCONTROL AND D.NOPREAFILIACION = DOC.NOCONTROL");
 		
 		System.out.println(query.toString());
 		
@@ -361,12 +425,13 @@ public class DerechohabienteDB {
 				+ "FROM DERECHOHABIENTE DH, "
 				+ "BENEFICIARIO BE "
 				+ "WHERE "
-				+ "DH.NOCONTROL = BE.NOCONTROL AND DH.NOPREAFILIACION = BE.NOPREAFILIACION "
+				+ "DH.NOCONTROL = BE.NOCONTROL AND"
+				+ " DH.NOPREAFILIACION = BE.NOPREAFILIACION "
 				+ " AND DH.NOCONTROL =");
 		query.append(noControl);
 		
 		if (!incluirTitular)
-			query.append("AND BE.NOPREAFILIACION != " + noControl);
+			query.append(" AND BE.NOPREAFILIACION != " + noControl);
 
 
 		System.out.println("Parentescos ==> " + query.toString());
@@ -404,6 +469,90 @@ public class DerechohabienteDB {
 			e.printStackTrace();
 		}
 		return beneficiarios;
+	}
+	
+	public List<ResultadoBusqueda> getInformacionPreAfiliaconByCampo(String campo , String dato, boolean esValorNumerico) {
+		dato = dato.toUpperCase();
+		StringBuilder query = new StringBuilder();
+		
+			query.append( "SELECT DH.NOMBRE, DH.PATERNO, DH.MATERNO, DH.NOCONTROL, "
+						+ "DH.NOPREAFILIACION, 0 AS NOAFILIACION, BE.NOBENEFICIARIO, "
+						+ "DH.CURP, BE.CLAVEPARENTESCO, DH.SEXO "
+						+ "FROM DERECHOHABIENTE DH, "
+						+ "BENEFICIARIO BE "
+						+ "WHERE DH.NOCONTROL = BE.NOCONTROL AND DH.NOPREAFILIACION = BE.NOPREAFILIACION AND ");
+		
+		if (esValorNumerico)
+				query.append( "(DH.NOCONTROL = " + dato + " OR DH.NOPREAFILIACION = " + dato + ")");
+		else
+			if (campo.equals("NOMBRE"))				
+				query.append( "(DH.NOMBRE LIKE '%" + campo + "%' OR DH.PATERNO LIKE '%" + dato + "%' OR DH.MATERNO LIKE '%" + dato + "%')");
+			else
+				query.append(  "DH.CURP LIKE '%" + dato + "%'");
+		
+		System.out.println("Consulta de busqueda (PreAfiliacion) ==> " + query.toString());
+		
+		List<ResultadoBusqueda> resultadoBusqueda = null;
+		
+		try {
+			resultadoBusqueda =  mysqlTemplate.query(query.toString(), new ResultadoBusquedaRowMapper());		
+		} 
+		catch (EmptyResultDataAccessException e) {
+			return null;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return resultadoBusqueda;
+	}
+	
+	
+	public List<ResultadoBusqueda> getInformacionAfiliaconByCampo(String campo , String dato, boolean esValorNumerico) {
+		dato = dato.toUpperCase();
+		StringBuilder query = new StringBuilder();
+		String queryComplemento = "";
+		
+			query.append( "SELECT T.NOMBRE, T.MATERNO, T.PATERNO, T.NOCONTROL, T.NOAFILIACION, "
+						+ "0 AS NOPREAFILIACION, T.NOCONTROL AS NOBENEFICIARIO, T.CURP, "
+						+ "0 AS CLAVEPARENTESCO, T.SEXO " 
+						+ "FROM TRABAJADOR T WHERE ");
+			queryComplemento = " UNION " + 
+							  "SELECT B.NOMBRE, B.MATERNO, B.PATERNO, B.NOCONTROL, "
+							+ "B.NOBENEFICIARIO AS NOAFILIACION, 0 AS NOPREAFILIACION, "
+							+ "B.NOBENEFICIARIO, B.CURP, B.CLAVEPARENTESCO, B.SEXO " 
+							+ "	FROM BENEFICIARIO B WHERE ";
+			
+		if (esValorNumerico) {
+				query.append( "(T.NOCONTROL = " + dato + " OR T.NOAFILIACION = " + dato + ")");
+				query.append( queryComplemento );
+				query.append( "(B.NOCONTROL = " + dato + " OR B.NOBENEFICIARIO = " + dato + ")");
+			}
+		else
+			if (campo.equals("NOMBRE")) {				
+				query.append( "(T.NOMBRE LIKE '%" + campo + "%' OR T.PATERNO LIKE '%" + dato + "%' OR T.MATERNO LIKE '%" + dato + "%')");
+				query.append( queryComplemento );
+				query.append( "(B.NOMBRE LIKE '%" + campo + "%' OR B.PATERNO LIKE '%" + dato + "%' OR B.MATERNO LIKE '%" + dato + "%')");
+			}
+			else {
+				query.append( "T.CURP LIKE '%" + dato + "%'");
+				query.append( queryComplemento );
+				query.append( "B.CURP LIKE '%" + dato + "%'");
+			}
+		
+		System.out.println("Consulta de busqueda (Afiliacion) ==> " + query.toString());
+		
+		List<ResultadoBusqueda> resultadoBusqueda = null;
+		
+		try {
+			resultadoBusqueda =  afiliacionDBTemplate.query(query.toString(), new ResultadoBusquedaRowMapper());
+		} 
+		catch (EmptyResultDataAccessException e) {
+			return null;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return resultadoBusqueda;
 	}
 }
 
@@ -492,7 +641,9 @@ class PersonaConParentescoRowMapper implements RowMapper<Derechohabiente> {
         // persona.setParentesco(rs.getString("PARENTESCO"));
         
         return persona;
-    }   
+    } 
+    
+    
 }
 
 class TrabajadorRowMapper implements RowMapper<Derechohabiente> {
@@ -600,10 +751,27 @@ class DerechohabienteRowMapper implements RowMapper<Derechohabiente> {
         persona.setClaveParentesco(rs.getLong("CLAVEPARENTESCO"));
         
         return persona;
+    }   
+}
+
+class ResultadoBusquedaRowMapper implements RowMapper<ResultadoBusqueda> {
+    @Override
+    public ResultadoBusqueda mapRow(ResultSet rs, int rowNum) throws SQLException {
+    	ResultadoBusqueda result = new ResultadoBusqueda();
+ 
+    	result.setNoBeneficiario(rs.getLong("NOBENEFICIARIO"));
+    	result.setNoControl(rs.getLong("NOCONTROL"));
+    	result.setNoPreAfiliacion(rs.getLong("NOPREAFILIACION"));
+    	result.setNoAfiliacion(rs.getLong("NOAFILIACION"));
+    	result.setNombre(rs.getString("NOMBRE"));
+    	result.setPaterno(rs.getString("PATERNO"));
+    	result.setMaterno(rs.getString("MATERNO"));
+    	result.setSexo(rs.getString("SEXO"));
+    	result.setCurp(rs.getString("CURP"));
+    	result.setClaveParentesco(rs.getLong("CLAVEPARENTESCO"));
+        
+        return result;
     }
-    
-    
-    
 }
 
 

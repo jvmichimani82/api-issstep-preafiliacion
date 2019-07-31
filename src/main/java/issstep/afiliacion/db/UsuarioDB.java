@@ -74,7 +74,7 @@ public class UsuarioDB {
 		query.append(" AND NOAFILIACION = ");
 		query.append(noAfiliacion);
 		
-		System.out.println(query.toString());
+		// System.out.println(query.toString());
 		
 		Usuario user = null;
 		try {

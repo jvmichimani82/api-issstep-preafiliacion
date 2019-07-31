@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import issstep.afiliacion.cons.DerechohabienteCONST;
 import issstep.afiliacion.model.Curp;
+import issstep.afiliacion.model.DatoABuscar;
 import issstep.afiliacion.model.Derechohabiente;
 import issstep.afiliacion.model.Email;
 import issstep.afiliacion.model.ResetPassword;
@@ -51,12 +52,27 @@ public class DerechohabienteController {
     	return derechohabienteService.getPersonaByNombre(persona, response);
     }
     
+    @ApiOperation(value = "Obtiene la información de un preafiliado")
     @JsonView(Derechohabiente.Views.Simple.class)
-    @RequestMapping(value = "/{idPersona}", method = RequestMethod.GET)
-    public ResponseEntity<?> getPersonaById(@ApiParam(value = "idPersona", required = true) @PathVariable long idPersona, HttpServletResponse response) {
+    @RequestMapping(value = "/{noControl}/{noPreAfiliacion}", method = RequestMethod.GET)
+    public ResponseEntity<?> getPersonaById(@ApiParam(value = "noControl", required = true) @PathVariable long noControl, 
+    										@ApiParam(value = "noPreAfiliacion", required = true) @PathVariable long noPreAfiliacion,
+    										HttpServletResponse response) {
 
-    	return derechohabienteService.getPersonaById(idPersona);
+    	return derechohabienteService.getPersonaByNoControlNoPreafiliacion(noControl, noPreAfiliacion);
     }
+    
+    @ApiOperation(value = "Obtiene la información de un afiliado")
+    @JsonView(Derechohabiente.Views.Simple.class)
+    @RequestMapping(value = "/afiliado/{noControl}/{noAfiliacion}/{claveParentesco}", method = RequestMethod.GET)
+    public ResponseEntity<?> getAfiliadoById(@ApiParam(value = "noControl", required = true) @PathVariable long noControl, 
+    										@ApiParam(value = "noAfiliacion", required = true) @PathVariable long noAfiliacion,
+    										@ApiParam(value = "claveParentesco", required = true) @PathVariable long claveParentesco,
+    										HttpServletResponse response) {
+
+    	return derechohabienteService.getAfiliadoByNoControlNoPreafiliacion(noControl, noAfiliacion, claveParentesco);
+    }
+    
     
     @ApiOperation(value = "Relación de beneficiarios de un derechohabiente")
     @JsonView(Derechohabiente.Views.Simple.class)
@@ -107,6 +123,15 @@ public class DerechohabienteController {
     	return derechohabienteService.asignarBeneficiario( beneficiario );
     }
     
+    @ApiOperation(value = "Eliminar beneficiario")
+    @JsonView(Derechohabiente.Views.RegistroDerechohabiente.class)
+    @RequestMapping(value = "/eliminar/beneficiario/{idBeneficiario}", method = RequestMethod.DELETE)
+    public ResponseEntity<?> eliminarBeneficiario(@ApiParam(value = "idBeneficiario", required = true)@PathVariable long idBeneficiario,
+    											 HttpServletResponse response) {
+   
+    	return derechohabienteService.eliminarBeneficiario( idBeneficiario );
+    }
+    
     @ApiOperation(value = "Resetear password")
     @RequestMapping(value = "/recuperar/password", method=RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> recuperarPassword(@ApiParam(value = DerechohabienteCONST.recuperarPassword, required = true)@RequestBody ResetPassword resetPassword, HttpServletResponse response ){
@@ -144,5 +169,19 @@ public class DerechohabienteController {
     	return derechohabienteService.getDerechohabientesPorEstatusDeValidacion(estatusValidacion);
 	}
     
+    @ApiOperation(value = "Buscar preafiliado")
+    @RequestMapping(value = "/buscar/preafiliado", method=RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> buscarPreafiliado( @ApiParam(value = "{ \n \"dato\" : \"información a buscar\" \n}", required = true)@RequestBody DatoABuscar datoABuscar,
+													HttpServletResponse response ){
+
+    	return derechohabienteService.buscarInformacionEnPreafiliacion(true, datoABuscar);
+	}
     
+    @ApiOperation(value = "Buscar afiliado")
+    @RequestMapping(value = "/buscar/afiliado", method=RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> buscarAfiliado( @ApiParam(value = "{ \n \"dato\" : \"información a buscar\" \n}", required = true)@RequestBody DatoABuscar datoABuscar,
+													HttpServletResponse response ){
+
+    	return derechohabienteService.buscarInformacionEnPreafiliacion(false, datoABuscar);
+	}
 }
