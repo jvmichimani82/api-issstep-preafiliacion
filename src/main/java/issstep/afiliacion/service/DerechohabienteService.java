@@ -36,7 +36,9 @@ import issstep.afiliacion.model.Usuario;
 import issstep.afiliacion.model.ActualizarDatos;
 import issstep.afiliacion.model.ActualizarPassword;
 import issstep.afiliacion.model.Beneficiario;
+import issstep.afiliacion.model.CatalogoGenerico;
 import issstep.afiliacion.model.DatoABuscar;
+import issstep.afiliacion.model.ResultadoValidacion;
 import issstep.afiliacion.utils.Utils;
 
 
@@ -45,9 +47,9 @@ import issstep.afiliacion.utils.Utils;
 public class DerechohabienteService {
 	private static final Logger logger = LoggerFactory.getLogger(DerechohabienteService.class);	
 	
-	private static final String expRegParaNumero = "^[0-9]+";
-	//private static final String expRegParaCURP = "^([A-Za-z]{1}[AEIOUaeiou]{1}[A-Za-z]{2}[0-9]{2}(0[1-9]|1[0-2])(0[1-9]|1[0-9]|2[0-9]|3[0-1])[HMhm]{1}([A|a][S|s]|[B|b][C|c]|[B|b][S|s]|[C|c][C|c]|[C|c][S|s]|[C|c][H|h]|[C|c][L|l]|[C|c][M|m]|[D|d][F|f]|[D|d][G|g]|[G|g][T|t]|[G|g][R|r]|[H|h][G|g]|[J|j][C|c]|[M|m][C|c]|[M|m][N|n]|[M|m][S|s]|[N|n][T|t]|[N|n][L|l]|[O|o][C|c]|[P|p][L|l]|[Q|q][T|t]|[Q|q][R|r]|[S|s][P|p]|[S|s][L|l]|[S|s][R|r]|[T|t][C|c]|[T|t][S|s]|[T|t][L|l]|[V|v][Z|z]|[Y|y][N|n]|[Z|z][S|s]|[N|n][E|e])[B-DF-HJ-NP-TV-Zb-df-hj-np-tv-z]{3}[0-9A-Za-z]{2})$";
-	private static final String expRegParaCURP = "^([A-Z]{4}[0-9]{1,6})|([A-Z]{4}[0-9]{6}[A-Z]{1,6})|([A-Z]{4}[0-9]{6}[A-Z]{6}[A-Z0-9]{1,2})$";
+	// private static final String expRegParaNumero = "^[0-9]+";
+	// private static final String expRegParaCURP = "^([A-Za-z]{1}[AEIOUaeiou]{1}[A-Za-z]{2}[0-9]{2}(0[1-9]|1[0-2])(0[1-9]|1[0-9]|2[0-9]|3[0-1])[HMhm]{1}([A|a][S|s]|[B|b][C|c]|[B|b][S|s]|[C|c][C|c]|[C|c][S|s]|[C|c][H|h]|[C|c][L|l]|[C|c][M|m]|[D|d][F|f]|[D|d][G|g]|[G|g][T|t]|[G|g][R|r]|[H|h][G|g]|[J|j][C|c]|[M|m][C|c]|[M|m][N|n]|[M|m][S|s]|[N|n][T|t]|[N|n][L|l]|[O|o][C|c]|[P|p][L|l]|[Q|q][T|t]|[Q|q][R|r]|[S|s][P|p]|[S|s][L|l]|[S|s][R|r]|[T|t][C|c]|[T|t][S|s]|[T|t][L|l]|[V|v][Z|z]|[Y|y][N|n]|[Z|z][S|s]|[N|n][E|e])[B-DF-HJ-NP-TV-Zb-df-hj-np-tv-z]{3}[0-9A-Za-z]{2})$";
+	// private static final String expRegPatronCURP = "^([A-Z]{4}[0-9]{1,6})|([A-Z]{4}[0-9]{6}[A-Z]{1,6})|([A-Z]{4}[0-9]{6}[A-Z]{6}[A-Z0-9]{1,2})$";
 	
 	@Autowired
 	DerechohabienteDB personaDB;
@@ -118,51 +120,51 @@ public class DerechohabienteService {
 	public ResponseEntity<?> getPersonaByNoControlNoPreafiliacion(long noControl, long noPreAfiliacion) {
 		Derechohabiente persona =  personaDB.getPersonaByNoControlNoPreafiliacion(noControl, noPreAfiliacion);
 			
-		if (persona != null) {
-			fillDerechohabiente(persona);
-			return new ResponseEntity<>(persona, HttpStatus.OK);
-		}
-		else
+		if (persona == null) 
 			return new ResponseEntity<>(new Mensaje("No existe esa persona"), HttpStatus.CONFLICT);
 		
+		fillDerechohabiente(persona);
+		return new ResponseEntity<>(persona, HttpStatus.OK);		
     }
 	
 	public ResponseEntity<?> getAfiliadoByNoControlNoPreafiliacion(long noControl, long noAfiliacion, long claveParentesco) {
 		Derechohabiente afiliado =  personaDB.getAfiliadoByNoControlNoPreafiliacion(noControl, noAfiliacion, claveParentesco);
 		
-		if (afiliado != null) {
-			fillDerechohabiente(afiliado);
-			return new ResponseEntity<>(afiliado, HttpStatus.OK);
-		}
-		
-		else
+		if (afiliado == null) 
 			if (claveParentesco == 0)
 				return new ResponseEntity<>(new Mensaje("No existe el titular"), HttpStatus.CONFLICT);
 			else 
 				return new ResponseEntity<>(new Mensaje("No existe el beneficiario"), HttpStatus.CONFLICT);
 		
+		fillDerechohabiente(afiliado);
+		return new ResponseEntity<>(afiliado, HttpStatus.OK);
     }
 	
 	
 	public ResponseEntity<?> registraUsuario(boolean registroOnline, Derechohabiente persona, long claveParentesco){
 		try{
 			Derechohabiente oldPersona = null;
-			//Revisamos si el registro trae curp sino haremos la consulta por noControl y NoAfiliacion
+			
+			// Revisamos si el registro trae curp sino haremos la consulta por noControl y NoAfiliacion
 			if(persona.getCurp() != null) {
+				
+				if (!Utils.esCURP(persona.getCurp()))
+					return new ResponseEntity<>(new Mensaje("Formato de CURP invalido"), HttpStatus.BAD_REQUEST);
+				
 				// Revisamos que la persona exista en nuestra base de datos
 				 oldPersona =  personaDB.getPersonaByColumnaStringValor("CURP", persona.getCurp());
 				
 				// Sin encontramos un resultado en nuestra bd rechacamos la creacion del usuario
 				if(oldPersona != null)
 					return new ResponseEntity<>(new Mensaje("Se encontro un registro en nuestra bd"), HttpStatus.CONFLICT);
+				
 				// Sino hacemos la consulta a la bd de issstep
-				else 
-					oldPersona = personaDB.getTrabajadorIssstepByColumnaStringValor("CURP", persona.getCurp());
+				oldPersona = personaDB.getTrabajadorIssstepByColumnaStringValor("CURP", persona.getCurp());
 					
 				//Si encontramos un resultado en la base de datos ISSSTEP procedemos a la creacion del Derechohabiente y su usuario de la plataforma
 				if(oldPersona != null) {
 					if(personaDB.createDerechohabiente(oldPersona) > 0) { 
-						// Benefiario del trabjador
+						// Benefiario del trabajador
 						beneficiarioDB.createBeneficiario(oldPersona.getNoControl(),  oldPersona, 0);
 						if(creaUsuario(oldPersona, persona)>0) {
 							for(Derechohabiente beneficiario : personaDB.getBeneficiariosByTrabajadorIssstep(oldPersona.getNoControl())) {
@@ -293,39 +295,26 @@ public class DerechohabienteService {
 			
 			Derechohabiente oldderechohabiente = personaDB.getPersonaByColumnaStringValor("CURP", derechohabiente.getCurp());
 			
-			if (oldderechohabiente != null) {
-				System.out.println("CURP existente");
-				return new ResponseEntity<>(new Mensaje("El derechohabiente ya esta registrado"), HttpStatus.CONFLICT);
-			}
-			/*Usuario usuario = new Usuario();
+			if (oldderechohabiente != null) 
+				return new ResponseEntity<>(new Mensaje("CURP duplicada"), HttpStatus.CONFLICT);
 			
-			usuario.setClaveRol(2);
-			usuario.setLogin("");
-			usuario.setPasswd("");
-			usuario.setToken("");
-			usuario.setFechaRegistro(new Timestamp(new Date().getTime()));
-			usuario.setEstatus(1);
-			usuario.setNoControl(derechohabiente.getNoControl());
 			
-			long claveUsuario = usuarioDB.createUsuario(claveParentesco, usuario);
+			oldderechohabiente = personaDB.getPersonaByNoControlNoPreafiliacion(derechohabiente.getNoControl(), derechohabiente.getNoPreAfiliacion());
+			if (oldderechohabiente != null) 
+				return new ResponseEntity<>(new Mensaje("No control con numero de pre-afiliacion duplicado"), HttpStatus.CONFLICT);
 			
-			if (claveUsuario == 0) 
-				return new ResponseEntity<>(new Mensaje("No fue posible crear su registro como usuario"), HttpStatus.CONFLICT);
-			
-			derechohabiente.setClaveUsuarioRegistro(claveUsuario); */
 			derechohabiente.setFechaRegistro(new Timestamp(new Date().getTime()));
 			derechohabiente.setFechaPreAfiliacion(new Timestamp(new Date().getTime()));
+			
 			long estatusRegistro = personaDB.createDerechohabiente( derechohabiente);
 			
-			if (estatusRegistro == 0) {
-				System.out.println("No registrado");
+			if (estatusRegistro == 0) 
 				return new ResponseEntity<>(new Mensaje("No fue posible registrar al derechohabiente"), HttpStatus.INTERNAL_SERVER_ERROR);
-			}
 			
-			if (estatusRegistro == -1) {
-				System.out.println("Integridad");
-				return new ResponseEntity<>(new Mensaje("No de control y no de pre-aficiliacion duplicados"), HttpStatus.CONFLICT);
-			}
+			
+			/* if (estatusRegistro == -1) 
+				return new ResponseEntity<>(new Mensaje("No de control y no de pre-aficiliacion duplicados"), HttpStatus.CONFLICT); */
+			
 			
 			// return registraUsuario( false, derechohabiente, claveParentesco );
 			
@@ -346,6 +335,21 @@ public class DerechohabienteService {
 	}
 	
 	public ResponseEntity<?> asignarBeneficiario(Beneficiario beneficiario) {
+		
+		CatalogoGenerico catalogoGenerico = catalogoGenericoDB.getRegistro("KPARENTESCO", beneficiario.getClaveParentesco());
+		
+		if (catalogoGenerico == null)
+			return new ResponseEntity<>(new Mensaje("Clave de parentesco invalida"), HttpStatus.BAD_REQUEST);
+		
+		if (beneficiario.getClaveParentesco() == 0)
+			return new ResponseEntity<>(new Mensaje("No puede registrar un beneficiario con clave de titular"), HttpStatus.BAD_REQUEST);
+
+		if (personaDB.existeBeneficiarioRegistradoById(beneficiario.getNoControl(), beneficiario.getNoPreAfiliacion()))
+			return new ResponseEntity<>(new Mensaje("Ya existe un beneficiario registrado"), HttpStatus.BAD_REQUEST);
+		
+		if (beneficiario.getClaveParentesco() != 6 && beneficiario.getClaveParentesco() != 7) 
+			if (personaDB.existeBeneficiarioRegistrado(beneficiario.getNoControl(), beneficiario.getClaveParentesco()))
+				return new ResponseEntity<>(new Mensaje("Ya existe un beneficiario registrado con ese parenteso"), HttpStatus.BAD_REQUEST);	
 		
 		Derechohabiente persona =  personaDB.getPersonaByNoControlNoPreafiliacion(beneficiario.getNoControl(), beneficiario.getNoPreAfiliacion());
 		
@@ -507,22 +511,16 @@ public class DerechohabienteService {
 	}
 	
 	public ResponseEntity<?> buscarInformacionEnPreafiliacion(boolean enPreafiliacion, DatoABuscar datoABuscar) {
-		Pattern numero = Pattern.compile(expRegParaNumero);
-		Matcher esNumero = numero.matcher(datoABuscar.getDato());
 		String campo = "NOMBRE";
 		boolean esValorNumerico = false;
 		
-		esValorNumerico = esNumero.find();
+		esValorNumerico = Utils.esNumero(datoABuscar.getDato()) ;
 		
 		if (esValorNumerico) 
 			campo = "";
-		else {
-			Pattern curp = Pattern.compile(expRegParaCURP);
-			Matcher esCURP = curp.matcher(datoABuscar.getDato());
-			
-			if (esCURP.find())
+		else 
+			if (Utils.esPatronCURP(datoABuscar.getDato()))
 				campo = "CURP";
-		}
 		
 		System.out.println("Campo ==> " + campo);
 		List<ResultadoBusqueda> resultadoBusqueda;

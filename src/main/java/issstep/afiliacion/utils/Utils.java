@@ -1,6 +1,8 @@
 package issstep.afiliacion.utils;
 
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 
@@ -30,6 +32,11 @@ import java.util.Map;
 
 public class Utils {
 	
+   private static final String expRegParaNumero = "^[0-9]+";
+   private static final String expRegParaCURP = "^([A-Za-z]{1}[AEIOUaeiou]{1}[A-Za-z]{2}[0-9]{2}(0[1-9]|1[0-2])(0[1-9]|1[0-9]|2[0-9]|3[0-1])[HMhm]{1}([A|a][S|s]|[B|b][C|c]|[B|b][S|s]|[C|c][C|c]|[C|c][S|s]|[C|c][H|h]|[C|c][L|l]|[C|c][M|m]|[D|d][F|f]|[D|d][G|g]|[G|g][T|t]|[G|g][R|r]|[H|h][G|g]|[J|j][C|c]|[M|m][C|c]|[M|m][N|n]|[M|m][S|s]|[N|n][T|t]|[N|n][L|l]|[O|o][C|c]|[P|p][L|l]|[Q|q][T|t]|[Q|q][R|r]|[S|s][P|p]|[S|s][L|l]|[S|s][R|r]|[T|t][C|c]|[T|t][S|s]|[T|t][L|l]|[V|v][Z|z]|[Y|y][N|n]|[Z|z][S|s]|[N|n][E|e])[B-DF-HJ-NP-TV-Zb-df-hj-np-tv-z]{3}[0-9A-Za-z]{2})$";
+   private static final String expRegPatronCURP = "^([A-Z]{4}[0-9]{1,6})|([A-Z]{4}[0-9]{6}[A-Z]{1,6})|([A-Z]{4}[0-9]{6}[A-Z]{6}[A-Z0-9]{1,2})$";
+   private static final String expRegPatronEmail = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*";
+   	
    public static String loadPropertie(String propiedad){
 	   try{
 		    Properties properties = new Properties();
@@ -94,6 +101,29 @@ public class Utils {
            e.printStackTrace();
            return 0l;
        }
+   }
+   
+   public static boolean verificaValorVSExpReg(String valor, String ExpReg) {
+	   Pattern patron = Pattern.compile(ExpReg);
+	   Matcher result = patron.matcher(valor);
+	   
+	   return result.find();
+   }
+   
+   public static boolean esNumero(String valor) {	   
+	   return verificaValorVSExpReg( valor,  expRegParaNumero);
+   }
+   
+   public static boolean esCURP(String valor) {	   
+	   return verificaValorVSExpReg( valor,  expRegParaCURP);
+   }
+   
+   public static boolean esPatronCURP(String valor) {	   
+	   return verificaValorVSExpReg( valor,  expRegPatronCURP);
+   }
+   
+   public static boolean esEmail(String valor) {	   
+	   return verificaValorVSExpReg( valor,  expRegPatronEmail);
    }
    
 

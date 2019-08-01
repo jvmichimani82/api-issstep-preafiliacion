@@ -38,6 +38,9 @@ public class Beneficiario {
 	long situacion;
 	
 	@JsonView({Beneficiario.Views.Simple.class})
+	String curp;
+	
+	@JsonView({Beneficiario.Views.Simple.class})
 	long claveUsuarioRegistro;
 	
 	@JsonView({Beneficiario.Views.Simple.class})

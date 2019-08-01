@@ -44,25 +44,15 @@ public class DerechohabienteDB {
 
 	public Derechohabiente getPersonaByColumnaStringValor(String columna, String valor) {
 		StringBuilder query = new StringBuilder();
-		/*query.append( "SELECT DH.*, EF.DESCRIPCION AS ENTIDAD, M.DESCRIPCION AS MUNICIPIO, L.DESCRIPCION AS LOCALIDAD, C.DESCRIPCION AS COLONIA,"
-				+ " EDOCVIL.DESCRIPCION AS ESTADOCIVIL, CSERV.DESCRIPCION AS CLINICA  "
-					+ "FROM DERECHOHABIENTE DH, KESTADO EF, KMUNICIPIO M, KLOCALIDAD L, KCOLONIA AS C, KESTADOCIVIL EDOCVIL, KCLINICASERVICIO CSERV "
-					+ "WHERE DH.CLAVEESTADO = EF.CLAVEESTADO AND "
-					+ "DH.CLAVEMUNICIPIO = M.CLAVEMUNICIPIO AND "
-					+ "DH.CLAVECOLONIA = C.CLAVECOLONIA AND "
-					+ "DH.CLAVECLINICASERVICIO = CSERV.CLAVECLINICASERVICIO AND "
-					+ "DH.CLAVEESTADOCIVIL = EDOCVIL.CLAVEESTADOCIVIL AND "
-					+ "DH.CLAVEMUNICIPIO = L.CLAVEMUNICIPIO AND DH.CLAVELOCALIDAD = L.CLAVELOCALIDAD AND DH.");*/
 		
-		query.append( "SELECT DH.*"
-					+ " FROM DERECHOHABIENTE DH WHERE DH.");
+		query.append( "SELECT DH.* FROM DERECHOHABIENTE DH WHERE DH.");
 		
 		query.append(columna);
 		query.append("= '");
 		query.append(valor);
 		query.append("'");
 		
-		System.out.println("Consulta ==> " + query.toString());
+		// System.out.println("Consulta ==> " + query.toString());
 		
 		Derechohabiente persona = null;
 		try {
@@ -90,7 +80,7 @@ public class DerechohabienteDB {
 		query.append(valor);
 		query.append("'");
 		
-		System.out.println("Consulta ==> " + query.toString());
+		// System.out.println("Consulta ==> " + query.toString());
 		
 		Derechohabiente persona = null;
 		try {
@@ -109,14 +99,6 @@ public class DerechohabienteDB {
 	
 	public Derechohabiente getPersonaByNombre(Derechohabiente persona, HttpServletResponse response) {
 		StringBuilder query = new StringBuilder();
-		/* query.append( "SELECT DH.*, EF.DESCRIPCION AS ENTIDAD, M.DESCRIPCION AS MUNICIPIO, L.DESCRIPCION AS LOCALIDAD, C.DESCRIPCION AS COLONIA, EDOCVIL.DESCRIPCION AS ESTADOCIVIL, CSERV.DESCRIPCION AS CLINICA  "
-					+ "FROM DERECHOHABIENTE DH, KESTADO EF, KMUNICIPIO M, KLOCALIDAD L, KCOLONIA AS C, KESTADOCIVIL EDOCVIL, KCLINICASERVICIO CSERV "
-					+ "WHERE DH.CLAVEESTADO = EF.CLAVEESTADO AND "
-					+ "DH.CLAVEMUNICIPIO = M.CLAVEMUNICIPIO AND "
-					+ "DH.CLAVECOLONIA = C.CLAVECOLONIA AND "
-					+ "DH.CLAVECLINICASERVICIO = CSERV.CLAVECLINICASERVICIO AND "
-					+ "DH.CLAVEESTADOCIVIL = EDOCVIL.CLAVEESTADOCIVIL AND "
-					+ "DH.CLAVEMUNICIPIO = L.CLAVEMUNICIPIO AND DH.CLAVELOCALIDAD = L.CLAVELOCALIDAD AND "); */
 		
 		query.append( "SELECT * FROM DERECHOHABIENTE WHERE PATERNO LIKE '%" + persona.getPaterno() + "%' "
 				    + "AND MATERNO LIKE '%" + persona.getMaterno() 
@@ -124,7 +106,7 @@ public class DerechohabienteDB {
 				    + "%' AND CLAVEESTADO = " + persona.getClaveEstado()
 				    + " AND FECHANACIMIENTO = '" + format.format(persona.getFechaNacimiento()) +"'");	
 		
-		System.out.println("Consulta ==> " + query.toString());
+		// System.out.println("Consulta ==> " + query.toString());
 				
 		Derechohabiente personaOld = null;
 		try {
@@ -143,21 +125,13 @@ public class DerechohabienteDB {
 	
 	public Derechohabiente getPersonaById(long noControl) {
 		StringBuilder query = new StringBuilder();
-		/* query.append( "SELECT DH.*, EF.DESCRIPCION AS ENTIDAD, M.DESCRIPCION AS MUNICIPIO, L.DESCRIPCION AS LOCALIDAD, C.DESCRIPCION AS COLONIA, EDOCVIL.DESCRIPCION AS ESTADOCIVIL, CSERV.DESCRIPCION AS CLINICA  "
-				+ "FROM DERECHOHABIENTE DH, KESTADO EF, KMUNICIPIO M, KLOCALIDAD L, KCOLONIA AS C, KESTADOCIVIL EDOCVIL, KCLINICASERVICIO CSERV "
-				+ "WHERE DH.CLAVEESTADO = EF.CLAVEESTADO AND "
-				+ "DH.CLAVEMUNICIPIO = M.CLAVEMUNICIPIO AND "
-				+ "DH.CLAVECOLONIA = C.CLAVECOLONIA AND "
-				+ "DH.CLAVECLINICASERVICIO = CSERV.CLAVECLINICASERVICIO AND "
-				+ "DH.CLAVEESTADOCIVIL = EDOCVIL.CLAVEESTADOCIVIL AND "
-				+ "DH.CLAVEMUNICIPIO = L.CLAVEMUNICIPIO AND DH.CLAVELOCALIDAD = L.CLAVELOCALIDAD AND DH.NOCONTROL =");	*/
 		
 		query.append( "SELECT * FROM DERECHOHABIENTE WHERE NOCONTROL ="); 
 		query.append(noControl);
 		query.append(" AND NOPREAFILIACION = ");
 		query.append(noControl);
 				
-		System.out.println(query.toString());
+		// System.out.println(query.toString());
 		
 		Derechohabiente persona = null;
 		try {
@@ -179,7 +153,7 @@ public class DerechohabienteDB {
 			query.append(" AND NOPREAFILIACION =");
 			query.append(noPreafiliacion);
 				
-		System.out.println(query.toString());
+		// System.out.println(query.toString());
 		
 		Derechohabiente persona = null;
 		try {
@@ -211,7 +185,7 @@ public class DerechohabienteDB {
 			query.append(" AND NOBENEFICIARIO = ");
 		query.append(noAafiliacion);
 				
-		System.out.println(query.toString());
+		// System.out.println(query.toString());
 		
 		Derechohabiente persona = null;
 		try {
@@ -236,7 +210,7 @@ public class DerechohabienteDB {
 			query.append(" AND NOAFILIACION =");
 			query.append(noAfiliacion);
 				
-		System.out.println(query.toString());
+		// System.out.println(query.toString());
 		
 		Derechohabiente persona = null;
 		try {
@@ -250,52 +224,12 @@ public class DerechohabienteDB {
 		}
 		return persona;
 	}
-	
-	/*public Persona getPersonaByCurp(String curp) {
-		StringBuilder query = new StringBuilder();
-		query.append("SELECT P.ID AS IDPERSONA, P.NOMBRE, P.APELLIDOPATERNO, P.APELLIDOMATERNO, P.FECHANACIMIENTO, P.CURP, "
-				+ "P.RFC, P.SEXO, P.NACIONALIDAD, P.EMAIL, P.DOCUMENTOPROBATORIO, P.RENAPOVALIDACION, P.SATVALIDACION, "
-				+ "P.FECHAREGISTRO, P.ULTIMOREGISTRO, P.ESTATUS, EF.ID AS IDENTIDAD, EF.DESCRIPCION AS DESENTIDAD, M.ID AS IDMUN, M.DESCRIPCION AS DESMUN  "
-				+ "FROM PERSONA P, ENTIDADFEDERATIVA EF, MUNICIPIO M  WHERE P.MUNICIPIO = M.ID AND M.ENTIDADFEDERATIVA = EF.ID AND P.CURP = '");
-		query.append(curp);
-		query.append("'");
 		
-		System.out.println(query.toString());
-		
-		Persona persona = null;
-		try {
-			persona =  mysqlTemplate.queryForObject(query.toString(), new PersonaRowMapper());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return persona;
-	}
-	
-	public Persona getPersonaByEmail(String mail) {
-		StringBuilder query = new StringBuilder();
-		query.append("SELECT P.ID AS IDPERSONA, P.NOMBRE, P.APELLIDOPATERNO, P.APELLIDOMATERNO, P.FECHANACIMIENTO, P.CURP, "
-				+ "P.RFC, P.SEXO, P.NACIONALIDAD, P.EMAIL, P.DOCUMENTOPROBATORIO, P.RENAPOVALIDACION, P.SATVALIDACION, "
-				+ "P.FECHAREGISTRO, P.ULTIMOREGISTRO, P.ESTATUS, EF.ID AS IDENTIDAD, EF.DESCRIPCION AS DESENTIDAD, M.ID AS IDMUN, M.DESCRIPCION AS DESMUN  "
-				+ "FROM PERSONA P, ENTIDADFEDERATIVA EF, MUNICIPIO M  WHERE P.MUNICIPIO = M.ID AND M.ENTIDADFEDERATIVA = EF.ID AND P.EMAIL = '");
-		query.append(mail);
-		query.append("'");
-		
-		System.out.println(query.toString());
-		
-		Persona persona = null;
-		try {
-			persona =  mysqlTemplate.queryForObject(query.toString(), new PersonaRowMapper());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return persona;
-	}*/
-	
 	public void actualiza (Derechohabiente persona) {
 		StringBuilder query = new StringBuilder();
 		query.append("UPDATE DERECHOHABIENTE SET NOMBRE= ?, PATERNO= ?, MATERNO = ?, EMAIL= ?, FECHAREGISTRO= ?, SITUACION= ?, CLAVEUSUARIOREGISTRO= ? WHERE NOCONTROL = ? ");
 					
-		System.out.println(query.toString());
+		// System.out.println(query.toString());
 		
 		try {
 			  mysqlTemplate.update(query.toString(), new Object[] { 
@@ -321,7 +255,7 @@ public class DerechohabienteDB {
 					+ " AND NOPREAFILIACION = " 
 					+ actualizarDatos.getNoPreAfiliacion());
 					
-		System.out.println(query.toString());
+		// System.out.println(query.toString());
 		
 		try {
 			  mysqlTemplate.update(query.toString());
@@ -342,11 +276,8 @@ public class DerechohabienteDB {
 	
 	public long createOrDeleteDerechohabiente(  Derechohabiente derechohabiente, long noControl, String opcion) {
 		StringBuilder query = new StringBuilder();
-		
-		
-		if (opcion.equals("create")) {
-			StringBuilder queryUsuario = new StringBuilder();
 				
+		if (opcion.equals("create")) 				
 			query.append("INSERT INTO DERECHOHABIENTE (NOCONTROL, NOPREAFILIACION, NOMBRE, PATERNO, MATERNO, "
 					+ "EMAIL, FECHANACIMIENTO, SEXO, CURP, RFC, DIRECCION, "
 					+ "CODIGOPOSTAL, TELEFONOCASA, TELEFONOCELULAR, FECHAPREAFILIACION, SITUACION, "
@@ -366,11 +297,10 @@ public class DerechohabienteDB {
 					+ (derechohabiente.getClaveEstadoCivil() > 0 ? derechohabiente.getClaveEstadoCivil() : null) + ", "  + derechohabiente.getClaveColonia() + ", " 
 					+ derechohabiente.getClaveClinicaServicio() + ", "  + derechohabiente.getClaveLocalidad() + ", " 
 					+ derechohabiente.getClaveMunicipio() + ", "  + derechohabiente.getClaveEstado() + ")" );
-		}
 		else 
 			query.append("DELETE FROM DERECHOHABIENTE WHERE noControl = " + noControl);
 		
-		System.out.println(query.toString());
+		// System.out.println(query.toString());
 		
 		try {
 			KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -405,7 +335,7 @@ public class DerechohabienteDB {
 					+ " GROUP BY NOCONTROL) DOC" 
 					+ " WHERE D.NOCONTROL = DOC.NOCONTROL AND D.NOPREAFILIACION = DOC.NOCONTROL");
 		
-		System.out.println(query.toString());
+		// System.out.println(query.toString());
 		
 		List<InfoDerechohabiente> lista = null;
 		
@@ -433,8 +363,7 @@ public class DerechohabienteDB {
 		if (!incluirTitular)
 			query.append(" AND BE.NOPREAFILIACION != " + noControl);
 
-
-		System.out.println("Parentescos ==> " + query.toString());
+		//System.out.println("Parentescos ==> " + query.toString());
 		List<Derechohabiente> beneficiarios = null;
 		try {
 			beneficiarios =  mysqlTemplate.query(query.toString(), new DerechohabienteRowMapper());
@@ -457,7 +386,7 @@ public class DerechohabienteDB {
 		
 		query.append(noControl);
 		
-		System.out.println(query.toString());
+		// System.out.println(query.toString());
 		List<Derechohabiente> beneficiarios = null;
 		try {
 			beneficiarios =  afiliacionDBTemplate.query(query.toString(), new BeneficiarioRowMapper());
@@ -490,7 +419,7 @@ public class DerechohabienteDB {
 			else
 				query.append(  "DH.CURP LIKE '%" + dato + "%'");
 		
-		System.out.println("Consulta de busqueda (PreAfiliacion) ==> " + query.toString());
+		// System.out.println("Consulta de busqueda (PreAfiliacion) ==> " + query.toString());
 		
 		List<ResultadoBusqueda> resultadoBusqueda = null;
 		
@@ -539,7 +468,7 @@ public class DerechohabienteDB {
 				query.append( "B.CURP LIKE '%" + dato + "%'");
 			}
 		
-		System.out.println("Consulta de busqueda (Afiliacion) ==> " + query.toString());
+		// System.out.println("Consulta de busqueda (Afiliacion) ==> " + query.toString());
 		
 		List<ResultadoBusqueda> resultadoBusqueda = null;
 		
@@ -553,6 +482,46 @@ public class DerechohabienteDB {
 			e.printStackTrace();
 		}
 		return resultadoBusqueda;
+	}
+	
+	public boolean existeBeneficiarioRegistrado(long noControl, long claveParentesco) {
+		StringBuilder query = new StringBuilder();
+		query.append("SELECT * FROM BENEFICIARIO WHERE NOCONTROL = " + noControl);
+		if (claveParentesco == 3 || claveParentesco == 4 || claveParentesco == 5 || claveParentesco == 9)
+			query.append(" AND CLAVEPARENTESCO IN (3, 4, 5, 9");
+		else 
+			query.append(" AND CLAVEPARENTESCO = " + claveParentesco);
+		
+		List<Derechohabiente> beneficiarios = null;
+		try {
+			beneficiarios =  mysqlTemplate.query(query.toString(), new DerechohabienteRowMapper());
+			return !beneficiarios.isEmpty();
+		} 
+		catch (EmptyResultDataAccessException e) {
+			return false;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return true;
+		}
+	}
+	
+	public boolean existeBeneficiarioRegistradoById(long noControl, long noPreAfiliacion) {
+		StringBuilder query = new StringBuilder();
+		query.append("SELECT * FROM BENEFICIARIO WHERE NOCONTROL = " + noControl + " AND NOPREAFILIACION = '" + noPreAfiliacion + "'");
+		
+		List<Derechohabiente> beneficiarios = null;
+		try {
+			beneficiarios =  mysqlTemplate.query(query.toString(), new DerechohabienteRowMapper());
+			return !beneficiarios.isEmpty();
+		} 
+		catch (EmptyResultDataAccessException e) {
+			return false;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return true;
+		}
 	}
 }
 
