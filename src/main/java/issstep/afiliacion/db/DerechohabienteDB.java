@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -14,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
@@ -23,7 +21,6 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
 import issstep.afiliacion.model.ActualizarDatos;
-import issstep.afiliacion.model.CatalogoGenerico;
 import issstep.afiliacion.model.Derechohabiente;
 import issstep.afiliacion.model.InfoDerechohabiente;
 import issstep.afiliacion.model.ResultadoBusqueda;
@@ -488,7 +485,7 @@ public class DerechohabienteDB {
 		StringBuilder query = new StringBuilder();
 		query.append("SELECT * FROM BENEFICIARIO WHERE NOCONTROL = " + noControl);
 		if (claveParentesco == 3 || claveParentesco == 4 || claveParentesco == 5 || claveParentesco == 9)
-			query.append(" AND CLAVEPARENTESCO IN (3, 4, 5, 9");
+			query.append(" AND CLAVEPARENTESCO IN (3, 4, 5, 9)");
 		else 
 			query.append(" AND CLAVEPARENTESCO = " + claveParentesco);
 		

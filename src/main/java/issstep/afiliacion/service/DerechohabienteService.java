@@ -376,35 +376,30 @@ public class DerechohabienteService {
 		
 		try{
 			
-			// Derechohabiente oldPersona = personaDB.getPersonaById(beneficiario.getNoControl());
-			
-			/* if (oldPersona == null) 
-				return new ResponseEntity<>(new Mensaje("No existe el derechohabiente"), HttpStatus.CONFLICT); */
-			
-			/* String user = (String) SecurityContextHolder.getContext().getAuthentication().getName();
-			Usuario usuario =  usuarioDB.getUsuarioByColumnaStringValor("LOGIN", user);*/ 
-			
 			persona.setSituacion(1);
 			persona.setFechaRegistro(new Timestamp(new Date().getTime()));
-			// persona.setClaveUsuarioRegistro(usuario.getClaveUsuario());  // Cambiarlo por la de la informacion del logeo
 				
 			long noBeneficiario = beneficiarioDB.createBeneficiario(beneficiario.getNoControlTitular(), persona, beneficiario.getClaveParentesco());
 			
-			 if (noBeneficiario == 0)
-				 return new ResponseEntity<>(new Mensaje("No fue posible asignar el beneficiario"), HttpStatus.INTERNAL_SERVER_ERROR);
+			if (noBeneficiario == 0)
+				return new ResponseEntity<>(new Mensaje("No fue posible asignar el beneficiario"), HttpStatus.INTERNAL_SERVER_ERROR);
+			
+			persona.setNoBeneficiario(noBeneficiario);
+			
+			System.out.println(persona.getNombreCompleto());
 			  
-			 return new ResponseEntity<>(noBeneficiario, HttpStatus.CREATED);
+			return new ResponseEntity<>(noBeneficiario, HttpStatus.CREATED);
 			 	 
 		}
 		catch(DataIntegrityViolationException e){
 			System.err.println("Exception PersonaService.asignarBeneficiario");
 			e.printStackTrace();
-			return  new ResponseEntity<>(null,null, HttpStatus.BAD_REQUEST);
+			return  new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
 		}
 		catch(Exception e){
 			System.err.println("Exception PersonaService.asignarBeneficiario");
 			e.printStackTrace();
-			return  new ResponseEntity<>(null,null, HttpStatus.INTERNAL_SERVER_ERROR);
+			return  new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 	

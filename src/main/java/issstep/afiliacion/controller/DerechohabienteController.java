@@ -1,11 +1,8 @@
 package issstep.afiliacion.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +19,6 @@ import issstep.afiliacion.model.DatoABuscar;
 import issstep.afiliacion.model.Derechohabiente;
 import issstep.afiliacion.model.Email;
 import issstep.afiliacion.model.ResetPassword;
-import issstep.afiliacion.model.Usuario;
 import issstep.afiliacion.model.ActualizarDatos;
 import issstep.afiliacion.model.ActualizarPassword;
 import issstep.afiliacion.model.Beneficiario;
