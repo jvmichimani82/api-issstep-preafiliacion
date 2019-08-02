@@ -39,14 +39,21 @@ public class DerechohabienteController {
     
     //servicio para la validacion por curp de los derechohabientes
     @JsonView(Derechohabiente.Views.Simple.class)
-    @RequestMapping(value = "/validadCurp", method = RequestMethod.POST)
+    @RequestMapping(value = "/validaCurp", method = RequestMethod.POST)
     public ResponseEntity<?> validaPersonaCurp( @ApiParam(value = DerechohabienteCONST.curp, required = true)@RequestBody Curp curp, HttpServletResponse response) {
 
     	return derechohabienteService.getPersonaByCurp(curp.getCurp());
     }
     
     @JsonView(Derechohabiente.Views.Simple.class)
-    @RequestMapping(value = "/validadNombre", method = RequestMethod.POST)
+    @RequestMapping(value = "/validaNoAfiliacion/{noAfiliacion}", method = RequestMethod.GET)
+    public ResponseEntity<?> validaPersonaNoAfiliacion( @ApiParam(value = "noAfiliacion", required = true) @PathVariable long noAfiliacion, HttpServletResponse response) {
+
+    	return derechohabienteService.validaPersonaNoAfiliacion(noAfiliacion);
+    }
+    
+    @JsonView(Derechohabiente.Views.Simple.class)
+    @RequestMapping(value = "/validaNombre", method = RequestMethod.POST)
     public ResponseEntity<?> validaPersonaNombre( @ApiParam(value = DerechohabienteCONST.buscaDerechohabiente, required = true)  @RequestBody Derechohabiente persona, HttpServletResponse response) {
 
     	return derechohabienteService.getPersonaByNombre(persona, response);
@@ -84,10 +91,10 @@ public class DerechohabienteController {
     
     @ApiOperation(value = "Relación de un derechohabiente y de sus beneficiarios ")
     @JsonView(Derechohabiente.Views.Simple.class)
-    @RequestMapping(value = "/beneficiariosConTitular/{claveUsuarioRegistro}", method = RequestMethod.GET)
-    public ResponseEntity<?> getBeneficiariosConTitular(@PathVariable("claveUsuarioRegistro") long claveUsuarioRegistro, HttpServletResponse response) {
+    @RequestMapping(value = "/beneficiariosConTitular/{noControl}", method = RequestMethod.GET)
+    public ResponseEntity<?> getBeneficiariosConTitular(@PathVariable("noControl") long noControl, HttpServletResponse response) {
     	
-    	return derechohabienteService.getBeneficiarios(true, claveUsuarioRegistro);
+    	return derechohabienteService.getBeneficiarios(true, noControl);
     }
     
     

@@ -10,12 +10,10 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.regex.*;
-
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.json.JSONObject;
+// import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -67,6 +65,11 @@ public class DerechohabienteService {
 	MailService mailService;
 		
 	public ResponseEntity<?> getPersonaByCurp(String curp) {
+		if (curp == null)
+			return new ResponseEntity<>(new Mensaje("Debe proporcionar el campo curp"), HttpStatus.BAD_REQUEST);
+		
+		if (!Utils.esCURP(curp))
+			return new ResponseEntity<>(new Mensaje("Formato de curp invalido"), HttpStatus.BAD_REQUEST);
 		
 		// Revisamos que la persona exista en nuestra base de datos
 		Derechohabiente persona =  personaDB.getPersonaByColumnaStringValor("CURP", curp);
@@ -75,16 +78,21 @@ public class DerechohabienteService {
 		if(persona == null) 
 			persona = personaDB.getTrabajadorIssstepByColumnaStringValor("CURP", curp);
 			
-		System.out.println("Terminacion");
-		if (persona != null) {
-			fillDerechohabiente(persona);
-			return new ResponseEntity<>(persona, HttpStatus.OK);
-		}
-		
-		else
+		if (persona == null)
 			return new ResponseEntity<>(new Mensaje("No existe persona con esa curp"), HttpStatus.NO_CONTENT);
 		
+		fillDerechohabiente(persona);
+		return new ResponseEntity<>(persona, HttpStatus.OK);		
     }
+	
+	public ResponseEntity<?> validaPersonaNoAfiliacion(long noAfiliacion) {
+		ResponseEntity<?> persona = getPersonaByNoControlNoPreafiliacion(noAfiliacion, noAfiliacion);
+		
+		if (persona.getStatusCodeValue() == 200) 
+			return new ResponseEntity<>(new Mensaje("Ya existe una cuenta con ese numero de afiliacion"), HttpStatus.CONFLICT);
+			
+		return getAfiliadoByNoControlNoPreafiliacion(noAfiliacion, noAfiliacion, 0);			
+	}
 	
 	public ResponseEntity<?> getPersonaByNombre(Derechohabiente persona, HttpServletResponse response) {
 		Derechohabiente personaOld =  personaDB.getPersonaByNombre(persona, response);
@@ -405,7 +413,7 @@ public class DerechohabienteService {
 		Beneficiario beneficiario = beneficiarioDB.getBeneficiarioById(idBeneficiario);
 		
 		if (beneficiario == null)
-			return new ResponseEntity<>(new Mensaje("No existe el beneficiario"), HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(new Mensaje("No existe el beneficiario"), HttpStatus.NOT_FOUND);
 		
 		if (beneficiarioDB.deleteBeneficiario( idBeneficiario) != 1)
 			return new ResponseEntity<>(new Mensaje("No se pudo eliminar el beneficiario"), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -431,6 +439,11 @@ public class DerechohabienteService {
 	}
 	
 	public ResponseEntity<?> actualizarPassword( ActualizarPassword actualizarPassword) {	
+		ResultadoValidacion resultadoValidacion =  validaDatosPassword(actualizarPassword);
+		
+		if (resultadoValidacion.isEtatus())
+			return new ResponseEntity<>(new Mensaje(resultadoValidacion.getMensaje()), HttpStatus.BAD_REQUEST);
+		
 		Usuario usuarioLogin = getInfoLogin();
 		if (usuarioLogin == null)
 			return new ResponseEntity<>(new Mensaje("Usuario no autentificado"), HttpStatus.BAD_REQUEST);
@@ -438,8 +451,8 @@ public class DerechohabienteService {
 		String passwordActual = Hashing.sha256().hashString(actualizarPassword.getPasswordActual(), Charsets.UTF_8).toString();
 		
 		Usuario usuario = usuarioDB.getUsuarioPreafiliacionByNoControlAndNoAfiliacion(usuarioLogin.getNoControl(), usuarioLogin.getNoAfiliacion());
-		System.out.println(passwordActual);
-		System.out.println(usuario.getPasswd());
+		/* System.out.println(passwordActual);
+		System.out.println(usuario.getPasswd());*/
 		
 		if (!usuario.getPasswd().equals(passwordActual)) 
 			return new ResponseEntity<>(new Mensaje("Password actual incorrecto "), HttpStatus.BAD_REQUEST);		
@@ -451,8 +464,31 @@ public class DerechohabienteService {
 				
     }
 	
-	public ResponseEntity<?> actualizarDatos( ActualizarDatos actualizarDatos) {	
+	ResultadoValidacion validaDatosPassword(ActualizarPassword actualizarPassword) {
+		ResultadoValidacion resultadoValidacion =  new ResultadoValidacion();
+		resultadoValidacion.setEtatus(true);
 		
+		if (actualizarPassword.getPasswordActual() == null) {
+			resultadoValidacion.setEtatus(false);
+			resultadoValidacion.setMensaje("Debe proporcional el campo passwordActual");
+			return resultadoValidacion;
+		}
+		
+		if (actualizarPassword.getPasswordNuevo() == null) {
+			resultadoValidacion.setEtatus(false);
+			resultadoValidacion.setMensaje("Debe proporcional el campo passwordNuevo");
+			return resultadoValidacion;
+		}
+		
+		return resultadoValidacion;
+	}
+	
+	public ResponseEntity<?> actualizarDatos( ActualizarDatos actualizarDatos) {	
+		ResultadoValidacion resultadoValidacion =  validaDatosAActualizar(actualizarDatos);
+		
+		if (resultadoValidacion.isEtatus())
+			return new ResponseEntity<>(new Mensaje(resultadoValidacion.getMensaje()), HttpStatus.BAD_REQUEST);
+			
 		Derechohabiente derechohabiente = personaDB.getPersonaById(actualizarDatos.getNoControl());
 		
 		if (derechohabiente == null)
@@ -463,6 +499,43 @@ public class DerechohabienteService {
 		
 		return new ResponseEntity<>(derechohabiente , HttpStatus.OK);				
     }
+	
+	ResultadoValidacion validaDatosAActualizar(ActualizarDatos actualizarDatos) {
+		ResultadoValidacion resultadoValidacion =  new ResultadoValidacion();
+		resultadoValidacion.setEtatus(true);
+		
+		if (actualizarDatos.getNoControl() == 0) {
+			resultadoValidacion.setEtatus(false);
+			resultadoValidacion.setMensaje("Debe proporcional el campo noControl");
+			return resultadoValidacion;
+		}
+		
+		if (actualizarDatos.getNoPreAfiliacion() == 0) {
+			resultadoValidacion.setEtatus(false);
+			resultadoValidacion.setMensaje("Debe proporcional el campo noPreAfiliacion");
+			return resultadoValidacion;
+		}
+		
+		if (actualizarDatos.getDireccion() == null) {
+			resultadoValidacion.setEtatus(false);
+			resultadoValidacion.setMensaje("Debe proporcional el campo direccion");
+			return resultadoValidacion;
+		}
+		
+		if (actualizarDatos.getTelefonoCasa() == null) {
+			resultadoValidacion.setEtatus(false);
+			resultadoValidacion.setMensaje("Debe proporcional el campo telefonoCasa");
+			return resultadoValidacion;
+		}
+		
+		if (actualizarDatos.getTelefonoCelular() == null) {
+			resultadoValidacion.setEtatus(false);
+			resultadoValidacion.setMensaje("Debe proporcional el campo telefonoCelular");
+			return resultadoValidacion;
+		}
+				
+		return resultadoValidacion;					
+	}
 	
 	public ResponseEntity<?> getDerechohabientesPorEstatusDeValidacion( int estatusValidacion) {	
 		if (estatusValidacion < 0 || estatusValidacion > 2)
@@ -494,8 +567,8 @@ public class DerechohabienteService {
 	
 	Usuario getInfoLogin() {
 		String user = (String) SecurityContextHolder.getContext().getAuthentication().getName();
-		System.out.println("N control ===> ");
-		System.out.println(user);
+		/* System.out.println("N control ===> ");
+		System.out.println(user); */
 		if (user == "anonymousUser") 
 			return null;
 			
@@ -511,6 +584,9 @@ public class DerechohabienteService {
 	}
 	
 	public ResponseEntity<?> buscarInformacionEnPreafiliacion(boolean enPreafiliacion, DatoABuscar datoABuscar) {
+		if (datoABuscar.getDato() == null)
+			return new ResponseEntity<>(new Mensaje("Debe proporcional el campo dato"), HttpStatus.BAD_REQUEST);
+		
 		String campo = "NOMBRE";
 		boolean esValorNumerico = false;
 		
@@ -522,7 +598,7 @@ public class DerechohabienteService {
 			if (Utils.esPatronCURP(datoABuscar.getDato()))
 				campo = "CURP";
 		
-		System.out.println("Campo ==> " + campo);
+		// System.out.println("Campo ==> " + campo);
 		List<ResultadoBusqueda> resultadoBusqueda;
 		
 		if (enPreafiliacion)

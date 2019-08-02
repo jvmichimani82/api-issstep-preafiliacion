@@ -415,11 +415,11 @@ public class DerechohabienteDB {
 				query.append( "(DH.NOCONTROL = " + dato + " OR DH.NOPREAFILIACION = " + dato + ")");
 		else
 			if (campo.equals("NOMBRE"))				
-				query.append( "(DH.NOMBRE LIKE '%" + campo + "%' OR DH.PATERNO LIKE '%" + dato + "%' OR DH.MATERNO LIKE '%" + dato + "%')");
+				query.append( "(DH.NOMBRE LIKE '%" + dato + "%' OR DH.PATERNO LIKE '%" + dato + "%' OR DH.MATERNO LIKE '%" + dato + "%')");
 			else
 				query.append(  "DH.CURP LIKE '%" + dato + "%'");
 		
-		// System.out.println("Consulta de busqueda (PreAfiliacion) ==> " + query.toString());
+		System.out.println("Consulta de busqueda (PreAfiliacion) ==> " + query.toString());
 		
 		List<ResultadoBusqueda> resultadoBusqueda = null;
 		
