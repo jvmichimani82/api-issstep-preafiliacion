@@ -394,7 +394,7 @@ public class DerechohabienteDB {
 		if (!incluirTitular)
 			query.append(" AND BE.NOPREAFILIACION != " + noControl);
 
-		//System.out.println("Parentescos ==> " + query.toString());
+		System.out.println("Parentescos ==> " + query.toString());
 		List<Derechohabiente> beneficiarios = null;
 		try {
 			beneficiarios =  mysqlTemplate.query(query.toString(), new DerechohabienteRowMapper());

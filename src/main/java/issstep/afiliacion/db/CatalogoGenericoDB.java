@@ -164,10 +164,13 @@ public class CatalogoGenericoDB {
 			case "KPARENTESCO": 
 				query.append("SELECT DESCRIPCION FROM "+ catalogo + " WHERE CLAVEPARENTESCO = " + derechohabiente.getClaveParentesco());
 				break;
+			case "KESTATUS": 
+				query.append("SELECT DESCRIPCION FROM "+ catalogo + " WHERE CLAVEESTATUS = " + derechohabiente.getEstatus());
+				break;
 		}
 		
 	
-		// System.out.println(query.toString());
+		System.out.println(query.toString());
 		
 		CatalogoGenerico descripcion = null;
 		try {

@@ -126,6 +126,9 @@ public class Derechohabiente {
 	@JsonView({Derechohabiente.Views.Simple.class})
 	int estatus;
 	
+	@JsonView({Derechohabiente.Views.Simple.class})
+	String estatusDescripcion;
+	
 	@JsonView({Derechohabiente.Views.Simple.class})	
 	String nombreCompleto;
 	

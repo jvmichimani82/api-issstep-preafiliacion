@@ -122,7 +122,7 @@ public class DerechohabienteService {
 		derechohabiente.setClinicaServicio(catalogoGenericoDB.getDescripcionCatalogo("KCLINICASERVICIO", derechohabiente));
 		derechohabiente.setParentesco(catalogoGenericoDB.getDescripcionCatalogo("KPARENTESCO", derechohabiente));
 		derechohabiente.setUsuario(usuarioDB.getUsuarioPreafiliacionByNoControlAndNoAfiliacion(derechohabiente.getNoControl(), derechohabiente.getNoPreAfiliacion()));
-		
+		derechohabiente.setEstatusDescripcion(catalogoGenericoDB.getDescripcionCatalogo("KESTATUS", derechohabiente));
 		
 	}
 	

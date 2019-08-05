@@ -17,9 +17,8 @@ public class DerechohabienteCONST {
 			"			    }\r\n" + 	
 			"			  }";
 	
-	public static final String registroDerechohabiente="Json para Registro de derechohabiente\n\n"+"{"
+	public static final String registroDerechohabiente="Json para Registro de derechohabiente Titular\n\n"+"{"
 			+"\n" + 
-			"			    \"noControl\": 20011,\n" + 
 			"			    \"curp\": \"RUHG820830HPLLCS08\",\n" + 
 			"			    \"rfc\": \"RUHG820830S08\",\n" +
 			"			    \"direccion\": \"direccion\",\n" + 
@@ -30,7 +29,14 @@ public class DerechohabienteCONST {
 			"			    \"codigoPostal\": 72014,\n" +
 			"			    \"claveColonia\": 24,\n" +
 			"			    \"fechaPreAfiliacion\": \"2019-01-01\"\n" +
-			"			    }" ;
+			"			    } \n\n\n" +
+			"Json para Registro de derechohabiente Beneficiario\n\n"+"{"
+			+"\n" + 
+			"			    \"curp\": \"RUHG820830HPLLCS08\",\n" + 
+			"			    \"rfc\": \"RUHG820830S08\",\n" +
+			"			    \"claveEstadoCivil\": 2,\n" + 
+			"			    \"claveParentesco\": 3\n" +
+			"			    }";
 	
 	public static final String buscaDerechohabiente="Json para Busqueda de derechohabiente\n\n"+"{"
 			+"\n" + 
