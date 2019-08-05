@@ -33,8 +33,9 @@ public class DerechohabienteController {
     @Autowired
     public DerechohabienteService derechohabienteService;
     
-    //servicio para la validacion por curp de los derechohabientes
+    // servicio para la validacion por curp de los derechohabientes
     @JsonView(Derechohabiente.Views.Simple.class)
+    @ApiOperation(value = "Verifica si hay un derechohabiente mediante su CURP")
     @RequestMapping(value = "/validaCurp", method = RequestMethod.POST)
     public ResponseEntity<?> validaPersonaCurp( @ApiParam(value = DerechohabienteCONST.curp, required = true)@RequestBody Curp curp, HttpServletResponse response) {
 
@@ -42,6 +43,7 @@ public class DerechohabienteController {
     }
     
     @JsonView(Derechohabiente.Views.Simple.class)
+    @ApiOperation(value = "Verifica si hay un derechohabiente mediante su numero de afiliacion")
     @RequestMapping(value = "/validaNoAfiliacion/{noAfiliacion}", method = RequestMethod.GET)
     public ResponseEntity<?> validaPersonaNoAfiliacion( @ApiParam(value = "noAfiliacion", required = true) @PathVariable long noAfiliacion, HttpServletResponse response) {
 
@@ -49,6 +51,7 @@ public class DerechohabienteController {
     }
     
     @JsonView(Derechohabiente.Views.Simple.class)
+    @ApiOperation(value = "Verifica si hay un derechohabiente mediante su nombre")
     @RequestMapping(value = "/validaNombre", method = RequestMethod.POST)
     public ResponseEntity<?> validaPersonaNombre( @ApiParam(value = DerechohabienteCONST.buscaDerechohabiente, required = true)  @RequestBody Derechohabiente persona, HttpServletResponse response) {
 
@@ -111,10 +114,10 @@ public class DerechohabienteController {
     @ApiOperation(value = "Registro de derechohabiente")
     @JsonView(Derechohabiente.Views.RegistroDerechohabiente.class)
     @RequestMapping(value = "/registro", method = RequestMethod.POST)
-    public ResponseEntity<?> registraDerechohabiente(@ApiParam(value = DerechohabienteCONST.registroDerechohabiente, required = true)@RequestBody Derechohabiente derechohabiente,
+    public ResponseEntity<?> registraDerechohabiente(@ApiParam(value = DerechohabienteCONST.registroDerechohabiente, required = true)@RequestBody Derechohabiente registroDerechohabiente,
     												 HttpServletResponse response) {
    
-    	return derechohabienteService.registraDerechohabiente(derechohabiente);
+    	return derechohabienteService.registraDerechohabiente(registroDerechohabiente);
     }
     
     @ApiOperation(value = "Asignar beneficiario")

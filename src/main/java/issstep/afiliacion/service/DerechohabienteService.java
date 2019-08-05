@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -26,6 +28,7 @@ import issstep.afiliacion.db.UsuarioDB;
 import issstep.afiliacion.db.BeneficiarioDB;
 import issstep.afiliacion.db.CatalogoGenericoDB;
 import issstep.afiliacion.model.Mensaje;
+import issstep.afiliacion.model.NumerosParaRegistro;
 import issstep.afiliacion.model.ResetPassword;
 import issstep.afiliacion.model.ResultadoBusqueda;
 import issstep.afiliacion.model.Derechohabiente;
@@ -37,9 +40,8 @@ import issstep.afiliacion.model.Beneficiario;
 import issstep.afiliacion.model.CatalogoGenerico;
 import issstep.afiliacion.model.DatoABuscar;
 import issstep.afiliacion.model.ResultadoValidacion;
+import issstep.afiliacion.model.Colonia;
 import issstep.afiliacion.utils.Utils;
-
-
 
 @Service
 public class DerechohabienteService {
@@ -171,12 +173,19 @@ public class DerechohabienteService {
 					
 				//Si encontramos un resultado en la base de datos ISSSTEP procedemos a la creacion del Derechohabiente y su usuario de la plataforma
 				if(oldPersona != null) {
-					if(personaDB.createDerechohabiente(oldPersona) > 0) { 
+					int estatus = -1;
+					if (persona.getEmail().equals("issstepregistro@gmail.com")) {
+						oldPersona.setEmail("issstepregistro" + oldPersona.getNoControl() +  "@gmail.com");
+						persona.setEmail("issstepregistro" + oldPersona.getNoControl() +  "@gmail.com");
+						estatus = 1;
+					}
+				
+					if(personaDB.createDerechohabiente(oldPersona, false, 4) > 0) { 
 						// Benefiario del trabajador
 						beneficiarioDB.createBeneficiario(oldPersona.getNoControl(),  oldPersona, 0);
-						if(creaUsuario(oldPersona, persona)>0) {
+						if(creaUsuario(oldPersona, persona, estatus)>0) {
 							for(Derechohabiente beneficiario : personaDB.getBeneficiariosByTrabajadorIssstep(oldPersona.getNoControl())) {
-								personaDB.createDerechohabiente(beneficiario);
+								personaDB.createDerechohabiente(beneficiario, false, 4);
 								beneficiarioDB.createBeneficiario(oldPersona.getNoControl(), beneficiario, beneficiario.getClaveParentesco());
 							}
 						}
@@ -208,7 +217,7 @@ public class DerechohabienteService {
 	}
 	
 	
-	public long creaUsuario(Derechohabiente oldPersona , Derechohabiente newPersona) {
+	public long creaUsuario(Derechohabiente oldPersona , Derechohabiente newPersona, int estatus) {
 		String token = Utils.sha256(newPersona.getEmail());
 		
 		Usuario usuario = new Usuario();
@@ -218,7 +227,7 @@ public class DerechohabienteService {
 		usuario.setPasswd(Hashing.sha256().hashString(newPersona.getUsuario().getPasswd(), Charsets.UTF_8).toString());
 		usuario.setToken(token);
 		usuario.setFechaRegistro(new Timestamp(new Date().getTime()));
-		usuario.setEstatus(-1);
+		usuario.setEstatus(estatus);
 		usuario.setNoAfiliacion(oldPersona.getNoPreAfiliacion());
 		
 		long claveUsuario = usuarioDB.createUsuario( 0, usuario );
@@ -234,8 +243,9 @@ public class DerechohabienteService {
 				
 			    oldPersona.setClaveUsuarioRegistro(claveUsuario);
 				personaDB.actualiza(oldPersona);
-			
-		         mailService.prepareAndSendBienvenida("issstepregistro@gmail.com", oldPersona.getNombreCompleto() ,
+				
+				if (!oldPersona.getEmail().equals("issstepregistro@gmail.com" + oldPersona.getNoControl() + "@gmail.com"))	
+				 	mailService.prepareAndSendBienvenida(oldPersona.getEmail(), oldPersona.getNombreCompleto() ,
 		        		 oldPersona.getEmail(), usuario.getToken(), oldPersona.getNoControl());
 		     //}	
 
@@ -298,48 +308,172 @@ public class DerechohabienteService {
 		}
 	}
 	
-	public ResponseEntity<?> registraDerechohabiente( Derechohabiente derechohabiente ) {
-		try{
+	public ResponseEntity<?> registraDerechohabiente( Derechohabiente registroDerechohabiente ) {
+		ResultadoValidacion resultadoValidacion =  validaDatosRegistro(registroDerechohabiente);
+		
+		if (resultadoValidacion.isEtatus())
+			return new ResponseEntity<>(new Mensaje(resultadoValidacion.getMensaje()), HttpStatus.BAD_REQUEST);
+		
+		String user = (String) SecurityContextHolder.getContext().getAuthentication().getName();
+		Usuario usuario =  usuarioDB.getUsuarioByColumnaStringValor("LOGIN", user);
+		Derechohabiente derechohabienteTitular = null;
+		
+		if (usuario == null)
+			return new ResponseEntity<>(new Mensaje("Usuario no logeado"), HttpStatus.BAD_REQUEST);
+		
+		boolean esAdmin = usuario.getClaveRol() == 1;
+		
+		if (esAdmin)
+			registroDerechohabiente.setClaveParentesco(0);
+		else 
+			if (registroDerechohabiente.getClaveParentesco() == 0)
+				return new ResponseEntity<>(new Mensaje("Usuario no puede dar de alta a un titular"), HttpStatus.BAD_REQUEST);
+				
+		try{	
 			
-			Derechohabiente oldderechohabiente = personaDB.getPersonaByColumnaStringValor("CURP", derechohabiente.getCurp());
+			if (registroDerechohabiente.getClaveParentesco() == 0) {
+				derechohabienteTitular = new Derechohabiente();
+				derechohabienteTitular.setNoControl(0);
+			}
+			else
+			{
+				derechohabienteTitular = personaDB.getPersonaByNoControlNoPreafiliacion(
+									usuario.getNoControl(), 
+									usuario.getNoControl());
+				
+				if (derechohabienteTitular == null)
+					return new ResponseEntity<>(new Mensaje("No existe el regitro del titular"), HttpStatus.BAD_REQUEST);	
+					
+				registroDerechohabiente.setNoControl(usuario.getNoControl()); 
+				registroDerechohabiente.setDireccion(derechohabienteTitular.getDireccion()); 
+				registroDerechohabiente.setTelefonoCasa(derechohabienteTitular.getTelefonoCasa());
+				registroDerechohabiente.setTelefonoCelular(derechohabienteTitular.getTelefonoCelular());
+				registroDerechohabiente.setCodigoPostal(derechohabienteTitular.getCodigoPostal());
+				registroDerechohabiente.setClaveColonia(derechohabienteTitular.getClaveColonia());
+				registroDerechohabiente.setFechaPreAfiliacion(derechohabienteTitular.getFechaPreAfiliacion());
+			}
+				
+			// oldderechohabiente = getPersonaByCurp(registroDerechohabiente.getCurp());
 			
-			if (oldderechohabiente != null) 
-				return new ResponseEntity<>(new Mensaje("CURP duplicada"), HttpStatus.CONFLICT);
+			/* if (oldderechohabiente.getStatusCode() == HttpStatus.OK)
+				return new ResponseEntity<>(new Mensaje("CURP duplicada"), HttpStatus.CONFLICT); */
 			
+			/* Obtener la informacion de la CURP del RENAPO */
 			
-			oldderechohabiente = personaDB.getPersonaByNoControlNoPreafiliacion(derechohabiente.getNoControl(), derechohabiente.getNoPreAfiliacion());
-			if (oldderechohabiente != null) 
-				return new ResponseEntity<>(new Mensaje("No control con numero de pre-afiliacion duplicado"), HttpStatus.CONFLICT);
+			registroDerechohabiente.setNombre("RUEBN");
+			registroDerechohabiente.setPaterno("HUERTA");
+			registroDerechohabiente.setMaterno("GOMEZ");
+			registroDerechohabiente.setSexo("M");
 			
-			derechohabiente.setFechaRegistro(new Timestamp(new Date().getTime()));
-			derechohabiente.setFechaPreAfiliacion(new Timestamp(new Date().getTime()));
+			DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			Date d = formatter.parse("1982-08-30");
+			registroDerechohabiente.setFechaNacimiento(new java.sql.Date (d.getTime()));
+				
+			NumerosParaRegistro numerosParaRegistro = personaDB.getNextNumerosRegistro(registroDerechohabiente.getClaveParentesco(), registroDerechohabiente.getNoControl());
 			
-			long estatusRegistro = personaDB.createDerechohabiente( derechohabiente);
+			registroDerechohabiente.setNoControl(numerosParaRegistro.getNoControl());
+			registroDerechohabiente.setNoPreAfiliacion(numerosParaRegistro.getNoAfiliacion());
+			registroDerechohabiente.setFechaRegistro(new Timestamp(new Date().getTime()));
+			// registroDerechohabiente.setFechaPreAfiliacion(new Timestamp(new Date().getTime()));
+			registroDerechohabiente.setSituacion(1);
+			registroDerechohabiente.setClaveUsuarioRegistro(usuario.getClaveUsuario());
+			registroDerechohabiente.setClaveUsuarioModificacion(usuario.getClaveUsuario());
+			
+				
+			Colonia colonia = personaDB.getColonia(registroDerechohabiente.getCodigoPostal(), registroDerechohabiente.getClaveColonia());
+			
+			registroDerechohabiente.setClaveClinicaServicio(colonia.getClaveClinicaServicio());
+			registroDerechohabiente.setClaveColonia(colonia.getClaveColonia());
+			registroDerechohabiente.setClaveEstado(colonia.getClaveEstado());
+			registroDerechohabiente.setClaveLocalidad(colonia.getClaveLocalidad());
+			registroDerechohabiente.setClaveMunicipio(colonia.getClaveMunicipio());
+			
+						
+			long estatusRegistro = personaDB.createDerechohabiente( registroDerechohabiente, esAdmin, 1);
 			
 			if (estatusRegistro == 0) 
 				return new ResponseEntity<>(new Mensaje("No fue posible registrar al derechohabiente"), HttpStatus.INTERNAL_SERVER_ERROR);
-			
-			
-			/* if (estatusRegistro == -1) 
-				return new ResponseEntity<>(new Mensaje("No de control y no de pre-aficiliacion duplicados"), HttpStatus.CONFLICT); */
-			
-			
-			// return registraUsuario( false, derechohabiente, claveParentesco );
-			
-			return new ResponseEntity<>(derechohabiente, HttpStatus.CREATED);					
+						
+			return new ResponseEntity<>(registroDerechohabiente, HttpStatus.CREATED);					
 			
 		}
 		catch(DataIntegrityViolationException e){
-			System.err.println("Exception PersonaService.guardaPersona");
+			System.err.println("Exception PersonaService.registraDerechohabiente");
 			e.printStackTrace();
 			return  new ResponseEntity<>(null,null, HttpStatus.BAD_REQUEST);
 		}
 		catch(Exception e){
-			System.err.println("Exception PersonaService.guardaPersona");
+			System.err.println("Exception PersonaService.registraDerechohabiente");
 			e.printStackTrace();
 			return  new ResponseEntity<>(null,null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}	
 	
+	}
+	
+	ResultadoValidacion validaDatosRegistro(Derechohabiente datosRegistro) {
+		ResultadoValidacion resultadoValidacion =  new ResultadoValidacion();
+		resultadoValidacion.setEtatus(true);
+				
+		/* if (datosRegistro.getClaveParentesco() != 0 && datosRegistro.getNoControl() == 0) {
+			resultadoValidacion.setEtatus(false);
+			resultadoValidacion.setMensaje("Debe proporcional el campo noControl");
+			return resultadoValidacion;
+		}*/ 
+		
+		if (datosRegistro.getCurp() == null) {
+			resultadoValidacion.setEtatus(false);
+			resultadoValidacion.setMensaje("Debe proporcional el campo curp");
+			return resultadoValidacion;
+		}
+		
+		if (datosRegistro.getRfc() == null) {
+			resultadoValidacion.setEtatus(false);
+			resultadoValidacion.setMensaje("Debe proporcional el campo rfc");
+			return resultadoValidacion;
+		}
+		
+		if (datosRegistro.getClaveParentesco() != 0) {
+			if (datosRegistro.getDireccion() == null) {
+				resultadoValidacion.setEtatus(false);
+				resultadoValidacion.setMensaje("Debe proporcional el campo direccion");
+				return resultadoValidacion;
+			}
+			
+			if (datosRegistro.getTelefonoCasa() == null) {
+				resultadoValidacion.setEtatus(false);
+				resultadoValidacion.setMensaje("Debe proporcional el campo telefonoCasa");
+				return resultadoValidacion;
+			}
+			
+			if (datosRegistro.getTelefonoCelular() == null) {
+				resultadoValidacion.setEtatus(false);
+				resultadoValidacion.setMensaje("Debe proporcional el campo telefonoCelular");
+				return resultadoValidacion;
+			}
+			
+			
+			
+			if (datosRegistro.getClaveClinicaServicio() == 0) {
+				resultadoValidacion.setEtatus(false);
+				resultadoValidacion.setMensaje("Debe proporcional el campo claveClinicaServicio");
+				return resultadoValidacion;
+			}
+			
+			if (datosRegistro.getFechaPreAfiliacion() == null) {
+				resultadoValidacion.setEtatus(false);
+				resultadoValidacion.setMensaje("Debe proporcional el campo fechaPreAfiliacion");
+				return resultadoValidacion;
+			}
+		}
+		
+		if (datosRegistro.getClaveEstadoCivil() == 0) {
+			resultadoValidacion.setEtatus(false);
+			resultadoValidacion.setMensaje("Debe proporcional el campo claveEstadoCivil");
+			return resultadoValidacion;
+		}
+		
+		return resultadoValidacion;
+		
 	}
 	
 	public ResponseEntity<?> asignarBeneficiario(Beneficiario beneficiario) {
@@ -366,7 +500,7 @@ public class DerechohabienteService {
 			
 			persona = personaDB.getPersonaByNoControlNoAfiliacionIssstep(beneficiario.getNoControl(), beneficiario.getNoPreAfiliacion());
 			persona.setNoControl(beneficiario.getNoControlTitular());
-			personaDB.createDerechohabiente(persona);
+			personaDB.createDerechohabiente(persona, false, 4);
 		}
 		
 		Beneficiario oldBeneficiario = beneficiarioDB.getBeneficiario(beneficiario.getNoControl(), beneficiario.getNoPreAfiliacion(), beneficiario.getClaveParentesco());
@@ -484,10 +618,14 @@ public class DerechohabienteService {
 		if (resultadoValidacion.isEtatus())
 			return new ResponseEntity<>(new Mensaje(resultadoValidacion.getMensaje()), HttpStatus.BAD_REQUEST);
 			
-		Derechohabiente derechohabiente = personaDB.getPersonaById(actualizarDatos.getNoControl());
+		Derechohabiente derechohabiente = personaDB.getPersonaByNoControlNoPreafiliacion(
+								actualizarDatos.getNoControl(), 
+								actualizarDatos.getNoPreAfiliacion());
 		
 		if (derechohabiente == null)
-			return new ResponseEntity<>(new Mensaje("No existe el usuario con número de Control: " + actualizarDatos.getNoControl()), HttpStatus.CONFLICT);		
+			return new ResponseEntity<>(new Mensaje("No existe el derechohabiente con número de Control: " + actualizarDatos.getNoControl() 
+												  + " y numero de pre-afiliacion: " + actualizarDatos.getNoPreAfiliacion())
+												  , HttpStatus.CONFLICT);		
 			
 		if (personaDB.actualizaDatos(actualizarDatos) == -1)
 			return new ResponseEntity<>(new Mensaje("No se pudo actualizar el usuario con número de Control: " + actualizarDatos.getNoControl()), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -543,8 +681,7 @@ public class DerechohabienteService {
 	
 	// funcion que regrerara los beneficiarios de algun trabador
 	public ResponseEntity<?> getBeneficiarios(boolean incluirTitular, long noControl) {		
-		/* String user = (String) SecurityContextHolder.getContext().getAuthentication().getName();
-		Usuario usuario =  usuarioDB.getUsuarioByColumnaStringValor("LOGIN", user); */
+		
 	
 		List<Derechohabiente> listaBeneficiarios = personaDB.getBeneficiariosByDerechohabiente(incluirTitular, noControl);
 		

@@ -1,5 +1,6 @@
 package issstep.afiliacion.model;
 
+import java.sql.Date;
 import java.sql.Timestamp;
 
 import com.fasterxml.jackson.annotation.JsonView;
@@ -39,7 +40,7 @@ public class Derechohabiente {
 	String email;
 		
 	@JsonView({Derechohabiente.Views.Simple.class})
-	Timestamp fechaNacimiento;
+	Date fechaNacimiento;
 	
 	@JsonView({Derechohabiente.Views.Simple.class})
 	String sexo;	
@@ -121,6 +122,9 @@ public class Derechohabiente {
 	
 	@JsonView({Derechohabiente.Views.Simple.class})
 	String parentesco;
+	
+	@JsonView({Derechohabiente.Views.Simple.class})
+	int estatus;
 	
 	@JsonView({Derechohabiente.Views.Simple.class})	
 	String nombreCompleto;

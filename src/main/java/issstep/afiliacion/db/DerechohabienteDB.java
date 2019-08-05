@@ -21,8 +21,10 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
 import issstep.afiliacion.model.ActualizarDatos;
+import issstep.afiliacion.model.Colonia;
 import issstep.afiliacion.model.Derechohabiente;
 import issstep.afiliacion.model.InfoDerechohabiente;
+import issstep.afiliacion.model.NumerosParaRegistro;
 import issstep.afiliacion.model.ResultadoBusqueda;
 
 @Component
@@ -263,52 +265,84 @@ public class DerechohabienteDB {
 		}		
 	}
 	
-	public long createDerechohabiente( Derechohabiente derechohabiente ) {
-		return createOrDeleteDerechohabiente( derechohabiente, 0, "create");
+	public long createDerechohabiente( Derechohabiente derechohabiente, boolean esAdmin, int estatus ) {
+		return createOrDeleteDerechohabiente( derechohabiente, 0, esAdmin, estatus, "create");
 	}
 	
 	public long deleteDerechohabiente(  long noControl ) {
-		return createOrDeleteDerechohabiente( null, noControl,"delete");
+		return createOrDeleteDerechohabiente( null, noControl, false, 1, "delete");
 	}
 	
-	public long createOrDeleteDerechohabiente(  Derechohabiente derechohabiente, long noControl, String opcion) {
+	public long createOrDeleteDerechohabiente(  Derechohabiente derechohabiente, long noControl, boolean esAdmin, int estatus, String opcion) {
 		StringBuilder query = new StringBuilder();
 				
-		if (opcion.equals("create")) 				
-			query.append("INSERT INTO DERECHOHABIENTE (NOCONTROL, NOPREAFILIACION, NOMBRE, PATERNO, MATERNO, "
-					+ "EMAIL, FECHANACIMIENTO, SEXO, CURP, RFC, DIRECCION, "
-					+ "CODIGOPOSTAL, TELEFONOCASA, TELEFONOCELULAR, FECHAPREAFILIACION, SITUACION, "
-					+ "CLAVEUSUARIOREGISTRO, FECHAREGISTRO, CLAVEUSUARIOMODIFICACION, "
-					+ "CLAVEESTADOCIVIL, CLAVECOLONIA, "
-					+ "CLAVECLINICASERVICIO, CLAVELOCALIDAD, CLAVEMUNICIPIO, CLAVEESTADO) VALUES (" 
-					+ derechohabiente.getNoControl() + ", " + derechohabiente.getNoPreAfiliacion()  
-					+ ", '" + derechohabiente.getNombre().trim() + "'" + ", '" + derechohabiente.getPaterno().toString() + "'"
-					+ ", '" + derechohabiente.getMaterno().toString() + "'" + ", '" + derechohabiente.getEmail() + "', '"
-					+ derechohabiente.getFechaNacimiento()+ "', '"  + derechohabiente.getSexo()
-					+ "', '" + derechohabiente.getCurp() + "'" + ", '" + derechohabiente.getRfc() + "'"
-					+ ", '" + derechohabiente.getDireccion() + "'" + ", '" + derechohabiente.getCodigoPostal() + "'"
-					+ ", '" + derechohabiente.getTelefonoCasa() + "', '" + derechohabiente.getTelefonoCelular() + "', '"
-					+ derechohabiente.getFechaPreAfiliacion() + "', "  + derechohabiente.getSituacion() + ", " 
-					+ derechohabiente.getClaveUsuarioRegistro() + ", '"  + derechohabiente.getFechaRegistro() + "', " 
-					+ derechohabiente.getClaveUsuarioModificacion() + ", "  
-					+ (derechohabiente.getClaveEstadoCivil() > 0 ? derechohabiente.getClaveEstadoCivil() : null) + ", "  + derechohabiente.getClaveColonia() + ", " 
-					+ derechohabiente.getClaveClinicaServicio() + ", "  + derechohabiente.getClaveLocalidad() + ", " 
-					+ derechohabiente.getClaveMunicipio() + ", "  + derechohabiente.getClaveEstado() + ")" );
+		if (opcion.equals("create")) {				
+			if (esAdmin)
+				query.append("INSERT INTO TRABAJADOR (NOCONTROL, NOAFILIACION, NOMBRE, PATERNO, MATERNO, FECHANACIMIENTO, SEXO, CURP, RFC, DOMICILIO, ");
+			else 
+				query.append("INSERT INTO DERECHOHABIENTE (NOCONTROL, NOPREAFILIACION, NOMBRE, PATERNO, MATERNO, EMAIL, FECHANACIMIENTO, SEXO, CURP, RFC, DIRECCION, ");
+			
+			if (esAdmin)
+				query.append("CODIGOPOSTAL, TELEFONO, FECHAAFILIACION, SITUACION, CLAVEUSUARIOCAPTURA,");
+			else 
+				query.append("CODIGOPOSTAL, TELEFONOCASA, TELEFONOCELULAR, FECHAPREAFILIACION, SITUACION, CLAVEUSUARIOREGISTRO,");
+			
+			query.append( " FECHAREGISTRO, CLAVEUSUARIOMODIFICACION, "
+						+ "CLAVEESTADOCIVIL, CLAVECOLONIA, "
+						+ "CLAVECLINICASERVICIO, CLAVELOCALIDAD, CLAVEMUNICIPIO, CLAVEESTADO");
+			if (!esAdmin)
+				query.append( ", ESTATUS");
+			
+			query.append( ") VALUES ("
+						+ derechohabiente.getNoControl() + ", " + derechohabiente.getNoPreAfiliacion()  
+						+ ", '" + derechohabiente.getNombre().trim() + "'" + ", '" + derechohabiente.getPaterno().toString() + "'"
+						+ ", '" + derechohabiente.getMaterno().toString() + "'");
+			if (!esAdmin)
+				query.append(", '" + derechohabiente.getEmail() + "'");
+			
+			query.append( ", '" + derechohabiente.getFechaNacimiento()+ "', '"  + derechohabiente.getSexo()
+						+ "', '" + derechohabiente.getCurp() + "'" + ", '" + derechohabiente.getRfc() + "'"
+						+ ", '" + derechohabiente.getDireccion() + "'" + ", '" + derechohabiente.getCodigoPostal() + "'"
+						+ ", '" + derechohabiente.getTelefonoCasa() + "',");
+			if (!esAdmin)
+				query.append("'" + derechohabiente.getTelefonoCelular() + "',");
+			
+			query.append( " '" + derechohabiente.getFechaPreAfiliacion() + "', "  + derechohabiente.getSituacion() + ", " 
+						+ derechohabiente.getClaveUsuarioRegistro() + ", '"  + derechohabiente.getFechaRegistro() + "', " 
+						+ derechohabiente.getClaveUsuarioModificacion() + ", "  
+						+ (derechohabiente.getClaveEstadoCivil() > 0 ? derechohabiente.getClaveEstadoCivil() : null) + ", "  + derechohabiente.getClaveColonia() + ", " 
+						+ derechohabiente.getClaveClinicaServicio() + ", "  + derechohabiente.getClaveLocalidad() + ", " 
+						+ derechohabiente.getClaveMunicipio() + ", "  + derechohabiente.getClaveEstado());
+			if (esAdmin)
+				query.append(")" );
+			else 
+				query.append(", "+ estatus +  ")" );
+		}
 		else 
 			query.append("DELETE FROM DERECHOHABIENTE WHERE noControl = " + noControl);
 		
-		// System.out.println(query.toString());
+		System.out.println("createOrDeleteDerechohabiente  " + query.toString());
 		
 		try {
 			KeyHolder keyHolder = new GeneratedKeyHolder();
-			mysqlTemplate.update(
-	    	    new PreparedStatementCreator() {
-	    	        public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-	    	            PreparedStatement pst = con.prepareStatement(query.toString(), new String[] {"noControl"});
-	    	            return pst;
-	    	        }
-	    	    },
-	    	    keyHolder);
+			if (esAdmin) 
+				afiliacionDBTemplate.update(
+		    	    new PreparedStatementCreator() {
+		    	        public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+		    	            PreparedStatement pst = con.prepareStatement(query.toString(), new String[] {"noControl"});
+		    	            return pst;
+		    	        }
+		    	    },
+		    	    keyHolder);
+			else 
+				mysqlTemplate.update(
+			    	    new PreparedStatementCreator() {
+			    	        public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+			    	            PreparedStatement pst = con.prepareStatement(query.toString(), new String[] {"noControl"});
+			    	            return pst;
+			    	        }
+			    	    },
+			    	    keyHolder);
 			
 			return (opcion.equals("create")) ? (long) derechohabiente.getNoControl() : (long) 1;		
 	    	
@@ -416,7 +450,7 @@ public class DerechohabienteDB {
 			else
 				query.append(  "DH.CURP LIKE '%" + dato + "%'");
 		
-		System.out.println("Consulta de busqueda (PreAfiliacion) ==> " + query.toString());
+		// System.out.println("Consulta de busqueda (PreAfiliacion) ==> " + query.toString());
 		
 		List<ResultadoBusqueda> resultadoBusqueda = null;
 		
@@ -520,9 +554,85 @@ public class DerechohabienteDB {
 			return true;
 		}
 	}
+	
+	public NumerosParaRegistro getNextNumerosRegistro(long claveParentesco, long noControl) {
+		StringBuilder query = new StringBuilder();
+		
+		if (claveParentesco == 0)
+			query.append( "SELECT NOCONTROL, NOCONTROL AS NOAFILIACION "
+						+ "FROM (SELECT MAX(NOCONTROL) + 100 AS NOCONTROL FROM TRABAJADOR) NUMEROS ;");
+		else 
+			query.append("SELECT NOCONTROL, MAX(NOPREAFILIACION) + 1 AS NOAFILIACION FROM BENEFICIARIO WHERE NOCONTROL = " + noControl);
+
+		NumerosParaRegistro numerosParaRegistro  = null;
+		try {
+			if (claveParentesco == 0)
+				numerosParaRegistro = afiliacionDBTemplate.queryForObject(query.toString(), new NumerosParaRegistroRowMapper());
+			else 
+				numerosParaRegistro = mysqlTemplate.queryForObject(query.toString(), new NumerosParaRegistroRowMapper());
+			return numerosParaRegistro;
+		} 
+		catch (EmptyResultDataAccessException e) {
+			numerosParaRegistro.setNoControl(noControl);
+			numerosParaRegistro.setNoAfiliacion(noControl + 1);
+			return null;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}			
+	}
+	
+	public Colonia getColonia(String codigoPostal, long claveColonia) {
+		StringBuilder query = new StringBuilder();
+		
+		query.append("SELECT * FROM KCOLONIA WHERE CODIGOPOSTAL = " + codigoPostal + " AND CLAVECOLONIA =  " + claveColonia);
+		
+		// System.out.println("getColonia  " + query.toString());
+		Colonia colonia  = null;
+		
+		try {
+			colonia = afiliacionDBTemplate.queryForObject(query.toString(), new ColoniaRowMapper());			
+			return colonia;
+		} 
+		catch (EmptyResultDataAccessException e) {
+			return null;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}			
+	}
 }
 
+class ColoniaRowMapper implements RowMapper<Colonia> {
+	 @Override
+	 public Colonia mapRow(ResultSet rs, int rowNum) throws SQLException {
+		 Colonia colonia = new Colonia();
+		 
+		 colonia.setClaveClinicaServicio(rs.getLong("CLAVECLINICASERVICIO"));
+		 colonia.setClaveColonia(rs.getLong("CLAVECOLONIA"));
+		 colonia.setClaveEstado(rs.getLong("CLAVEESTADO"));
+		 colonia.setClaveLocalidad(rs.getLong("CLAVELOCALIDAD"));
+		 colonia.setClaveMunicipio(rs.getLong("CLAVEMUNICIPIO"));
+		 colonia.setCodigoPostal(rs.getLong("CODIGOPOSTAL"));
+		 colonia.setDescripcion(rs.getString("DESCRIPCION"));
+		 
+		return colonia;
+	 }
+}
 
+class NumerosParaRegistroRowMapper implements RowMapper<NumerosParaRegistro> {
+	 @Override
+	 public NumerosParaRegistro mapRow(ResultSet rs, int rowNum) throws SQLException {
+		 NumerosParaRegistro numerosParaRegistro = new NumerosParaRegistro();
+		 
+		 numerosParaRegistro.setNoControl(rs.getLong("NOCONTROL"));
+		 numerosParaRegistro.setNoAfiliacion(rs.getLong("NOAFILIACION"));
+		 
+		return numerosParaRegistro;
+	 }
+}
 
 class PersonaRowMapper implements RowMapper<Derechohabiente> {
     @Override
@@ -535,7 +645,7 @@ class PersonaRowMapper implements RowMapper<Derechohabiente> {
         persona.setPaterno(rs.getString("PATERNO"));
         persona.setMaterno(rs.getString("MATERNO"));
         persona.setEmail(rs.getString("EMAIL"));
-        persona.setFechaNacimiento(rs.getTimestamp("FECHANACIMIENTO"));
+        persona.setFechaNacimiento(rs.getDate("FECHANACIMIENTO"));
         persona.setSexo(rs.getString("SEXO"));
         persona.setCurp(rs.getString("CURP"));
         persona.setRfc(rs.getString("RFC"));
@@ -561,6 +671,7 @@ class PersonaRowMapper implements RowMapper<Derechohabiente> {
         // persona.setClinicaServicio(rs.getString("CLINICA"));        
         persona.setClaveEstadoCivil(rs.getLong("CLAVEESTADOCIVIL"));
         // persona.setEstadoCivil(rs.getString("ESTADOCIVIL"));
+        persona.setEstatus(rs.getInt("ESTATUS"));
         
         return persona;
     }   
@@ -577,7 +688,7 @@ class PersonaConParentescoRowMapper implements RowMapper<Derechohabiente> {
         persona.setPaterno(rs.getString("PATERNO"));
         persona.setMaterno(rs.getString("MATERNO"));
         persona.setEmail(rs.getString("EMAIL"));
-        persona.setFechaNacimiento(rs.getTimestamp("FECHANACIMIENTO"));
+        persona.setFechaNacimiento(rs.getDate("FECHANACIMIENTO"));
         persona.setSexo(rs.getString("SEXO"));
         persona.setCurp(rs.getString("CURP"));
         persona.setRfc(rs.getString("RFC"));
@@ -622,7 +733,7 @@ class TrabajadorRowMapper implements RowMapper<Derechohabiente> {
         persona.setNombre(rs.getString("NOMBRE"));
         persona.setPaterno(rs.getString("PATERNO"));
         persona.setMaterno(rs.getString("MATERNO"));
-        persona.setFechaNacimiento(rs.getTimestamp("FECHANACIMIENTO"));
+        persona.setFechaNacimiento(rs.getDate("FECHANACIMIENTO"));
         persona.setSexo(rs.getString("SEXO"));
         persona.setCurp(rs.getString("CURP"));
         persona.setRfc(rs.getString("RFC"));
@@ -641,6 +752,7 @@ class TrabajadorRowMapper implements RowMapper<Derechohabiente> {
         persona.setClaveColonia(rs.getLong("CLAVECOLONIA"));
         persona.setClaveClinicaServicio(rs.getLong("CLAVECLINICASERVICIO"));
         persona.setClaveEstadoCivil(rs.getLong("CLAVEESTADOCIVIL"));
+        persona.setEstatus(4);
         
         return persona;
     }
@@ -659,7 +771,7 @@ class BeneficiarioRowMapper implements RowMapper<Derechohabiente> {
         persona.setNombre(rs.getString("NOMBRE"));
         persona.setPaterno(rs.getString("PATERNO"));
         persona.setMaterno(rs.getString("MATERNO"));
-        persona.setFechaNacimiento(rs.getTimestamp("FECHANACIMIENTO"));
+        persona.setFechaNacimiento(rs.getDate("FECHANACIMIENTO"));
         persona.setSexo(rs.getString("SEXO"));
         persona.setCurp(rs.getString("CURP"));
         persona.setRfc(rs.getString("RFC"));
@@ -677,6 +789,7 @@ class BeneficiarioRowMapper implements RowMapper<Derechohabiente> {
         persona.setClaveColonia(rs.getLong("CLAVECOLONIA"));
         persona.setClaveClinicaServicio(rs.getLong("CLAVECLINICASERVICIO"));
         persona.setClaveParentesco(rs.getLong("CLAVEPARENTESCO"));
+        persona.setEstatus(rs.getInt("ESTATUS"));
         
         return persona;
     }
@@ -695,7 +808,7 @@ class DerechohabienteRowMapper implements RowMapper<Derechohabiente> {
         persona.setPaterno(rs.getString("PATERNO"));
         persona.setMaterno(rs.getString("MATERNO"));
         persona.setEmail(rs.getString("EMAIL"));
-        persona.setFechaNacimiento(rs.getTimestamp("FECHANACIMIENTO"));
+        persona.setFechaNacimiento(rs.getDate("FECHANACIMIENTO"));
         persona.setSexo(rs.getString("SEXO"));
         persona.setCurp(rs.getString("CURP"));
         persona.setRfc(rs.getString("RFC"));
@@ -715,6 +828,7 @@ class DerechohabienteRowMapper implements RowMapper<Derechohabiente> {
         persona.setClaveClinicaServicio(rs.getLong("CLAVECLINICASERVICIO"));
         persona.setClaveEstadoCivil(rs.getLong("CLAVEESTADOCIVIL"));
         persona.setClaveParentesco(rs.getLong("CLAVEPARENTESCO"));
+        persona.setEstatus(rs.getInt("ESTATUS"));
         
         return persona;
     }   

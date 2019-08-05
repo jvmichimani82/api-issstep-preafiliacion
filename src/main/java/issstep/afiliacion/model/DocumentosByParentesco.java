@@ -1,10 +1,7 @@
 package issstep.afiliacion.model;
 
-import java.sql.Timestamp;
-
 import com.fasterxml.jackson.annotation.JsonView;
 
-import issstep.afiliacion.model.Archivo.ArchivoBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

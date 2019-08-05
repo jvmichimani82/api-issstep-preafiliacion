@@ -11,7 +11,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Curp  {
-	String curp;
+public class NumerosParaRegistro {
 
+	long noControl;
+	
+	long noAfiliacion;
+	
+	long noBeneficiario;
+	
 }

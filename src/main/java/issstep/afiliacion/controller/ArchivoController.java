@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.annotation.JsonView;
-
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import issstep.afiliacion.service.ArchivoService;
@@ -25,7 +23,6 @@ public class ArchivoController {
 	@Autowired
 	ArchivoService archivoService;
 
-	 //@JsonView(Archivo.Views.Simple.class)
 	 @ApiOperation(value = "Subir un documento")
 	 @RequestMapping(value="/uploadDocto/{noControl}/{noPreafiliacion}/{claveParentesco}/{claveTipoArchivo}", method = RequestMethod.POST, consumes="multipart/form-data")
 	 public ResponseEntity<?> uploadDoctos(	@PathVariable("noControl") long noControl, 
@@ -43,19 +40,12 @@ public class ArchivoController {
 	 	return archivoService.updateDocumento(claveDocumento, uploadingFiles, response );		
 	 } 
 	 
-	 //@JsonView(Archivo.Views.Simple.class)
 	 @ApiOperation(value = "Descargar un documento")
 	 @RequestMapping(value="/downloadDocto/{claveDocumento}", method = RequestMethod.GET)
 		public ResponseEntity<?> downloadDocto(	@PathVariable("claveDocumento") long claveDocumento, 
 												HttpServletResponse response) throws Exception {   
 	 		return archivoService.dowloadDocumento(claveDocumento, response );	
 	 }
-	
-	//@JsonView(Archivo.Views.Simple.class)
-	/* @RequestMapping(value="/listadoByidUsuario/{idUsuario}", method = RequestMethod.GET)
-		public ResponseEntity<?> listaDoctos(@PathVariable("idUsuario") long idUsuario, HttpServletResponse response) throws Exception {   
-	 		return archivoService.listaDocumentos(idUsuario, response );	
-	}*/
 	
 	 @ApiOperation(value = "Eliminar un documento")
 	 @RequestMapping(value="/deleteDocto/{claveDocumento}", method = RequestMethod.DELETE)
@@ -65,14 +55,12 @@ public class ArchivoController {
 	 }
 	
 	
-	//@JsonView(Archivo.Views.Simple.class)
 	 @ApiOperation(value = "Relacion de documentos necesarios por parentesco")
 	 @RequestMapping(value="/listadoByidParentesco/{idParentesco}", method = RequestMethod.GET)
  		public ResponseEntity<?> listaDoctos(@PathVariable("idParentesco") long idParentesco, HttpServletResponse response) throws Exception {   
 	 		return archivoService.listaDocumentos( idParentesco, response );	
  	 }
 	
-	//@JsonView(Archivo.Views.Simple.class)
 	 @ApiOperation(value = "Relacion de documentos de un derecohabiente")
 	 @RequestMapping(value="/listadoArchivos/{noControl}/{noPreAfiliacion}/{claveParentesco}", method = RequestMethod.GET)
 		public ResponseEntity<?> listaArchivos(	@PathVariable("noControl") long noControl, 

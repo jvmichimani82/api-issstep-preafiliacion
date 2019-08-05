@@ -20,26 +20,16 @@ public class DerechohabienteCONST {
 	public static final String registroDerechohabiente="Json para Registro de derechohabiente\n\n"+"{"
 			+"\n" + 
 			"			    \"noControl\": 20011,\n" + 
-			"			    \"noPreAfiliacion\": 20011,\n" + 
-			"			    \"nombre\": \"JOSE LUIS\",\n" + 
-			"			    \"paterno\": \"OSORIO\",\n" + 
-			"			    \"materno\": \"CAMPOS\",\n" + 
-			"			    \"email\": \"email@correo.com\",\n" + 
-			"			    \"fechaNacimiento\": \"2000-01-01\",\n" +
-			"			    \"sexo\": \"M\",\n" + 
-			"			    \"curp\": \"RHUJ820830HPLLCS08\",\n" + 
-			"			    \"rfc\": \"RHUJ820830S08\",\n" +
-			"			    \"domicilio\": \"direccion\",\n" + 
-			"			    \"codigoPostal\": 72755,\n" + 
+			"			    \"curp\": \"RUHG820830HPLLCS08\",\n" + 
+			"			    \"rfc\": \"RUHG820830S08\",\n" +
+			"			    \"direccion\": \"direccion\",\n" + 
 			"			    \"telefonoCasa\": \"1234567890\",\n" + 
 			"			    \"telefonoCelular\": \"1234567890\",\n" + 
 			"			    \"claveEstadoCivil\": 2,\n" + 
-			"			    \"claveColonia\": 366,\n" + 
-			"			    \"claveClinicaServicio\": 19,\n" + 
-			"			    \"claveLocalidad\": 1,\n" +
-			"			    \"claveMunicipio\": 114,\n" +
-			"			    \"claveEstado\": 21\n" +
-			
+			"			    \"claveParentesco\": 3,\n" +
+			"			    \"codigoPostal\": 72014,\n" +
+			"			    \"claveColonia\": 24,\n" +
+			"			    \"fechaPreAfiliacion\": \"2019-01-01\"\n" +
 			"			    }" ;
 	
 	public static final String buscaDerechohabiente="Json para Busqueda de derechohabiente\n\n"+"{"
