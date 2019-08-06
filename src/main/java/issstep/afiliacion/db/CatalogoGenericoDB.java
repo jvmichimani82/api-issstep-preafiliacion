@@ -170,7 +170,7 @@ public class CatalogoGenericoDB {
 		}
 		
 	
-		System.out.println(query.toString());
+		// System.out.println(query.toString());
 		
 		CatalogoGenerico descripcion = null;
 		try {

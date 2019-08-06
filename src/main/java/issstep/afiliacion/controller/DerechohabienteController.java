@@ -190,4 +190,20 @@ public class DerechohabienteController {
 
     	return derechohabienteService.buscarInformacionEnPreafiliacion(false, datoABuscar);
 	}
+    
+    @ApiOperation(value = "Documentacion faltante de los beneficiarios")
+    @RequestMapping(value = "/documentacion/{noControl}", method = RequestMethod.GET)
+    public ResponseEntity<?> getDocumentacionBeneficiarios(@PathVariable("noControl") long noControl, HttpServletResponse response) {
+    	
+    	return derechohabienteService.getDocumentacionBeneficiarios(false, noControl);
+    }
+    
+    @ApiOperation(value = "Documentacion faltante de los beneficiarios y el titular")
+    @RequestMapping(value = "/documentacionConTitular/{noControl}", method = RequestMethod.GET)
+    public ResponseEntity<?> getDocumentacionBeneficiariosYTitular(@PathVariable("noControl") long noControl, HttpServletResponse response) {
+    	
+    	return derechohabienteService.getDocumentacionBeneficiarios(true, noControl);
+    }
+    
+    
 }

@@ -32,6 +32,7 @@ import issstep.afiliacion.model.NumerosParaRegistro;
 import issstep.afiliacion.model.ResetPassword;
 import issstep.afiliacion.model.ResultadoBusqueda;
 import issstep.afiliacion.model.Derechohabiente;
+import issstep.afiliacion.model.DocumentosFaltantes;
 import issstep.afiliacion.model.InfoDerechohabiente;
 import issstep.afiliacion.model.Usuario;
 import issstep.afiliacion.model.ActualizarDatos;
@@ -691,6 +692,17 @@ public class DerechohabienteService {
 		
 		if (listaBeneficiarios != null)
 			return new ResponseEntity<>(listaBeneficiarios, HttpStatus.OK);
+		
+		else
+			return new ResponseEntity<>(new ArrayList[0] , HttpStatus.OK);
+		
+    }
+	
+	public ResponseEntity<?> getDocumentacionBeneficiarios(boolean incluirTitular, long noControl) {		
+		List<DocumentosFaltantes> listaDocumentosFaltantes = personaDB.getDocumentacionByDerechohabiente(incluirTitular, noControl);
+		
+		if (listaDocumentosFaltantes != null)
+			return new ResponseEntity<>(listaDocumentosFaltantes, HttpStatus.OK);
 		
 		else
 			return new ResponseEntity<>(new ArrayList[0] , HttpStatus.OK);

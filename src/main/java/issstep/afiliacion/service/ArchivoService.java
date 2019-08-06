@@ -237,6 +237,9 @@ public class ArchivoService{
 	}
 	
 	public ResponseEntity<?> updateValidacionDocto( long claveDocumento, int estatusValidacion, HttpServletResponse response) {
+		if (estatusValidacion != 0 && estatusValidacion != 1)
+			return new ResponseEntity<>(new Mensaje("Estatus invalido"), HttpStatus.BAD_REQUEST);
+		
 		try {
 			
 			Archivo archivo = archivoDB.getArchivo(claveDocumento);

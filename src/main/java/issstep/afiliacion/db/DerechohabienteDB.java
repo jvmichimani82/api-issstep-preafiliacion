@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 import issstep.afiliacion.model.ActualizarDatos;
 import issstep.afiliacion.model.Colonia;
 import issstep.afiliacion.model.Derechohabiente;
+import issstep.afiliacion.model.DocumentosFaltantes;
 import issstep.afiliacion.model.InfoDerechohabiente;
 import issstep.afiliacion.model.NumerosParaRegistro;
 import issstep.afiliacion.model.ResultadoBusqueda;
@@ -406,6 +407,47 @@ public class DerechohabienteDB {
 			e.printStackTrace();
 		}
 		return beneficiarios;
+	}
+	
+	public List<DocumentosFaltantes> getDocumentacionByDerechohabiente(boolean incluirTitular, long noControl) {
+
+		StringBuilder query = new StringBuilder();
+		query.append( "SELECT \n"
+					+ "	NOCONTROL, NOPREAFILIACION, COUNT(NOCONTROL) AS NUMDOCS \n"
+					+ "    FROM \n"
+					+ "	  (SELECT \n"
+					+ "        DOCXDH.NOCONTROL, DOCXDH.NOPREAFILIACION, DOCXDH.CLAVEPARENTESCO, \n"
+					+ "        DOCXDH.CLAVETIPOARCHIVO, DOCXDH.ESOBLIGATORIO, D.ESVALIDO \n"
+					+ "    FROM \n"
+					+ "        (SELECT B.NOCONTROL, B.NOPREAFILIACION, B.CLAVEPARENTESCO, TA.CLAVETIPOARCHIVO, TA.ESOBLIGATORIO \n"
+					+ "        FROM BENEFICIARIO B,  KPARENTESCOTIPOARCHIVO TA \n"
+					+ "        WHERE B.CLAVEPARENTESCO = TA.CLAVEPARENTESCO \n"
+					+ "            AND B.NOCONTROL = ");
+		query.append(noControl);
+		
+		if (!incluirTitular)
+			query.append(" AND B.NOPREAFILIACION != " + noControl);
+		
+		query.append(" ) DOCXDH \n"
+					+ "        LEFT JOIN DOCUMENTO D \n"
+					+ "		   ON DOCXDH.NOPREAFILIACION = D.NOPREAFILIACION \n"
+					+ "				AND DOCXDH.CLAVEPARENTESCO = D.CLAVEPARENTESCO \n"
+					+ "				AND DOCXDH.CLAVETIPOARCHIVO = D.CLAVETIPOARCHIVO) FALTANTES \n"
+					+ "        WHERE  ISNULL(ESVALIDO) OR ESVALIDO = 2 OR ESVALIDO = 0 \n"
+					+ "		   GROUP BY NOCONTROL, NOPREAFILIACION \n");
+
+		// System.out.println("DocumentosFaltantes ==> " + query.toString());
+		List<DocumentosFaltantes> listDocumentosFaltantes = null;
+		try {
+			listDocumentosFaltantes =  mysqlTemplate.query(query.toString(), new DocumentosFaltantesRowMapper());
+		} 
+		catch (EmptyResultDataAccessException e) {
+			return null;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return listDocumentosFaltantes;
 	}
 	
 	public List<Derechohabiente> getBeneficiariosByTrabajadorIssstep(long noControl) {
@@ -872,3 +914,15 @@ class ListaPersonaRowMapper implements RowMapper<InfoDerechohabiente> {
     }
 }
 
+class DocumentosFaltantesRowMapper implements RowMapper<DocumentosFaltantes> {
+    @Override
+    public DocumentosFaltantes mapRow(ResultSet rs, int rowNum) throws SQLException {
+    	DocumentosFaltantes documentosFaltantes = new DocumentosFaltantes();
+ 
+    	documentosFaltantes.setNoControl(rs.getLong("NOCONTROL"));
+    	documentosFaltantes.setNoPreAfiliacion(rs.getLong("NOPREAFILIACION"));
+    	documentosFaltantes.setNumDocs(rs.getInt("NUMDOCS"));
+    	         
+        return documentosFaltantes;
+    }
+}
