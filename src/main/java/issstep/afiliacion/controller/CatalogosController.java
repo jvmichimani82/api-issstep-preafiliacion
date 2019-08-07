@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import issstep.afiliacion.cons.CatalogosCONST;
 import issstep.afiliacion.model.Descripcion;
@@ -47,5 +48,34 @@ public class CatalogosController {
     @RequestMapping(value = "/documento", method = RequestMethod.POST)
     public ResponseEntity<?> creaDocumento(@ApiParam(value = CatalogosCONST.registroDocumento, required = true)@RequestBody Descripcion descripcion, HttpServletResponse response ) {
     	return catalogosService.createDocument(descripcion);
+    }
+    
+    @ApiOperation(value = "Catálogo de municipios de un estado")
+    @RequestMapping(value = "/municipios/{idEstado}", method = RequestMethod.GET)
+    public ResponseEntity<?> getMunicipios(@ApiParam(value = "idEstado", required = true) @PathVariable long idEstado, HttpServletResponse response ) {
+    	return catalogosService.getMunicipios(idEstado);
+    }
+    
+    @ApiOperation(value = "Catálogo de localidades de un municipio")
+    @RequestMapping(value = "/localidades/{idEstado}/{idMunicipio}", method = RequestMethod.GET)
+    public ResponseEntity<?> getLocalidades(@ApiParam(value = "idEstado", required = true) @PathVariable long idEstado,
+    										@ApiParam(value = "idMunicipio", required = true) @PathVariable long idMunicipio,
+    										HttpServletResponse response ) {
+    	return catalogosService.getLocalidades(idEstado, idMunicipio);
+    }
+    
+    @ApiOperation(value = "Catálogo de colonias de una localidad")
+    @RequestMapping(value = "/colonias/{idEstado}/{idMunicipio}/{idLocalidad}", method = RequestMethod.GET)
+    public ResponseEntity<?> getLocalidades(@ApiParam(value = "idEstado", required = true) @PathVariable long idEstado,
+    										@ApiParam(value = "idMunicipio", required = true) @PathVariable long idMunicipio,
+    										@ApiParam(value = "idLocalidad", required = true) @PathVariable long idLocalidad,
+    										HttpServletResponse response ) {
+    	return catalogosService.getColonias(idEstado, idMunicipio, idLocalidad);
+    }
+    
+    @ApiOperation(value = "Catálogo de clínicas de servicio")
+    @RequestMapping(value = "/clinicas", method = RequestMethod.GET)
+    public ResponseEntity<?> getClinicas(HttpServletResponse response ) {
+    	return catalogosService.getClinicas();
     }
 }

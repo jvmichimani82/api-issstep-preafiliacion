@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonView;
 
 public class Mensaje {
 	
-	@JsonView(Mensaje.Views.Simple.class)
 	String mensaje;
 	
 	public Mensaje() {

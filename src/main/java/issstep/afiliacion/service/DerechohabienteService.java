@@ -245,8 +245,8 @@ public class DerechohabienteService {
 			    oldPersona.setClaveUsuarioRegistro(claveUsuario);
 				personaDB.actualiza(oldPersona);
 				
-				if (!oldPersona.getEmail().equals("issstepregistro@gmail.com" + oldPersona.getNoControl() + "@gmail.com"))	
-				 	mailService.prepareAndSendBienvenida(oldPersona.getEmail(), oldPersona.getNombreCompleto() ,
+				// if (!oldPersona.getEmail().equals("issstepregistro@gmail.com" + oldPersona.getNoControl() + "@gmail.com"))	
+				 	mailService.prepareAndSendBienvenida("issstepregistro@gmail.com", oldPersona.getNombreCompleto() ,
 		        		 oldPersona.getEmail(), usuario.getToken(), oldPersona.getNoControl());
 		     //}	
 
@@ -312,7 +312,10 @@ public class DerechohabienteService {
 	public ResponseEntity<?> registraDerechohabiente( Derechohabiente registroDerechohabiente ) {
 		ResultadoValidacion resultadoValidacion =  validaDatosRegistro(registroDerechohabiente);
 		
-		if (resultadoValidacion.isEtatus())
+		if  (getPersonaByCurp(registroDerechohabiente.getCurp()) != null)
+			return new ResponseEntity<>(new Mensaje("Ya exite un derechohabiente con esa Curp"), HttpStatus.CONFLICT);
+		
+		if (!resultadoValidacion.isEtatus())
 			return new ResponseEntity<>(new Mensaje(resultadoValidacion.getMensaje()), HttpStatus.BAD_REQUEST);
 		
 		String user = (String) SecurityContextHolder.getContext().getAuthentication().getName();
@@ -321,6 +324,7 @@ public class DerechohabienteService {
 		
 		if (usuario == null)
 			return new ResponseEntity<>(new Mensaje("Usuario no logeado"), HttpStatus.BAD_REQUEST);
+		
 		
 		boolean esAdmin = usuario.getClaveRol() == 1;
 		
@@ -361,15 +365,20 @@ public class DerechohabienteService {
 			
 			/* Obtener la informacion de la CURP del RENAPO */
 			
-			registroDerechohabiente.setNombre("RUEBN");
+			/* registroDerechohabiente.setNombre("RUEBN");
 			registroDerechohabiente.setPaterno("HUERTA");
 			registroDerechohabiente.setMaterno("GOMEZ");
-			registroDerechohabiente.setSexo("M");
+			registroDerechohabiente.setSexo("M"); */
+			System.out.println("registroDerechohabiente.getFechaNacimiento()");
+			System.out.println(registroDerechohabiente.getFechaNacimiento());
+			// DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 			
-			DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-			Date d = formatter.parse("1982-08-30");
-			registroDerechohabiente.setFechaNacimiento(new java.sql.Date (d.getTime()));
-				
+			// Date d = formatter.parse(registroDerechohabiente.getFechaNacimiento().toString());
+			
+			// registroDerechohabiente.setFechaNacimiento(new java.sql.Date (d.getTime()));
+			String[] fechaNac = registroDerechohabiente.getFechaNacimiento().split("/");
+			registroDerechohabiente.setFechaNacimiento(fechaNac[2] + "/" + fechaNac[1] + "/"+ fechaNac[0]);
+			
 			NumerosParaRegistro numerosParaRegistro = personaDB.getNextNumerosRegistro(registroDerechohabiente.getClaveParentesco(), registroDerechohabiente.getNoControl());
 			
 			registroDerechohabiente.setNoControl(numerosParaRegistro.getNoControl());
@@ -381,15 +390,15 @@ public class DerechohabienteService {
 			registroDerechohabiente.setClaveUsuarioModificacion(usuario.getClaveUsuario());
 			
 				
-			Colonia colonia = personaDB.getColonia(registroDerechohabiente.getCodigoPostal(), registroDerechohabiente.getClaveColonia());
+			/* Colonia colonia = personaDB.getColonia(registroDerechohabiente.getCodigoPostal(), registroDerechohabiente.getClaveColonia());
 			
 			registroDerechohabiente.setClaveClinicaServicio(colonia.getClaveClinicaServicio());
 			registroDerechohabiente.setClaveColonia(colonia.getClaveColonia());
 			registroDerechohabiente.setClaveEstado(colonia.getClaveEstado());
 			registroDerechohabiente.setClaveLocalidad(colonia.getClaveLocalidad());
-			registroDerechohabiente.setClaveMunicipio(colonia.getClaveMunicipio());
+			registroDerechohabiente.setClaveMunicipio(colonia.getClaveMunicipio()); */
 			
-						
+					
 			long estatusRegistro = personaDB.createDerechohabiente( registroDerechohabiente, esAdmin, 1);
 			
 			if (estatusRegistro == 0) 

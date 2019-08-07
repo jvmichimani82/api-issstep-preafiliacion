@@ -26,8 +26,12 @@ public class DerechohabienteCONST {
 			"			    \"telefonoCelular\": \"1234567890\",\n" + 
 			"			    \"claveEstadoCivil\": 2,\n" + 
 			"			    \"claveParentesco\": 3,\n" +
-			"			    \"codigoPostal\": 72014,\n" +
+			"			    \"claveEstado\": 21,\n" +
+			"			    \"claveMunicipio\": 114,\n" +
+			"			    \"claveLocalidad\": 1,\n" +
 			"			    \"claveColonia\": 24,\n" +
+			"			    \"codigoPostal\": 72014,\n" +
+			"			    \"claveClinicaServicio\": 20,\n" +
 			"			    \"fechaPreAfiliacion\": \"2019-01-01\"\n" +
 			"			    } \n\n\n" +
 			"Json para Registro de derechohabiente Beneficiario\n\n"+"{"

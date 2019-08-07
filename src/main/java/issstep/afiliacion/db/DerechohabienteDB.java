@@ -422,6 +422,7 @@ public class DerechohabienteDB {
 					+ "        (SELECT B.NOCONTROL, B.NOPREAFILIACION, B.CLAVEPARENTESCO, TA.CLAVETIPOARCHIVO, TA.ESOBLIGATORIO \n"
 					+ "        FROM BENEFICIARIO B,  KPARENTESCOTIPOARCHIVO TA \n"
 					+ "        WHERE B.CLAVEPARENTESCO = TA.CLAVEPARENTESCO \n"
+					+ "			   AND TA.ESOBLIGATORIO = 1 \n"					
 					+ "            AND B.NOCONTROL = ");
 		query.append(noControl);
 		
@@ -625,7 +626,7 @@ public class DerechohabienteDB {
 		}			
 	}
 	
-	public Colonia getColonia(String codigoPostal, long claveColonia) {
+	/* public Colonia getColonia(String codigoPostal, long claveColonia) {
 		StringBuilder query = new StringBuilder();
 		
 		query.append("SELECT * FROM KCOLONIA WHERE CODIGOPOSTAL = " + codigoPostal + " AND CLAVECOLONIA =  " + claveColonia);
@@ -644,25 +645,10 @@ public class DerechohabienteDB {
 			e.printStackTrace();
 			return null;
 		}			
-	}
+	} */
 }
 
-class ColoniaRowMapper implements RowMapper<Colonia> {
-	 @Override
-	 public Colonia mapRow(ResultSet rs, int rowNum) throws SQLException {
-		 Colonia colonia = new Colonia();
-		 
-		 colonia.setClaveClinicaServicio(rs.getLong("CLAVECLINICASERVICIO"));
-		 colonia.setClaveColonia(rs.getLong("CLAVECOLONIA"));
-		 colonia.setClaveEstado(rs.getLong("CLAVEESTADO"));
-		 colonia.setClaveLocalidad(rs.getLong("CLAVELOCALIDAD"));
-		 colonia.setClaveMunicipio(rs.getLong("CLAVEMUNICIPIO"));
-		 colonia.setCodigoPostal(rs.getLong("CODIGOPOSTAL"));
-		 colonia.setDescripcion(rs.getString("DESCRIPCION"));
-		 
-		return colonia;
-	 }
-}
+
 
 class NumerosParaRegistroRowMapper implements RowMapper<NumerosParaRegistro> {
 	 @Override
@@ -687,7 +673,7 @@ class PersonaRowMapper implements RowMapper<Derechohabiente> {
         persona.setPaterno(rs.getString("PATERNO"));
         persona.setMaterno(rs.getString("MATERNO"));
         persona.setEmail(rs.getString("EMAIL"));
-        persona.setFechaNacimiento(rs.getDate("FECHANACIMIENTO"));
+        persona.setFechaNacimiento(rs.getString("FECHANACIMIENTO"));
         persona.setSexo(rs.getString("SEXO"));
         persona.setCurp(rs.getString("CURP"));
         persona.setRfc(rs.getString("RFC"));
@@ -730,7 +716,7 @@ class PersonaConParentescoRowMapper implements RowMapper<Derechohabiente> {
         persona.setPaterno(rs.getString("PATERNO"));
         persona.setMaterno(rs.getString("MATERNO"));
         persona.setEmail(rs.getString("EMAIL"));
-        persona.setFechaNacimiento(rs.getDate("FECHANACIMIENTO"));
+        persona.setFechaNacimiento(rs.getString("FECHANACIMIENTO"));
         persona.setSexo(rs.getString("SEXO"));
         persona.setCurp(rs.getString("CURP"));
         persona.setRfc(rs.getString("RFC"));
@@ -775,7 +761,7 @@ class TrabajadorRowMapper implements RowMapper<Derechohabiente> {
         persona.setNombre(rs.getString("NOMBRE"));
         persona.setPaterno(rs.getString("PATERNO"));
         persona.setMaterno(rs.getString("MATERNO"));
-        persona.setFechaNacimiento(rs.getDate("FECHANACIMIENTO"));
+        persona.setFechaNacimiento(rs.getString("FECHANACIMIENTO"));
         persona.setSexo(rs.getString("SEXO"));
         persona.setCurp(rs.getString("CURP"));
         persona.setRfc(rs.getString("RFC"));
@@ -813,7 +799,7 @@ class BeneficiarioRowMapper implements RowMapper<Derechohabiente> {
         persona.setNombre(rs.getString("NOMBRE"));
         persona.setPaterno(rs.getString("PATERNO"));
         persona.setMaterno(rs.getString("MATERNO"));
-        persona.setFechaNacimiento(rs.getDate("FECHANACIMIENTO"));
+        persona.setFechaNacimiento(rs.getString("FECHANACIMIENTO"));
         persona.setSexo(rs.getString("SEXO"));
         persona.setCurp(rs.getString("CURP"));
         persona.setRfc(rs.getString("RFC"));
@@ -850,7 +836,7 @@ class DerechohabienteRowMapper implements RowMapper<Derechohabiente> {
         persona.setPaterno(rs.getString("PATERNO"));
         persona.setMaterno(rs.getString("MATERNO"));
         persona.setEmail(rs.getString("EMAIL"));
-        persona.setFechaNacimiento(rs.getDate("FECHANACIMIENTO"));
+        persona.setFechaNacimiento(rs.getString("FECHANACIMIENTO"));
         persona.setSexo(rs.getString("SEXO"));
         persona.setCurp(rs.getString("CURP"));
         persona.setRfc(rs.getString("RFC"));

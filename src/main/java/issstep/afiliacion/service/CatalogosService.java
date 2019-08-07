@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import issstep.afiliacion.db.DocumentoDB;
+import issstep.afiliacion.db.CatalogoDB;
 import issstep.afiliacion.model.Descripcion;
 import issstep.afiliacion.model.Documento;
 import issstep.afiliacion.model.Mensaje;
@@ -14,14 +14,14 @@ import issstep.afiliacion.model.Mensaje;
 public class CatalogosService {
 	
 	@Autowired
-	DocumentoDB documentoDB;
+	CatalogoDB catalogoDB;
 		
 	public ResponseEntity<?> getDocuments() {	
-		return new ResponseEntity<>(documentoDB.getDocumentos(), HttpStatus.OK);	
+		return new ResponseEntity<>(catalogoDB.getDocumentos(), HttpStatus.OK);	
     }
 	
 	public ResponseEntity<?> getDocument(long id) {	
-		Documento documento = documentoDB.getDocumento(id);
+		Documento documento = catalogoDB.getDocumento(id);
 		
 		if (documento != null) 
 			return new ResponseEntity<>(documento, HttpStatus.OK);		
@@ -30,10 +30,10 @@ public class CatalogosService {
     }
 	
 	public ResponseEntity<?> updateDocument(Documento documento) {	
-		Documento registro = documentoDB.getDocumento(documento.getId());
+		Documento registro = catalogoDB.getDocumento(documento.getId());
 		
 		if (registro != null) {
-			int numDocumento = documentoDB.updateDocumento(documento);
+			int numDocumento = catalogoDB.updateDocumento(documento);
 			
 			if (numDocumento != 0) 
 				return new ResponseEntity<>(documento , HttpStatus.OK);
@@ -45,7 +45,7 @@ public class CatalogosService {
     }
 	
 	public ResponseEntity<?> createDocument(Descripcion descripcion) {	
-		long idDocumento = documentoDB.createDocumento(descripcion);
+		long idDocumento = catalogoDB.createDocumento(descripcion);
 		
 		if (idDocumento != 0) {
 			Documento documento= new Documento();
@@ -60,12 +60,28 @@ public class CatalogosService {
     }
 	
 	public ResponseEntity<?> deleteDocument(long id) {	
-		Documento registro = documentoDB.getDocumento(id);
+		Documento registro = catalogoDB.getDocumento(id);
 		if (registro != null) {
-			documentoDB.deleteDocumento(id);
+			catalogoDB.deleteDocumento(id);
 			return new ResponseEntity<>( HttpStatus.OK);
 		}
 		else
 			return new ResponseEntity<>(new Mensaje("El documento con id: " + id + ", no existe."), HttpStatus.NOT_FOUND);
 	}
+	
+	public ResponseEntity<?> getMunicipios(long idEstado) {	
+		return new ResponseEntity<>(catalogoDB.getMunicipios(idEstado), HttpStatus.OK);	
+    }
+	
+	public ResponseEntity<?> getLocalidades(long idEstado, long idMunicipio) {	
+		return new ResponseEntity<>(catalogoDB.getLocalidades(idEstado, idMunicipio), HttpStatus.OK);	
+    }
+	
+	public ResponseEntity<?> getColonias(long idEstado, long idMunicipio, long idLocalidad) {	
+		return new ResponseEntity<>(catalogoDB.getColonias(idEstado, idMunicipio, idLocalidad), HttpStatus.OK);	
+    }
+	
+	public ResponseEntity<?> getClinicas() {	
+		return new ResponseEntity<>(catalogoDB.getClinicas(), HttpStatus.OK);	
+    }
 }
