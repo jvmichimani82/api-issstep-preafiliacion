@@ -36,7 +36,7 @@ public class BeneficiarioDB {
 		query.append(" AND CLAVEPARENTESCO = ");
 		query.append(claveParentesco);
 		
-		System.out.println("getBeneficiario == " + query.toString());
+		// System.out.println("getBeneficiario == " + query.toString());
 				
 		// Beneficiario beneficiario = null;
 		try {
@@ -58,7 +58,7 @@ public class BeneficiarioDB {
 		query.append("SELECT * FROM BENEFICIARIO WHERE NOBENEFICIARIO = ");
 		query.append(idBeneficiario);
 		
-		System.out.println("getBeneficiario == " + query.toString());
+		// System.out.println("getBeneficiario == " + query.toString());
 				
 		// Beneficiario beneficiario = null;
 		try {
@@ -97,7 +97,7 @@ public class BeneficiarioDB {
 		else 
 			query.append("DELETE FROM BENEFICIARIO WHERE NOBENEFICIARIO = " + noBeneficiario);
 		
-		System.out.println(query.toString());
+		// System.out.println(query.toString());
 		
 		try {
 			KeyHolder keyHolder = new GeneratedKeyHolder();

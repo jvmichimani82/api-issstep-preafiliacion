@@ -49,9 +49,9 @@ public class AuthenticationRestController {
     	if(authentication != null) {
 	    	SecurityContextHolder.getContext().setAuthentication(authentication);
 	        Usuario usuarioDetails = (Usuario) authentication.getPrincipal();
-	        System.out.println("Usuario ==> ");
+	        /* System.out.println("Usuario ==> ");
 	        System.out.println(usuarioDetails.getNoControl());
-	        System.out.println(usuarioDetails.getEstatus());
+	        System.out.println(usuarioDetails.getEstatus()); */
 	        
 	        if (usuarioDetails.getEstatus() == -1 )
 	        	return new ResponseEntity<>(new Mensaje("Usuario no activo"), HttpStatus.CONFLICT);

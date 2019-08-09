@@ -168,10 +168,7 @@ public class CatalogoGenericoDB {
 				query.append("SELECT DESCRIPCION FROM "+ catalogo + " WHERE CLAVEESTATUS = " + derechohabiente.getEstatus());
 				break;
 		}
-		
-	
-		// System.out.println(query.toString());
-		
+			
 		CatalogoGenerico descripcion = null;
 		try {
 			if (esDatoLocal)
@@ -251,7 +248,6 @@ public class CatalogoGenericoDB {
 		else 
 			query.append("DELETE FROM " + catalogo + " WHERE " + nombreId + " = " + id);
 		
-		System.out.println(query.toString());
 		
 		try {
 			KeyHolder keyHolder = new GeneratedKeyHolder();

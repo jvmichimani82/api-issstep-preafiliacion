@@ -33,8 +33,8 @@ public class UtilsImage {
 	
 		public static String getTipoDeSO(){
 		   String SO = System.getProperty("os.name");
-		   System.out.println(SO);
-		   System.out.println(getURLBySO());
+		   /* System.out.println(SO);
+		   System.out.println(getURLBySO());*/
 		   return SO;
 		}
 		

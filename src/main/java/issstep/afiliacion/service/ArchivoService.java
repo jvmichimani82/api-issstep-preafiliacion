@@ -119,7 +119,7 @@ public class ArchivoService{
 				if (archivo == null) 
 					return new ResponseEntity<>(new Mensaje("El archivo no existe"), HttpStatus.NO_CONTENT);
 		
-				System.out.println("Eliminacion de informacion");
+				// System.out.println("Eliminacion de informacion");
 				UtilsImage.deleteDocto(archivo.getUrlArchivo());
 				
 				String desTipoDocto = archivoDB.getTipoArchivoByParentesco(archivo.getClaveParentesco(), archivo.getClaveTipoArchivo());
@@ -150,7 +150,7 @@ public class ArchivoService{
 		try {
 			
 			Archivo archivo = archivoDB.getArchivo(claveDocumento);
-			System.out.println(archivo);
+			// System.out.println(archivo);
 			
 			if(archivo != null) {
 			

@@ -66,7 +66,6 @@ public class CatalogoDB {
 		StringBuilder query = new StringBuilder();
 		
 		query.append("UPDATE TIPODOCTO SET descripcion = '" + documento.getDescripcion() + "' WHERE id = ?");
-		System.out.println(query.toString());
 		
 		int numDocumento = 0;
 		try {
@@ -82,7 +81,6 @@ public class CatalogoDB {
 		StringBuilder query = new StringBuilder();
 		
 		query.append("INSERT INTO TIPODOCTO (DESCRIPCION, ESTATUS) VALUES ('" + descripcion.getDescripcion() + "', 1)");
-		System.out.println(query.toString());
 		
 		try {
 			KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -108,7 +106,6 @@ public class CatalogoDB {
 		StringBuilder query = new StringBuilder();
 		
 		query.append("DELETE FROM TIPODOCTO WHERE id = " + id);
-		System.out.println(query.toString());
 		
 		try {
 			KeyHolder keyHolder = new GeneratedKeyHolder();

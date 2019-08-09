@@ -99,7 +99,7 @@ public class ArchivoDB {
 		query.append(idParentesco);
 		query.append(" ORDER BY ARCHIVO");
 		
-		System.out.println(query.toString());
+		//System.out.println(query.toString());
 		
 		List<DocumentosByParentesco> documentos = new ArrayList<DocumentosByParentesco>();
 		try {
@@ -118,7 +118,7 @@ public class ArchivoDB {
 				+ "FECHAREGISTRO, CLAVEUSUARIOMODIFICACION, ESTATUS)"
 				+ " VALUES(?,?,?,?,?,?,?,?,?,?,?,?)");
 
-		System.out.println(query.toString());
+		// System.out.println(query.toString());
 		
 		try {
 			KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -156,7 +156,7 @@ public class ArchivoDB {
 		StringBuilder query = new StringBuilder();
 		query.append("DELETE FROM DOCUMENTO WHERE CLAVEDOCUMENTO = ? ");
 			
-		System.out.println(query.toString());
+		// System.out.println(query.toString());
 		
 		try {
 			  mysqlTemplate.update(query.toString(), new Object[] { claveDocumento });
@@ -177,7 +177,7 @@ public class ArchivoDB {
 		query.append( "UPDATE DOCUMENTO SET NOMBRE = ?, URLARCHIVO = ?, "
 					+ "ESVALIDO = ?, FECHAREGISTRO = ?, ESTATUS = ? WHERE CLAVEDOCUMENTO = ? ");
 			
-		System.out.println(query.toString());
+		// System.out.println(query.toString());
 		
 		try {
 			  mysqlTemplate.update(query.toString(), new Object[] { archivo.getNombre(),

@@ -114,7 +114,7 @@ public class JwtTokenUtil implements Serializable {
     private Date generateExpirationDate() {
     	Long expiration = Long.parseLong(messageUtils.getMessage("duracion_jwt_token"));
     	Calendar fechaExpira = Calendar.getInstance();
-    	System.out.println(fechaExpira.getTimeInMillis() + expiration * 10000);
+    	// System.out.println(fechaExpira.getTimeInMillis() + expiration * 10000);
     	return new Date(fechaExpira.getTimeInMillis() + expiration * 10000);
     }
 
@@ -160,7 +160,7 @@ public class JwtTokenUtil implements Serializable {
     }
 
     private String generateToken(Map<String, Object> claims) {
-    	System.out.println(generateExpirationDate());
+    	// System.out.println(generateExpirationDate());
     	
     	  return Jwts.builder()
                 .setClaims(claims)

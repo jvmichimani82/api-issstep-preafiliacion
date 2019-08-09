@@ -97,7 +97,7 @@ public class UsuarioDB {
 		query.append(token+"'");
 		query.append(" AND U.CLAVEROL = R.CLAVEROL");
 		
-		System.out.println(query.toString());
+		// System.out.println(query.toString());
 	
 		Usuario user = null;
 		try {
@@ -118,7 +118,7 @@ public class UsuarioDB {
 					+ "U.FECHAULTIMOACCESO, U.ESTATUS, U.NOCONTROL, U.NOAFILIACION FROM USUARIO U, KROL R WHERE "
 					+ campo + " = '" + valor + "' AND U.CLAVEROL = R.CLAVEROL");
 	
-		System.out.println(query.toString());
+		// System.out.println(query.toString());
 		
 		Usuario user = null;
 		try {
@@ -141,7 +141,7 @@ public class UsuarioDB {
 				+ "(NOCONTROL, CLAVEROL, LOGIN, PASSWORD, TOKEN, FECHAREGISTRO, ESTATUS, NOAFILIACION )"
 				+ " VALUES(?,?,?,?,?,?,?,?)");
 
-		System.out.println(query.toString());
+		// System.out.println(query.toString());
 		
 		//if (registraBeneficiario( derechohabiente, claveParentesco ) == 1) {
 			try {
@@ -188,7 +188,7 @@ public class UsuarioDB {
 		StringBuilder query = new StringBuilder();
 		query.append("UPDATE USUARIO SET CLAVEROL = ?, PASSWORD = ?, TOKEN = ?, FECHAULTIMOACCESO = ?, ESTATUS = ? WHERE CLAVEUSUARIO = ? ");
 			
-		System.out.println(query.toString());
+		// .println(query.toString());
 		
 		try {
 			  mysqlTemplate.update(query.toString(), new Object[] { 
@@ -208,7 +208,7 @@ public class UsuarioDB {
 		StringBuilder query = new StringBuilder();
 		query.append("UPDATE USUARIO SET TOKEN = ? WHERE NOCONTROL = ? AND NOAFILIACION = ? ");
 			
-		System.out.println(query.toString());
+		// System.out.println(query.toString());
 		
 		try {
 			  mysqlTemplate.update(query.toString(), new Object[] { 
@@ -245,7 +245,7 @@ public class UsuarioDB {
 		else 
 			query.append("DELETE FROM USUARIO WHERE CLAVEUSUARIO = " + claveUsuario);
 		
-		System.out.println(query.toString());
+		// System.out.println(query.toString());
 		
 		try {
 			KeyHolder keyHolder = new GeneratedKeyHolder();
