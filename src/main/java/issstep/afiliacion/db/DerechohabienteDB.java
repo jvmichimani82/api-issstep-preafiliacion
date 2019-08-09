@@ -275,75 +275,84 @@ public class DerechohabienteDB {
 	}
 	
 	public long createOrDeleteDerechohabiente(  Derechohabiente derechohabiente, long noControl, boolean esAdmin, int estatus, String opcion) {
-		StringBuilder query = new StringBuilder();
+		StringBuilder queryTrabajador = new StringBuilder();
+		StringBuilder queryDerechohabiente = new StringBuilder();
 				
 		if (opcion.equals("create")) {				
-			if (esAdmin)
-				query.append("INSERT INTO TRABAJADOR (NOCONTROL, NOAFILIACION, NOMBRE, PATERNO, MATERNO, FECHANACIMIENTO, SEXO, CURP, RFC, DOMICILIO, ");
-			else 
-				query.append("INSERT INTO DERECHOHABIENTE (NOCONTROL, NOPREAFILIACION, NOMBRE, PATERNO, MATERNO, EMAIL, FECHANACIMIENTO, SEXO, CURP, RFC, DIRECCION, ");
+			queryTrabajador.append("INSERT INTO TRABAJADOR (NOCONTROL, NOAFILIACION, NOMBRE, PATERNO, "
+								 + "MATERNO, FECHANACIMIENTO, SEXO, CURP, RFC, DOMICILIO, "
+								 + "CODIGOPOSTAL, TELEFONO, FECHAAFILIACION, "
+								 + "SITUACION, CLAVEUSUARIOCAPTURA,");
 			
-			if (esAdmin)
-				query.append("CODIGOPOSTAL, TELEFONO, FECHAAFILIACION, SITUACION, CLAVEUSUARIOCAPTURA,");
-			else 
-				query.append("CODIGOPOSTAL, TELEFONOCASA, TELEFONOCELULAR, FECHAPREAFILIACION, SITUACION, CLAVEUSUARIOREGISTRO,");
+			queryDerechohabiente.append("INSERT INTO DERECHOHABIENTE (NOCONTROL, NOPREAFILIACION, NOMBRE, PATERNO, "
+									  + "MATERNO, EMAIL, FECHANACIMIENTO, SEXO, CURP, RFC, DIRECCION, "
+									  + "CODIGOPOSTAL, TELEFONOCASA, TELEFONOCELULAR, "
+									  + "FECHAPREAFILIACION, SITUACION, CLAVEUSUARIOREGISTRO,");
 			
-			query.append( " FECHAREGISTRO, CLAVEUSUARIOMODIFICACION, "
-						+ "CLAVEESTADOCIVIL, CLAVECOLONIA, "
-						+ "CLAVECLINICASERVICIO, CLAVELOCALIDAD, CLAVEMUNICIPIO, CLAVEESTADO");
-			if (!esAdmin)
-				query.append( ", ESTATUS");
+			String queryComun1 =  " FECHAREGISTRO, CLAVEUSUARIOMODIFICACION, "
+								+ "CLAVEESTADOCIVIL, CLAVECOLONIA, "
+								+ "CLAVECLINICASERVICIO, CLAVELOCALIDAD, CLAVEMUNICIPIO, CLAVEESTADO";
 			
-			query.append( ") VALUES ("
-						+ derechohabiente.getNoControl() + ", " + derechohabiente.getNoPreAfiliacion()  
-						+ ", '" + derechohabiente.getNombre().trim() + "'" + ", '" + derechohabiente.getPaterno().toString() + "'"
-						+ ", '" + derechohabiente.getMaterno().toString() + "'");
-			if (!esAdmin)
-				query.append(", '" + derechohabiente.getEmail() + "'");
+			queryTrabajador.append( queryComun1 );
+			queryDerechohabiente.append( queryComun1 + ", ESTATUS");
 			
-			query.append( ", '" + derechohabiente.getFechaNacimiento()+ "', '"  + derechohabiente.getSexo()
-						+ "', '" + derechohabiente.getCurp() + "'" + ", '" + derechohabiente.getRfc() + "'"
-						+ ", '" + derechohabiente.getDireccion() + "'" + ", '" + derechohabiente.getCodigoPostal() + "'"
-						+ ", '" + derechohabiente.getTelefonoCasa() + "',");
-			if (!esAdmin)
-				query.append("'" + derechohabiente.getTelefonoCelular() + "',");
+			String queryComun2 = ") VALUES ("
+				+ derechohabiente.getNoControl() + ", " 
+				+ derechohabiente.getNoPreAfiliacion()  
+				+ ", '" + derechohabiente.getNombre().trim() + "'" + ", '" 
+				+ derechohabiente.getPaterno().toString() + "'"
+				+ ", '" + derechohabiente.getMaterno().toString() + "'";
 			
-			query.append( " '" + derechohabiente.getFechaPreAfiliacion() + "', "  + derechohabiente.getSituacion() + ", " 
-						+ derechohabiente.getClaveUsuarioRegistro() + ", '"  + derechohabiente.getFechaRegistro() + "', " 
-						+ derechohabiente.getClaveUsuarioModificacion() + ", "  
-						+ (derechohabiente.getClaveEstadoCivil() > 0 ? derechohabiente.getClaveEstadoCivil() : null) + ", "  + derechohabiente.getClaveColonia() + ", " 
-						+ derechohabiente.getClaveClinicaServicio() + ", "  + derechohabiente.getClaveLocalidad() + ", " 
-						+ derechohabiente.getClaveMunicipio() + ", "  + derechohabiente.getClaveEstado());
-			if (esAdmin)
-				query.append(")" );
-			else 
-				query.append(", "+ estatus +  ")" );
+			queryTrabajador.append( queryComun2 );
+			queryDerechohabiente.append( queryComun2 + ", '" + derechohabiente.getEmail() + "'" );
+			
+			String queryComun3 = ", '" + derechohabiente.getFechaNacimiento()+ "', '"  + derechohabiente.getSexo()
+				+ "', '" + derechohabiente.getCurp() + "'" + ", '" + derechohabiente.getRfc() + "'"
+				+ ", '" + derechohabiente.getDireccion() + "'" + ", '" + derechohabiente.getCodigoPostal() + "'"
+				+ ", '" + derechohabiente.getTelefonoCasa() + "',";
+			
+			queryTrabajador.append( queryComun3 );
+			queryDerechohabiente.append( queryComun3 + "'" + derechohabiente.getTelefonoCelular() + "',");
+			
+			String queryComun4 = " '" + derechohabiente.getFechaPreAfiliacion() + "', "  + derechohabiente.getSituacion() + ", " 
+				+ derechohabiente.getClaveUsuarioRegistro() + ", '"  + derechohabiente.getFechaRegistro() + "', " 
+				+ derechohabiente.getClaveUsuarioModificacion() + ", "  
+				+ (derechohabiente.getClaveEstadoCivil() > 0 ? derechohabiente.getClaveEstadoCivil() : null) + ", "  
+				+ derechohabiente.getClaveColonia() + ", " 
+				+ derechohabiente.getClaveClinicaServicio() + ", "  + derechohabiente.getClaveLocalidad() + ", " 
+				+ derechohabiente.getClaveMunicipio() + ", "  + derechohabiente.getClaveEstado();
+				
+			queryTrabajador.append( queryComun4 + ")" );
+			queryDerechohabiente.append( queryComun4 + ", "+ estatus +  ")" );
+			
 		}
 		else 
-			query.append("DELETE FROM DERECHOHABIENTE WHERE noControl = " + noControl);
+			queryDerechohabiente.append("DELETE FROM DERECHOHABIENTE WHERE noControl = " + noControl);
 		
-		System.out.println("createOrDeleteDerechohabiente  " + query.toString());
+		/* System.out.println("createOrDeleteDerechohabiente (Trabajador) " + queryTrabajador.toString());
+		System.out.println("createOrDeleteDerechohabiente (Derechohabiente) " + queryDerechohabiente.toString()); */
 		
 		try {
 			KeyHolder keyHolder = new GeneratedKeyHolder();
-			if (esAdmin) 
+			
+			/* if (derechohabiente.getClaveParentesco() == 0)
 				afiliacionDBTemplate.update(
 		    	    new PreparedStatementCreator() {
 		    	        public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-		    	            PreparedStatement pst = con.prepareStatement(query.toString(), new String[] {"noControl"});
+		    	            PreparedStatement pst = con.prepareStatement(queryTrabajador.toString(), new String[] {"noControl"});
+		    	            return pst;
+		    	        }
+		    	    },
+		    	    keyHolder); */
+			
+			mysqlTemplate.update(
+		    	    new PreparedStatementCreator() {
+		    	        public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+		    	            PreparedStatement pst = con.prepareStatement(queryDerechohabiente.toString(), new String[] {"noControl"});
 		    	            return pst;
 		    	        }
 		    	    },
 		    	    keyHolder);
-			else 
-				mysqlTemplate.update(
-			    	    new PreparedStatementCreator() {
-			    	        public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-			    	            PreparedStatement pst = con.prepareStatement(query.toString(), new String[] {"noControl"});
-			    	            return pst;
-			    	        }
-			    	    },
-			    	    keyHolder);
 			
 			return (opcion.equals("create")) ? (long) derechohabiente.getNoControl() : (long) 1;		
 	    	
@@ -395,18 +404,22 @@ public class DerechohabienteDB {
 		if (!incluirTitular)
 			query.append(" AND BE.NOPREAFILIACION != " + noControl);
 
-		System.out.println("Parentescos ==> " + query.toString());
+		// System.out.println("Parentescos ==> " + query.toString());
 		List<Derechohabiente> beneficiarios = null;
 		try {
 			beneficiarios =  mysqlTemplate.query(query.toString(), new DerechohabienteRowMapper());
+			if (beneficiarios.isEmpty())
+				return null;
+			return beneficiarios;
 		} 
 		catch (EmptyResultDataAccessException e) {
+			// System.out.println("No hay daytos");
 			return null;
 		}
 		catch (Exception e) {
 			e.printStackTrace();
+			return null;
 		}
-		return beneficiarios;
 	}
 	
 	public List<DocumentosFaltantes> getDocumentacionByDerechohabiente(boolean incluirTitular, long noControl) {
@@ -453,7 +466,7 @@ public class DerechohabienteDB {
 	
 	public List<Derechohabiente> getBeneficiariosByTrabajadorIssstep(long noControl) {
 		StringBuilder query = new StringBuilder();
-		query.append( "SELECT B.* "
+		query.append( "SELECT B.*  "
 				+ "FROM BENEFICIARIO B "
 				+ "WHERE "
 				+ "B.NOCONTROL =");	
@@ -513,33 +526,33 @@ public class DerechohabienteDB {
 	public List<ResultadoBusqueda> getInformacionAfiliaconByCampo(String campo , String dato, boolean esValorNumerico) {
 		dato = dato.toUpperCase();
 		StringBuilder query = new StringBuilder();
-		String queryComplemento = "";
+		// String queryComplemento = "";
 		
 			query.append( "SELECT T.NOMBRE, T.MATERNO, T.PATERNO, T.NOCONTROL, T.NOAFILIACION, "
 						+ "0 AS NOPREAFILIACION, T.NOCONTROL AS NOBENEFICIARIO, T.CURP, "
 						+ "0 AS CLAVEPARENTESCO, T.SEXO " 
 						+ "FROM TRABAJADOR T WHERE ");
-			queryComplemento = " UNION " + 
+			/* queryComplemento = " UNION " + 
 							  "SELECT B.NOMBRE, B.MATERNO, B.PATERNO, B.NOCONTROL, "
 							+ "B.NOBENEFICIARIO AS NOAFILIACION, 0 AS NOPREAFILIACION, "
 							+ "B.NOBENEFICIARIO, B.CURP, B.CLAVEPARENTESCO, B.SEXO " 
-							+ "	FROM BENEFICIARIO B WHERE ";
+							+ "	FROM BENEFICIARIO B WHERE "; */
 			
 		if (esValorNumerico) {
 				query.append( "(T.NOCONTROL = " + dato + " OR T.NOAFILIACION = " + dato + ")");
-				query.append( queryComplemento );
-				query.append( "(B.NOCONTROL = " + dato + " OR B.NOBENEFICIARIO = " + dato + ")");
+				/* query.append( queryComplemento );
+				query.append( "(B.NOCONTROL = " + dato + " OR B.NOBENEFICIARIO = " + dato + ")"); */
 			}
 		else
 			if (campo.equals("NOMBRE")) {				
 				query.append( "(T.NOMBRE LIKE '%" + campo + "%' OR T.PATERNO LIKE '%" + dato + "%' OR T.MATERNO LIKE '%" + dato + "%')");
-				query.append( queryComplemento );
-				query.append( "(B.NOMBRE LIKE '%" + campo + "%' OR B.PATERNO LIKE '%" + dato + "%' OR B.MATERNO LIKE '%" + dato + "%')");
+				/* query.append( queryComplemento );
+				query.append( "(B.NOMBRE LIKE '%" + campo + "%' OR B.PATERNO LIKE '%" + dato + "%' OR B.MATERNO LIKE '%" + dato + "%')"); */
 			}
 			else {
 				query.append( "T.CURP LIKE '%" + dato + "%'");
-				query.append( queryComplemento );
-				query.append( "B.CURP LIKE '%" + dato + "%'");
+				/* query.append( queryComplemento );
+				query.append( "B.CURP LIKE '%" + dato + "%'"); */
 			}
 		
 		// System.out.println("Consulta de busqueda (Afiliacion) ==> " + query.toString());
@@ -817,7 +830,6 @@ class BeneficiarioRowMapper implements RowMapper<Derechohabiente> {
         persona.setClaveColonia(rs.getLong("CLAVECOLONIA"));
         persona.setClaveClinicaServicio(rs.getLong("CLAVECLINICASERVICIO"));
         persona.setClaveParentesco(rs.getLong("CLAVEPARENTESCO"));
-        persona.setEstatus(rs.getInt("ESTATUS"));
         
         return persona;
     }

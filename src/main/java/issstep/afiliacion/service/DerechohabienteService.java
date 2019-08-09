@@ -328,9 +328,7 @@ public class DerechohabienteService {
 		
 		boolean esAdmin = usuario.getClaveRol() == 1;
 		
-		if (esAdmin)
-			registroDerechohabiente.setClaveParentesco(0);
-		else 
+		if (!esAdmin) 
 			if (registroDerechohabiente.getClaveParentesco() == 0)
 				return new ResponseEntity<>(new Mensaje("Usuario no puede dar de alta a un titular"), HttpStatus.BAD_REQUEST);
 				
@@ -357,25 +355,7 @@ public class DerechohabienteService {
 				registroDerechohabiente.setClaveColonia(derechohabienteTitular.getClaveColonia());
 				registroDerechohabiente.setFechaPreAfiliacion(derechohabienteTitular.getFechaPreAfiliacion());
 			}
-				
-			// oldderechohabiente = getPersonaByCurp(registroDerechohabiente.getCurp());
 			
-			/* if (oldderechohabiente.getStatusCode() == HttpStatus.OK)
-				return new ResponseEntity<>(new Mensaje("CURP duplicada"), HttpStatus.CONFLICT); */
-			
-			/* Obtener la informacion de la CURP del RENAPO */
-			
-			/* registroDerechohabiente.setNombre("RUEBN");
-			registroDerechohabiente.setPaterno("HUERTA");
-			registroDerechohabiente.setMaterno("GOMEZ");
-			registroDerechohabiente.setSexo("M"); */
-			System.out.println("registroDerechohabiente.getFechaNacimiento()");
-			System.out.println(registroDerechohabiente.getFechaNacimiento());
-			// DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-			
-			// Date d = formatter.parse(registroDerechohabiente.getFechaNacimiento().toString());
-			
-			// registroDerechohabiente.setFechaNacimiento(new java.sql.Date (d.getTime()));
 			String[] fechaNac = registroDerechohabiente.getFechaNacimiento().split("/");
 			registroDerechohabiente.setFechaNacimiento(fechaNac[2] + "/" + fechaNac[1] + "/"+ fechaNac[0]);
 			
@@ -384,26 +364,16 @@ public class DerechohabienteService {
 			registroDerechohabiente.setNoControl(numerosParaRegistro.getNoControl());
 			registroDerechohabiente.setNoPreAfiliacion(numerosParaRegistro.getNoAfiliacion());
 			registroDerechohabiente.setFechaRegistro(new Timestamp(new Date().getTime()));
-			// registroDerechohabiente.setFechaPreAfiliacion(new Timestamp(new Date().getTime()));
 			registroDerechohabiente.setSituacion(1);
 			registroDerechohabiente.setClaveUsuarioRegistro(usuario.getClaveUsuario());
 			registroDerechohabiente.setClaveUsuarioModificacion(usuario.getClaveUsuario());
-			
-				
-			/* Colonia colonia = personaDB.getColonia(registroDerechohabiente.getCodigoPostal(), registroDerechohabiente.getClaveColonia());
-			
-			registroDerechohabiente.setClaveClinicaServicio(colonia.getClaveClinicaServicio());
-			registroDerechohabiente.setClaveColonia(colonia.getClaveColonia());
-			registroDerechohabiente.setClaveEstado(colonia.getClaveEstado());
-			registroDerechohabiente.setClaveLocalidad(colonia.getClaveLocalidad());
-			registroDerechohabiente.setClaveMunicipio(colonia.getClaveMunicipio()); */
-			
 					
 			long estatusRegistro = personaDB.createDerechohabiente( registroDerechohabiente, esAdmin, 1);
 			
 			if (estatusRegistro == 0) 
 				return new ResponseEntity<>(new Mensaje("No fue posible registrar al derechohabiente"), HttpStatus.INTERNAL_SERVER_ERROR);
-						
+				
+			
 			return new ResponseEntity<>(registroDerechohabiente, HttpStatus.CREATED);					
 			
 		}
@@ -424,11 +394,11 @@ public class DerechohabienteService {
 		ResultadoValidacion resultadoValidacion =  new ResultadoValidacion();
 		resultadoValidacion.setEtatus(true);
 				
-		/* if (datosRegistro.getClaveParentesco() != 0 && datosRegistro.getNoControl() == 0) {
+		if (datosRegistro.getClaveParentesco() != 0 && datosRegistro.getNoControl() == 0) {
 			resultadoValidacion.setEtatus(false);
-			resultadoValidacion.setMensaje("Debe proporcional el campo noControl");
+			resultadoValidacion.setMensaje("Debe proporcional el numero de control");
 			return resultadoValidacion;
-		}*/ 
+		}
 		
 		if (datosRegistro.getCurp() == null) {
 			resultadoValidacion.setEtatus(false);
@@ -442,7 +412,7 @@ public class DerechohabienteService {
 			return resultadoValidacion;
 		}
 		
-		if (datosRegistro.getClaveParentesco() != 0) {
+		if (datosRegistro.getClaveParentesco() == 0) {
 			if (datosRegistro.getDireccion() == null) {
 				resultadoValidacion.setEtatus(false);
 				resultadoValidacion.setMensaje("Debe proporcional el campo direccion");
@@ -460,12 +430,40 @@ public class DerechohabienteService {
 				resultadoValidacion.setMensaje("Debe proporcional el campo telefonoCelular");
 				return resultadoValidacion;
 			}
-			
-			
-			
+						
 			if (datosRegistro.getClaveClinicaServicio() == 0) {
 				resultadoValidacion.setEtatus(false);
 				resultadoValidacion.setMensaje("Debe proporcional el campo claveClinicaServicio");
+				return resultadoValidacion;
+			}
+			
+			if (datosRegistro.getClaveColonia() == 0) {
+				resultadoValidacion.setEtatus(false);
+				resultadoValidacion.setMensaje("Debe proporcional el campo claveColonia");
+				return resultadoValidacion;
+			}
+			
+			if (datosRegistro.getClaveEstado() == 0) {
+				resultadoValidacion.setEtatus(false);
+				resultadoValidacion.setMensaje("Debe proporcional el campo claveEstado");
+				return resultadoValidacion;
+			}
+			
+			if (datosRegistro.getClaveLocalidad() == 0) {
+				resultadoValidacion.setEtatus(false);
+				resultadoValidacion.setMensaje("Debe proporcional el campo claveLocalidad");
+				return resultadoValidacion;
+			}
+			
+			if (datosRegistro.getClaveMunicipio() == 0) {
+				resultadoValidacion.setEtatus(false);
+				resultadoValidacion.setMensaje("Debe proporcional el campo claveMunicipio");
+				return resultadoValidacion;
+			}
+			
+			if (datosRegistro.getCodigoPostal() == null) {
+				resultadoValidacion.setEtatus(false);
+				resultadoValidacion.setMensaje("Debe proporcional el campo claveCodigoPostal");
 				return resultadoValidacion;
 			}
 			
@@ -530,7 +528,7 @@ public class DerechohabienteService {
 			
 			persona.setNoBeneficiario(noBeneficiario);
 			
-			System.out.println(persona.getNombreCompleto());
+			// System.out.println(persona.getNombreCompleto());
 			  
 			return new ResponseEntity<>(noBeneficiario, HttpStatus.CREATED);
 			 	 
@@ -690,20 +688,45 @@ public class DerechohabienteService {
     }
 	
 	// funcion que regrerara los beneficiarios de algun trabador
-	public ResponseEntity<?> getBeneficiarios(boolean incluirTitular, long noControl) {		
+	public ResponseEntity<?> getBeneficiarios(boolean incluirTitular, long noControl) {	
+		Usuario usuarioLogin = getInfoLogin();
+		if (usuarioLogin == null)
+			return new ResponseEntity<>(new Mensaje("Usuario no autentificado"), HttpStatus.BAD_REQUEST);
 		
-	
 		List<Derechohabiente> listaBeneficiarios = personaDB.getBeneficiariosByDerechohabiente(incluirTitular, noControl);
 		
-		for(Derechohabiente dere: listaBeneficiarios){
-			fillDerechohabiente(dere);
-		}
-		
-		if (listaBeneficiarios != null)
+		if (listaBeneficiarios != null) {
+			for(Derechohabiente dere: listaBeneficiarios){
+				fillDerechohabiente(dere);
+			}
 			return new ResponseEntity<>(listaBeneficiarios, HttpStatus.OK);
-		
-		else
-			return new ResponseEntity<>(new ArrayList[0] , HttpStatus.OK);
+		}
+		else {		
+			if (!usuarioLogin.getRol().equals("ADMINISTRADOR"))
+				return new ResponseEntity<>( new ArrayList[0], HttpStatus.NOT_FOUND) ;
+			
+			Derechohabiente trabajador = null;
+			
+			trabajador = personaDB.getPersonaByNoControlNoAfiliacionIssstep(noControl, noControl);
+			
+			// Verificamos si se encontrol en la bd de derecohabientes
+			if(trabajador != null) {
+				// Si no se encontro se crear el registro del titular en la bd de derechohabientes
+				if(personaDB.createDerechohabiente(trabajador, false, 4) > 0) { 
+					// Se recuperan los benefiarios y se registran en la bd de derechochoabientes
+					beneficiarioDB.createBeneficiario(trabajador.getNoControl(),  trabajador, 0);
+					for(Derechohabiente beneficiario : personaDB.getBeneficiariosByTrabajadorIssstep(trabajador.getNoControl())) {
+						personaDB.createDerechohabiente(beneficiario, false, 4);
+						beneficiarioDB.createBeneficiario(trabajador.getNoControl(), beneficiario, beneficiario.getClaveParentesco());
+					}
+					return getBeneficiarios(true, noControl);
+				}
+				else
+					return new ResponseEntity<>(new Mensaje("No fue posible registrar la información del trabajador para realizar el proceso de pre-afiliación: " + noControl), HttpStatus.OK);				
+			}
+			else 
+				return new ResponseEntity<>(new Mensaje("No existe información para el número de control: " + noControl), HttpStatus.BAD_REQUEST);
+		}
 		
     }
 	
@@ -720,8 +743,6 @@ public class DerechohabienteService {
 	
 	Usuario getInfoLogin() {
 		String user = (String) SecurityContextHolder.getContext().getAuthentication().getName();
-		/* System.out.println("N control ===> ");
-		System.out.println(user); */
 		if (user == "anonymousUser") 
 			return null;
 			
