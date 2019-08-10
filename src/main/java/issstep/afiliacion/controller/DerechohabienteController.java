@@ -161,9 +161,9 @@ public class DerechohabienteController {
     
     @ApiOperation(value = "Actualizar datos")
     @RequestMapping(value = "/actualizar/datos", method=RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> actualizarDatos( @ApiParam(value = DerechohabienteCONST.actualizarDatos, required = true)@RequestBody ActualizarDatos actualizarDireccion, HttpServletResponse response ){
+	public ResponseEntity<?> actualizarDatos( @ApiParam(value = DerechohabienteCONST.registroDerechohabiente, required = true)@RequestBody Derechohabiente datosDerechohabiente, HttpServletResponse response ){
 
-    	return derechohabienteService.actualizarDatos(actualizarDireccion);
+    	return derechohabienteService.actualizarDatos(datosDerechohabiente);
 	}
     
     @ApiOperation(value = "Relación de derechohabientes por estatus de validación")

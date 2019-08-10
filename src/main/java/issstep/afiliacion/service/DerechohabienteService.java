@@ -82,7 +82,7 @@ public class DerechohabienteService {
 			persona = personaDB.getTrabajadorIssstepByColumnaStringValor("CURP", curp);
 			
 		if (persona == null)
-			return new ResponseEntity<>(new Mensaje("No existe persona con esa curp"), HttpStatus.NO_CONTENT);
+			return null;
 		
 		fillDerechohabiente(persona);
 		return new ResponseEntity<>(persona, HttpStatus.OK);		
@@ -108,7 +108,7 @@ public class DerechohabienteService {
 			if(response.getStatus() == 429)
 				return new ResponseEntity<>(new Mensaje("Multiples resultados para la busqueda"), HttpStatus.CONFLICT);
 			else
-				return new ResponseEntity<>(new Mensaje("No existe persona con esos datos"), HttpStatus.CONFLICT);	
+				return new ResponseEntity<>(new Mensaje("No existe persona con esos datos"), HttpStatus.NOT_FOUND);	
 		}
 		
     }
@@ -312,7 +312,7 @@ public class DerechohabienteService {
 	public ResponseEntity<?> registraDerechohabiente( Derechohabiente registroDerechohabiente ) {
 		ResultadoValidacion resultadoValidacion =  validaDatosRegistro(registroDerechohabiente);
 		
-		if  (getPersonaByCurp(registroDerechohabiente.getCurp()) != null)
+		if  (getPersonaByCurp(registroDerechohabiente.getCurp()) != null) 
 			return new ResponseEntity<>(new Mensaje("Ya exite un derechohabiente con esa Curp"), HttpStatus.CONFLICT);
 		
 		if (!resultadoValidacion.isEtatus())
@@ -346,14 +346,9 @@ public class DerechohabienteService {
 				
 				if (derechohabienteTitular == null)
 					return new ResponseEntity<>(new Mensaje("No existe el regitro del titular"), HttpStatus.BAD_REQUEST);	
-					
+				
 				registroDerechohabiente.setNoControl(usuario.getNoControl()); 
-				registroDerechohabiente.setDireccion(derechohabienteTitular.getDireccion()); 
-				registroDerechohabiente.setTelefonoCasa(derechohabienteTitular.getTelefonoCasa());
-				registroDerechohabiente.setTelefonoCelular(derechohabienteTitular.getTelefonoCelular());
-				registroDerechohabiente.setCodigoPostal(derechohabienteTitular.getCodigoPostal());
-				registroDerechohabiente.setClaveColonia(derechohabienteTitular.getClaveColonia());
-				registroDerechohabiente.setFechaPreAfiliacion(derechohabienteTitular.getFechaPreAfiliacion());
+				inicializaConValoresDelTitular( registroDerechohabiente, derechohabienteTitular);			
 			}
 			
 			String[] fechaNac = registroDerechohabiente.getFechaNacimiento().split("/");
@@ -388,6 +383,20 @@ public class DerechohabienteService {
 			return  new ResponseEntity<>(null,null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}	
 	
+	}
+	
+	void inicializaConValoresDelTitular(Derechohabiente registroDerechohabiente, Derechohabiente derechohabienteTitular) {
+		
+		registroDerechohabiente.setDireccion(derechohabienteTitular.getDireccion()); 
+		registroDerechohabiente.setTelefonoCasa(derechohabienteTitular.getTelefonoCasa());
+		registroDerechohabiente.setTelefonoCelular(derechohabienteTitular.getTelefonoCelular());
+		registroDerechohabiente.setCodigoPostal(derechohabienteTitular.getCodigoPostal());
+		registroDerechohabiente.setClaveColonia(derechohabienteTitular.getClaveColonia());
+		registroDerechohabiente.setFechaPreAfiliacion(derechohabienteTitular.getFechaPreAfiliacion());
+		registroDerechohabiente.setClaveClinicaServicio(derechohabienteTitular.getClaveClinicaServicio());
+		registroDerechohabiente.setClaveLocalidad(derechohabienteTitular.getClaveLocalidad());
+		registroDerechohabiente.setClaveMunicipio(derechohabienteTitular.getClaveMunicipio());
+		registroDerechohabiente.setClaveEstado(derechohabienteTitular.getClaveEstado());
 	}
 	
 	ResultadoValidacion validaDatosRegistro(Derechohabiente datosRegistro) {
@@ -620,23 +629,29 @@ public class DerechohabienteService {
 		return resultadoValidacion;
 	}
 	
-	public ResponseEntity<?> actualizarDatos( ActualizarDatos actualizarDatos) {	
-		ResultadoValidacion resultadoValidacion =  validaDatosAActualizar(actualizarDatos);
+	public ResponseEntity<?> actualizarDatos( Derechohabiente datosDerechohabiente) {	
+		Usuario usuarioLogin = getInfoLogin();
+		if (usuarioLogin == null)
+			return new ResponseEntity<>(new Mensaje("Usuario no autentificado"), HttpStatus.BAD_REQUEST);
 		
-		if (resultadoValidacion.isEtatus())
+		boolean esAdmin = usuarioLogin.getRol().equals("ADMINISTRADOR");
+		
+		ResultadoValidacion resultadoValidacion =  validaDatosRegistro(datosDerechohabiente);
+		
+		if (!resultadoValidacion.isEtatus())
 			return new ResponseEntity<>(new Mensaje(resultadoValidacion.getMensaje()), HttpStatus.BAD_REQUEST);
 			
 		Derechohabiente derechohabiente = personaDB.getPersonaByNoControlNoPreafiliacion(
-								actualizarDatos.getNoControl(), 
-								actualizarDatos.getNoPreAfiliacion());
+														datosDerechohabiente.getNoControl(), 
+														datosDerechohabiente.getNoPreAfiliacion());
 		
 		if (derechohabiente == null)
-			return new ResponseEntity<>(new Mensaje("No existe el derechohabiente con número de Control: " + actualizarDatos.getNoControl() 
-												  + " y numero de pre-afiliacion: " + actualizarDatos.getNoPreAfiliacion())
+			return new ResponseEntity<>(new Mensaje("No existe el derechohabiente con número de Control: " + datosDerechohabiente.getNoControl() 
+												  + " y numero de pre-afiliacion: " + datosDerechohabiente.getNoPreAfiliacion())
 												  , HttpStatus.CONFLICT);		
 			
-		if (personaDB.actualizaDatos(actualizarDatos) == -1)
-			return new ResponseEntity<>(new Mensaje("No se pudo actualizar el usuario con número de Control: " + actualizarDatos.getNoControl()), HttpStatus.INTERNAL_SERVER_ERROR);
+		if (personaDB.actualizaDatos(esAdmin, datosDerechohabiente) == -1)
+			return new ResponseEntity<>(new Mensaje("No se pudo actualizar el usuario con número de Control: " + datosDerechohabiente.getNoControl()), HttpStatus.INTERNAL_SERVER_ERROR);
 		
 		return new ResponseEntity<>(derechohabiente , HttpStatus.OK);				
     }

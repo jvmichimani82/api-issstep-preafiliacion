@@ -104,7 +104,7 @@ public class DerechohabienteDB {
 				    + "AND MATERNO LIKE '%" + persona.getMaterno() 
 				    + "%' AND NOMBRE LIKE '%" + persona.getNombre()
 				    + "%' AND CLAVEESTADO = " + persona.getClaveEstado()
-				    + " AND FECHANACIMIENTO = '" + format.format(persona.getFechaNacimiento()) +"'");	
+				    + " AND FECHANACIMIENTO = '" + format.format(Long.parseLong(persona.getFechaNacimiento())) +"'");	
 		
 		// System.out.println("Consulta ==> " + query.toString());
 				
@@ -242,24 +242,43 @@ public class DerechohabienteDB {
 		}		
 	}
 	
-	public long actualizaDatos(ActualizarDatos actualizarDatos) {
+	public long actualizaDatos(boolean esAdmin, Derechohabiente datosDerechohabiente) {
 		StringBuilder query = new StringBuilder();
-		query.append("UPDATE DERECHOHABIENTE SET DIRECCION = '"
-					+ actualizarDatos.getDireccion()
+		query.append("UPDATE DERECHOHABIENTE SET ");
+		
+		if (esAdmin) 
+			query.append( " EMAIL = '" + datosDerechohabiente.getEmail()
+						+ "', RFC = '" + datosDerechohabiente.getRfc()
+						+ "', CODIGOPOSTAL = '" + datosDerechohabiente.getCodigoPostal()
+						+ "', CLAVEESTADOCIVIL = " + datosDerechohabiente.getClaveEstadoCivil()
+						+ ", CLAVECOLONIA = " + datosDerechohabiente.getClaveColonia()
+						+ ", CLAVELOCALIDAD = " + datosDerechohabiente.getClaveLocalidad()
+						+ ", CLAVEMUNICIPIO = " + datosDerechohabiente.getClaveMunicipio()
+						+ ", CLAVEESTADO = " + datosDerechohabiente.getClaveEstado()
+						+ ", ");
+		
+		query.append(" DIRECCION = '"
+					+ datosDerechohabiente.getDireccion()
 					+ "', TELEFONOCASA = '"
-					+ actualizarDatos.getTelefonoCasa() 
+					+ datosDerechohabiente.getTelefonoCasa() 
 					+ "', TELEFONOCELULAR = '"
-					+ actualizarDatos.getTelefonoCelular() 
-					+ "' WHERE NOCONTROL = "
-					+ actualizarDatos.getNoControl() 
+					+ datosDerechohabiente.getTelefonoCelular());
+		
+		if (esAdmin)
+			query.append("', ESTATUS = 6");
+		else 
+			query.append("', ESTATUS = 7");
+		
+		query.append( " WHERE NOCONTROL = "
+					+ datosDerechohabiente.getNoControl() 
 					+ " AND NOPREAFILIACION = " 
-					+ actualizarDatos.getNoPreAfiliacion());
+					+ datosDerechohabiente.getNoPreAfiliacion());
 					
 		// System.out.println(query.toString());
 		
 		try {
 			  mysqlTemplate.update(query.toString());
-			  return actualizarDatos.getNoControl();
+			  return datosDerechohabiente.getNoControl();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return -1;
