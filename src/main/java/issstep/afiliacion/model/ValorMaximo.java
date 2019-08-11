@@ -11,14 +11,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class DocumentosFaltantes {
-	
-	long noControl;
-	
-	long noPreAfiliacion;
-	
-	int esValido;
-	
-	int numDocs;
+public class ValorMaximo {
 
+	long valor;
+	
 }

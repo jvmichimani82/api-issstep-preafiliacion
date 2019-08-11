@@ -445,11 +445,10 @@ public class DerechohabienteDB {
 
 		StringBuilder query = new StringBuilder();
 		query.append( "SELECT \n"
-					+ "	NOCONTROL, NOPREAFILIACION, COUNT(NOCONTROL) AS NUMDOCS \n"
+					+ "	NOCONTROL, NOPREAFILIACION, ESVALIDO, COUNT(ESVALIDO) AS NUMDOCS \n"
 					+ "    FROM \n"
 					+ "	  (SELECT \n"
-					+ "        DOCXDH.NOCONTROL, DOCXDH.NOPREAFILIACION, DOCXDH.CLAVEPARENTESCO, \n"
-					+ "        DOCXDH.CLAVETIPOARCHIVO, DOCXDH.ESOBLIGATORIO, D.ESVALIDO \n"
+					+ "        DOCXDH.*, IF(ISNULL(D.ESVALIDO), 2, D.ESVALIDO) AS ESVALIDO \n"
 					+ "    FROM \n"
 					+ "        (SELECT B.NOCONTROL, B.NOPREAFILIACION, B.CLAVEPARENTESCO, TA.CLAVETIPOARCHIVO, TA.ESOBLIGATORIO \n"
 					+ "        FROM BENEFICIARIO B,  KPARENTESCOTIPOARCHIVO TA \n"
@@ -466,10 +465,11 @@ public class DerechohabienteDB {
 					+ "		   ON DOCXDH.NOPREAFILIACION = D.NOPREAFILIACION \n"
 					+ "				AND DOCXDH.CLAVEPARENTESCO = D.CLAVEPARENTESCO \n"
 					+ "				AND DOCXDH.CLAVETIPOARCHIVO = D.CLAVETIPOARCHIVO) FALTANTES \n"
-					+ "        WHERE  ISNULL(ESVALIDO) OR ESVALIDO = 2 OR ESVALIDO = 0 \n"
-					+ "		   GROUP BY NOCONTROL, NOPREAFILIACION \n");
+					+ "        WHERE ESOBLIGATORIO = 1 \n"
+					+ "		   GROUP BY NOCONTROL, NOPREAFILIACION, ESVALIDO \n");
 
 		// System.out.println("DocumentosFaltantes ==> " + query.toString());
+		
 		List<DocumentosFaltantes> listDocumentosFaltantes = null;
 		try {
 			listDocumentosFaltantes =  mysqlTemplate.query(query.toString(), new DocumentosFaltantesRowMapper());
@@ -938,6 +938,7 @@ class DocumentosFaltantesRowMapper implements RowMapper<DocumentosFaltantes> {
  
     	documentosFaltantes.setNoControl(rs.getLong("NOCONTROL"));
     	documentosFaltantes.setNoPreAfiliacion(rs.getLong("NOPREAFILIACION"));
+    	documentosFaltantes.setEsValido(rs.getInt("ESVALIDO"));
     	documentosFaltantes.setNumDocs(rs.getInt("NUMDOCS"));
     	         
         return documentosFaltantes;

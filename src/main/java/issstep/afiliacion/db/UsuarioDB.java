@@ -34,7 +34,7 @@ public class UsuarioDB {
 		query.append("'");
 		query.append(" AND U.CLAVEROL=R.CLAVEROL");
 		
-		System.out.println(query.toString());
+		// System.out.println(query.toString());
 		Usuario user = null;
 		try {
 			user =  mysqlTemplate.queryForObject(query.toString(), new UsuarioRowMapper());
@@ -266,6 +266,25 @@ public class UsuarioDB {
 		}
 		
 	}	
+	
+	public boolean actualizaEstatusDerechohabiente (long noControl, long noAfiliacion, int estatus) {
+		StringBuilder query = new StringBuilder();
+		query.append("UPDATE DERECHOHABIENTE SET ESTATUS = ? WHERE NOCONTROL = ? AND NOPREAFILIACION = ? ");
+			
+		// System.out.println(query.toString());
+		
+		try {
+			  mysqlTemplate.update(query.toString(), new Object[] { 
+					  estatus, noControl, noAfiliacion
+			});
+			return true;
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+	}
 	
 }
 

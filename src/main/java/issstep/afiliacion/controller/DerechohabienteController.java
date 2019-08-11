@@ -205,5 +205,15 @@ public class DerechohabienteController {
     	return derechohabienteService.getDocumentacionBeneficiarios(true, noControl);
     }
     
+    @ApiOperation(value = "Derechohabiente listo para afiliar")
+    @JsonView(Derechohabiente.Views.Simple.class)
+    @RequestMapping(value = "/afiliar/{noControl}/{noPreAfiliacion}", method = RequestMethod.PUT)
+    public ResponseEntity<?> updateEstatusByNoControlAndNoPreafiliacion(
+    										 @ApiParam(value = "noControl", required = true) @PathVariable long noControl, 
+    										 @ApiParam(value = "noPreAfiliacion", required = true) @PathVariable long noPreAfiliacion,
+    										 HttpServletResponse response) {
+
+    	return derechohabienteService.updateEstatusByNoControlAndNoPreAfiliacion( noControl, noPreAfiliacion, 9 );
+    }
     
 }

@@ -49,6 +49,27 @@ public class ArchivoDB {
 		}
 	}
 	
+	public Archivo getArchivoByPersonaAndParentesco( long noControl, long noPreAfiliacion, long claveParentesco, long claveTipoArchivo ) {
+		StringBuilder query = new StringBuilder();
+		query.append( "SELECT * FROM DOCUMENTO WHERE NOCONTROL = " + noControl
+					+ " AND NOPREAFILIACION = " + noPreAfiliacion
+					+ " AND CLAVEPARENTESCO = " + claveParentesco
+					+ " AND CLAVETIPOARCHIVO = " + claveTipoArchivo);
+				
+		Archivo archive = null;
+		try {
+			archive =  mysqlTemplate.queryForObject(query.toString(), new ArchivoRowMapper());
+			return archive;
+		} 
+		catch (EmptyResultDataAccessException e) {
+			return null;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
 	public Archivo getArchivo(long claveDocumento) {
 		StringBuilder query = new StringBuilder();
 		query.append("SELECT * FROM DOCUMENTO WHERE CLAVEDOCUMENTO = ");

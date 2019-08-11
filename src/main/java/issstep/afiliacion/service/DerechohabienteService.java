@@ -807,5 +807,48 @@ public class DerechohabienteService {
 			return new ResponseEntity<>(new ArrayList[0] , HttpStatus.OK);
 		
     }
-
+	
+	public ResponseEntity<?> updateEstatusByNoControlAndNoPreAfiliacion(long noControl, long noPreAfiliacion, int estatus) {
+		if (estatus < 0 && estatus > catalogoGenericoDB.getUltimoEstatus())
+			return new ResponseEntity<>(new Mensaje("Estatus no valido"), HttpStatus.BAD_REQUEST);
+		
+		Derechohabiente afiliado =  personaDB.getPersonaByNoControlNoPreafiliacion( noControl, noPreAfiliacion );
+		
+		if (afiliado == null) 
+			return new ResponseEntity<>(new Mensaje("No existe el derechohabiente"), HttpStatus.CONFLICT);
+		
+		if (estatus == 9) {
+			List<DocumentosFaltantes> listaDocumentosFaltantes = personaDB.getDocumentacionByDerechohabiente(true, noControl);
+			
+			int numDocsTitular = getNoDocumentosFaltantes(listaDocumentosFaltantes, noControl, noControl);
+			
+			if (numDocsTitular != 0)
+				/* if (afiliado.getClaveParentesco() == 0 )
+					return new ResponseEntity<>(new Mensaje("Aún tiene documentación pendiente"), HttpStatus.CONFLICT);
+				else	*/
+					return new ResponseEntity<>(new Mensaje("El titular aún tiene documentación pendiente"), HttpStatus.CONFLICT);
+			
+			// Se verifican el numero de documentos si no es titular
+			// if (afiliado.getClaveParentesco() != 0) {
+				int numDocsBeneficiario = getNoDocumentosFaltantes(listaDocumentosFaltantes, noControl, noPreAfiliacion);
+				if ( numDocsBeneficiario > 0) 
+					return new ResponseEntity<>(new Mensaje("Aún tiene documentación pendiente"), HttpStatus.CONFLICT);
+			// }
+		}
+		
+		if(!usuarioDB.actualizaEstatusDerechohabiente(noControl, noPreAfiliacion, estatus))
+			return new ResponseEntity<>(new Mensaje("No fue posible actualizar el estatus"), HttpStatus.INTERNAL_SERVER_ERROR);
+		
+		return new ResponseEntity<>(new Mensaje("Actualizacion exitosa"), HttpStatus.OK);
+    }
+	
+	int getNoDocumentosFaltantes(List<DocumentosFaltantes> listaDocumentosFaltantes, long noControl, long noPreAfiliacion) {		
+		int docNoValidos = 0;
+		for(DocumentosFaltantes reg: listaDocumentosFaltantes) {
+			if (reg.getNoControl() == noControl && reg.getNoPreAfiliacion() == noPreAfiliacion && reg.getEsValido() != 1) 
+				docNoValidos += reg.getNumDocs();
+		}
+		
+		return docNoValidos;
+	}
 }

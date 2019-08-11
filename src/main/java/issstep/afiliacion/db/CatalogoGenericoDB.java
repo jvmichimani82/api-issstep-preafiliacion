@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import issstep.afiliacion.model.CatalogoGenerico;
 import issstep.afiliacion.model.Derechohabiente;
 import issstep.afiliacion.model.Descripcion;
+import issstep.afiliacion.model.ValorMaximo;
 
 @Component
 public class CatalogoGenericoDB {
@@ -279,6 +280,42 @@ public class CatalogoGenericoDB {
 		return (long) 0;
 		
 	}	
+	
+	public long getUltimoEstatus() {
+		StringBuilder query = new StringBuilder();
+		
+		query.append("SELECT MAX(CLAVEESTATUS) AS CLAVEESTATUS FROM KESTATUS");
+		
+		ValorMaximo valorMaximo = null;
+		
+		try {
+			valorMaximo = mysqlTemplate.queryForObject(query.toString(), new ValorMaximoRowMapper());
+			return valorMaximo.getValor();
+		}
+		catch (EmptyResultDataAccessException e) {
+			return 0;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return 0;
+		}
+    	
+    }
+}
+
+
+
+class ValorMaximoRowMapper implements RowMapper<ValorMaximo> {
+    @Override
+    public ValorMaximo mapRow(ResultSet rs, int rowNum) throws SQLException {
+    	
+    	ValorMaximo valorMaximo= new ValorMaximo();
+ 
+    	valorMaximo.setValor(rs.getLong("MAXIMO"));
+    	
+        return valorMaximo;
+    }
+  
 }
 
 class RegistroRowMapper implements RowMapper<CatalogoGenerico> {
@@ -292,6 +329,7 @@ class RegistroRowMapper implements RowMapper<CatalogoGenerico> {
     	
         return registro;
     }
+  
 }
 
 class DescripcionRowMapper implements RowMapper<CatalogoGenerico> {
