@@ -95,7 +95,7 @@ public class BeneficiarioDB {
 					+ derechohabiente.getClaveUsuarioRegistro() + ", '" + derechohabiente.getFechaRegistro() 
 					+ "')" );
 		else 
-			query.append("DELETE FROM BENEFICIARIO WHERE NOBENEFICIARIO = " + noBeneficiario);
+			query.append("DELETE FROM WBENEFICIARIO WHERE NOBENEFICIARIO = " + noBeneficiario);
 		
 		// System.out.println(query.toString());
 		

@@ -495,7 +495,7 @@ public class DerechohabienteService {
 	
 	public ResponseEntity<?> asignarBeneficiario(Beneficiario beneficiario) {
 		
-		CatalogoGenerico catalogoGenerico = catalogoGenericoDB.getRegistro("KPARENTESCO", beneficiario.getClaveParentesco());
+		CatalogoGenerico catalogoGenerico = catalogoGenericoDB.getRegistro("WKPARENTESCO", beneficiario.getClaveParentesco());
 		
 		if (catalogoGenerico == null)
 			return new ResponseEntity<>(new Mensaje("Clave de parentesco invalida"), HttpStatus.BAD_REQUEST);
