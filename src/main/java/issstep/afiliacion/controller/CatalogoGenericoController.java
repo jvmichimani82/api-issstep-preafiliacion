@@ -38,7 +38,7 @@ public class CatalogoGenericoController {
     
     @ApiOperation(value = "Obtiene los registros de un catálogo")
     @RequestMapping(value = "/{catalogo}", method = RequestMethod.GET)
-    public ResponseEntity<?> obtenRegistros(@ApiParam(value = "Catalogo: KESTADO, KESTADOCIVIL, KESTATUS, KPARENTESCO, KREGION, KROL, KSITUACION, KTIPOARCHIVO", required = true) @PathVariable("catalogo") String catalogo, HttpServletResponse response ) {
+    public ResponseEntity<?> obtenRegistros(@ApiParam(value = "Catalogo: KESTADO, KESTADOCIVIL, WKESTATUS, WKPARENTESCO, KREGION, WKROL, KSITUACION, WKTIPOARCHIVO", required = true) @PathVariable("catalogo") String catalogo, HttpServletResponse response ) {
     	return catalogoGenericoService.getRegisters(catalogo);
     }
     
