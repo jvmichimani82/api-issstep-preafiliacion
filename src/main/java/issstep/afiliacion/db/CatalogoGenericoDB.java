@@ -39,14 +39,14 @@ public class CatalogoGenericoDB {
 		esDatoLocal = false;
 		
 		switch (catalogo) {
-			case "KESTADO": 	 nombreId = "CLAVEESTADO"; break;
-			case "KESTADOCIVIL": nombreId = "CLAVEESTADOCIVIL"; break;
-			case "KESTATUS": 	 nombreId = "CLAVEESTATUS"; esDatoLocal = true; break;
-			case "KPARENTESCO":  nombreId = "CLAVEPARENTESCO"; esDatoLocal = true; break;
-			case "KREGION": 	 nombreId = "CLAVEREGION"; break;
-			case "KROL": 		 nombreId = "CLAVEROL"; esDatoLocal = true; break;
-			case "KSITUACION":   nombreId = "CLAVESITUACION"; break;
-			case "KTIPOARCHIVO": nombreId = "CLAVETIPOARCHIVO"; esDatoLocal = true; break;
+			case "KESTADO": 	  nombreId = "CLAVEESTADO"; break;
+			case "KESTADOCIVIL":  nombreId = "CLAVEESTADOCIVIL"; break;
+			case "WKESTATUS": 	  nombreId = "CLAVEESTATUS"; esDatoLocal = true; break;
+			case "WKPARENTESCO":  nombreId = "CLAVEPARENTESCO"; esDatoLocal = true; break;
+			case "KREGION": 	  nombreId = "CLAVEREGION"; break;
+			case "WKROL": 		  nombreId = "CLAVEROL"; esDatoLocal = true; break;
+			case "KSITUACION":    nombreId = "CLAVESITUACION"; break;
+			case "WKTIPOARCHIVO": nombreId = "CLAVETIPOARCHIVO"; esDatoLocal = true; break;
 		}
 		
 		return nombreId;
@@ -162,10 +162,10 @@ public class CatalogoGenericoDB {
 			case "KSITUACION": 
 				query.append("SELECT DESCRIPCION FROM "+ catalogo + " WHERE CLAVESITUACION = " + derechohabiente.getSituacion());
 				break;
-			case "KPARENTESCO": 
+			case "WKPARENTESCO": 
 				query.append("SELECT DESCRIPCION FROM "+ catalogo + " WHERE CLAVEPARENTESCO = " + derechohabiente.getClaveParentesco());
 				break;
-			case "KESTATUS": 
+			case "WKESTATUS": 
 				query.append("SELECT DESCRIPCION FROM "+ catalogo + " WHERE CLAVEESTATUS = " + derechohabiente.getEstatus());
 				break;
 		}
@@ -189,7 +189,7 @@ public class CatalogoGenericoDB {
 	
 	public String getDescripcionParentesco( long claveParentesco ) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT DESCRIPCION FROM KPARENTESCO WHERE CLAVEPARENTESCO = " + claveParentesco);
+		query.append("SELECT DESCRIPCION FROM WKPARENTESCO WHERE CLAVEPARENTESCO = " + claveParentesco);
 		
 		CatalogoGenerico descripcion = null;
 		try {
@@ -242,7 +242,7 @@ public class CatalogoGenericoDB {
 		StringBuilder query = new StringBuilder();
 		
 		if (opcion.equals("create")) 
-			if (catalogo.equals("KPARENTESCO") || catalogo.equals("KROL") || catalogo.equals("KTIPOARCHIVO"))
+			if (catalogo.equals("WKPARENTESCO") || catalogo.equals("WKROL") || catalogo.equals("WKTIPOARCHIVO"))
 				query.append("INSERT INTO " + catalogo + " (DESCRIPCION, ESTATUS) VALUES ('" + descripcion + "', 1)");
 			else 
 				query.append("INSERT INTO " + catalogo + " (DESCRIPCION) VALUES ('" + descripcion + "')");
@@ -284,7 +284,7 @@ public class CatalogoGenericoDB {
 	public long getUltimoEstatus() {
 		StringBuilder query = new StringBuilder();
 		
-		query.append("SELECT MAX(CLAVEESTATUS) AS CLAVEESTATUS FROM KESTATUS");
+		query.append("SELECT MAX(CLAVEESTATUS) AS CLAVEESTATUS FROM WKESTATUS");
 		
 		ValorMaximo valorMaximo = null;
 		
@@ -302,8 +302,6 @@ public class CatalogoGenericoDB {
     	
     }
 }
-
-
 
 class ValorMaximoRowMapper implements RowMapper<ValorMaximo> {
     @Override

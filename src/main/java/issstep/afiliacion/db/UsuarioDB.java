@@ -27,7 +27,9 @@ public class UsuarioDB {
 
 	public Usuario getSession(String usuario, String passwd) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT U.CLAVEUSUARIO, U.CLAVEROL, R.DESCRIPCION, U.LOGIN, U.TOKEN, U.PASSWORD, U.FECHAREGISTRO, U.FECHAULTIMOACCESO, U.ESTATUS, U.NOCONTROL, U.NOAFILIACION FROM USUARIO U, KROL R WHERE LOGIN ='");
+		query.append( "SELECT U.CLAVEUSUARIO, U.CLAVEROL, R.DESCRIPCION, U.LOGIN, U.TOKEN, U.PASSWORD, "
+					+ "U.FECHAREGISTRO, U.FECHAULTIMOACCESO, U.ESTATUS, U.NOCONTROL, U.NOAFILIACION "
+					+ "FROM WUSUARIO U, WKROL R WHERE LOGIN ='");
 		query.append(usuario);
 		query.append("' AND U.PASSWORD ='");
 		query.append(passwd);
@@ -51,7 +53,10 @@ public class UsuarioDB {
 	
 	public Usuario getUsuarioById(long id) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT CLAVEUSUARIO, CLAVEROL, LOGIN, TOKEN, PASSWORD, FECHAREGISTRO, FECHAULTIMOACCESO, ESTATUS, NOCONTROL, NOAFILIACION FROM USUARIO WHERE NOCONTROL = ");
+		query.append( "SELECT CLAVEUSUARIO, CLAVEROL, LOGIN, TOKEN, PASSWORD, "
+					+ "FECHAREGISTRO, FECHAULTIMOACCESO, ESTATUS, NOCONTROL, "
+					+ "NOAFILIACION "
+					+ "	FROM WUSUARIO WHERE NOCONTROL = ");
 		query.append(id);
 	
 		Usuario user = null;
@@ -69,10 +74,10 @@ public class UsuarioDB {
 	
 	public Usuario getUsuarioPreafiliacionByNoControlAndNoAfiliacion(long noControl, long noAfiliacion) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT U.*, R.DESCRIPCION FROM USUARIO U, KROL R WHERE U.CLAVEROL = R.CLAVEROL AND  NOCONTROL =");
-		query.append(noControl);
-		query.append(" AND NOAFILIACION = ");
-		query.append(noAfiliacion);
+		query.append("SELECT U.*, R.DESCRIPCION"
+				   + "  FROM WUSUARIO U, WKROL R"
+				   + "	WHERE U.CLAVEROL = R.CLAVEROL AND  NOCONTROL = " + noControl);
+		query.append("        AND NOAFILIACION = "+ noAfiliacion);
 		
 		// System.out.println(query.toString());
 		
@@ -92,10 +97,11 @@ public class UsuarioDB {
 	public Usuario getUsuarioByToken(String token) {
 		StringBuilder query = new StringBuilder();
 
-		query.append("SELECT U.CLAVEUSUARIO, U.CLAVEROL, R.DESCRIPCION, U.LOGIN, U.TOKEN, U.PASSWORD, U.FECHAREGISTRO, "
-				+"U.FECHAULTIMOACCESO, U.ESTATUS, U.NOCONTROL, U.NOAFILIACION FROM USUARIO U, KROL R WHERE TOKEN = '");
-		query.append(token+"'");
-		query.append(" AND U.CLAVEROL = R.CLAVEROL");
+		query.append( "SELECT U.CLAVEUSUARIO, U.CLAVEROL, R.DESCRIPCION, U.LOGIN, U.TOKEN, U.PASSWORD, U.FECHAREGISTRO, "
+					+ "U.FECHAULTIMOACCESO, U.ESTATUS, U.NOCONTROL, U.NOAFILIACION "
+					+ "	FROM WUSUARIO U, WKROL R "
+					+ "	WHERE TOKEN = '"+ token + "'");
+		query.append("        AND U.CLAVEROL = R.CLAVEROL");
 		
 		// System.out.println(query.toString());
 	
@@ -115,8 +121,10 @@ public class UsuarioDB {
 	public Usuario getUsuarioByColumnaStringValor(String campo, String valor) {
 		StringBuilder query = new StringBuilder();
 		query.append( "SELECT U.CLAVEUSUARIO, U.CLAVEROL, R.DESCRIPCION, U.LOGIN, U.TOKEN, U.PASSWORD, U.FECHAREGISTRO, "
-					+ "U.FECHAULTIMOACCESO, U.ESTATUS, U.NOCONTROL, U.NOAFILIACION FROM USUARIO U, KROL R WHERE "
-					+ campo + " = '" + valor + "' AND U.CLAVEROL = R.CLAVEROL");
+					+ "U.FECHAULTIMOACCESO, U.ESTATUS, U.NOCONTROL, U.NOAFILIACION "
+					+ "	FROM WUSUARIO U, WKROL R "
+					+ "	WHERE " + campo + " = '" + valor + "' "
+					+ "		  AND U.CLAVEROL = R.CLAVEROL");
 	
 		// System.out.println(query.toString());
 		
@@ -137,9 +145,9 @@ public class UsuarioDB {
 	public int insertar (Derechohabiente derechohabiente, Usuario usuario, long claveParentesco) {
 		StringBuilder query = new StringBuilder();
 		
-		query.append("INSERT INTO USUARIO "
-				+ "(NOCONTROL, CLAVEROL, LOGIN, PASSWORD, TOKEN, FECHAREGISTRO, ESTATUS, NOAFILIACION )"
-				+ " VALUES(?,?,?,?,?,?,?,?)");
+		query.append( "INSERT INTO WUSUARIO "
+					+ "(NOCONTROL, CLAVEROL, LOGIN, PASSWORD, TOKEN, FECHAREGISTRO, ESTATUS, NOAFILIACION )"
+					+ " VALUES(?,?,?,?,?,?,?,?)");
 
 		// System.out.println(query.toString());
 		
@@ -164,9 +172,9 @@ public class UsuarioDB {
 	public int registraBeneficiario(Derechohabiente derechohabiente, long claveParentesco) {
 		StringBuilder query = new StringBuilder();
 		
-		query.append("INSERT INTO BENEFICIARIO "
-				+ "(NOCONTROL, NOPREAFILIACION, CLAVEPARENTESCO, FECHAAFILIACION, SITUACION, CLAVEUSUARIOREGISTRO, FECHAREGISTRO) "
-				+ "VALUES(?,?,?,?,?,?,?)");
+		query.append( "INSERT INTO WBENEFICIARIO "
+					+ "(NOCONTROL, NOPREAFILIACION, CLAVEPARENTESCO, FECHAAFILIACION, SITUACION, CLAVEUSUARIOREGISTRO, FECHAREGISTRO) "
+					+ "VALUES(?,?,?,?,?,?,?)");
 		
 		try {
 			
@@ -186,7 +194,7 @@ public class UsuarioDB {
 	
 	public void actualiza (Usuario usuario) {
 		StringBuilder query = new StringBuilder();
-		query.append("UPDATE USUARIO SET CLAVEROL = ?, PASSWORD = ?, TOKEN = ?, FECHAULTIMOACCESO = ?, ESTATUS = ? WHERE CLAVEUSUARIO = ? ");
+		query.append("UPDATE WUSUARIO SET CLAVEROL = ?, PASSWORD = ?, TOKEN = ?, FECHAULTIMOACCESO = ?, ESTATUS = ? WHERE CLAVEUSUARIO = ? ");
 			
 		// .println(query.toString());
 		
@@ -206,7 +214,7 @@ public class UsuarioDB {
 	
 	public void actualizaToken (String token, long noControl, long noAfiliacion) {
 		StringBuilder query = new StringBuilder();
-		query.append("UPDATE USUARIO SET TOKEN = ? WHERE NOCONTROL = ? AND NOAFILIACION = ? ");
+		query.append("UPDATE WUSUARIO SET TOKEN = ? WHERE NOCONTROL = ? AND NOAFILIACION = ? ");
 			
 		// System.out.println(query.toString());
 		
@@ -234,7 +242,7 @@ public class UsuarioDB {
 		
 		
 		if (opcion.equals("create")) 		
-			query.append("INSERT INTO USUARIO "
+			query.append("INSERT INTO WUSUARIO "
 					+ "(CLAVEROL, LOGIN, PASSWORD, TOKEN, FECHAREGISTRO, ESTATUS, NOCONTROL,  NOAFILIACION  )"
 					+ " VALUES( "
 					+ usuario.getClaveRol() + ", '" + usuario.getLogin() + "', '" + usuario.getPasswd() + "', '"
@@ -243,7 +251,7 @@ public class UsuarioDB {
 					+ ")");
 		
 		else 
-			query.append("DELETE FROM USUARIO WHERE CLAVEUSUARIO = " + claveUsuario);
+			query.append("DELETE FROM WUSUARIO WHERE CLAVEUSUARIO = " + claveUsuario);
 		
 		// System.out.println(query.toString());
 		
@@ -269,7 +277,7 @@ public class UsuarioDB {
 	
 	public boolean actualizaEstatusDerechohabiente (long noControl, long noAfiliacion, int estatus) {
 		StringBuilder query = new StringBuilder();
-		query.append("UPDATE DERECHOHABIENTE SET ESTATUS = ? WHERE NOCONTROL = ? AND NOPREAFILIACION = ? ");
+		query.append("UPDATE WDERECHOHABIENTE SET ESTATUS = ? WHERE NOCONTROL = ? AND NOPREAFILIACION = ? ");
 			
 		// System.out.println(query.toString());
 		

@@ -45,7 +45,7 @@ public class DerechohabienteDB {
 	public Derechohabiente getPersonaByColumnaStringValor(String columna, String valor) {
 		StringBuilder query = new StringBuilder();
 		
-		query.append( "SELECT DH.* FROM DERECHOHABIENTE DH WHERE DH.");
+		query.append( "SELECT DH.* FROM WDERECHOHABIENTE DH WHERE DH.");
 		
 		query.append(columna);
 		query.append("= '");
@@ -100,7 +100,7 @@ public class DerechohabienteDB {
 	public Derechohabiente getPersonaByNombre(Derechohabiente persona, HttpServletResponse response) {
 		StringBuilder query = new StringBuilder();
 		
-		query.append( "SELECT * FROM DERECHOHABIENTE WHERE PATERNO LIKE '%" + persona.getPaterno() + "%' "
+		query.append( "SELECT * FROM WDERECHOHABIENTE WHERE PATERNO LIKE '%" + persona.getPaterno() + "%' "
 				    + "AND MATERNO LIKE '%" + persona.getMaterno() 
 				    + "%' AND NOMBRE LIKE '%" + persona.getNombre()
 				    + "%' AND CLAVEESTADO = " + persona.getClaveEstado()
@@ -126,7 +126,7 @@ public class DerechohabienteDB {
 	public Derechohabiente getPersonaById(long noControl) {
 		StringBuilder query = new StringBuilder();
 		
-		query.append( "SELECT * FROM DERECHOHABIENTE WHERE NOCONTROL ="); 
+		query.append( "SELECT * FROM WDERECHOHABIENTE WHERE NOCONTROL ="); 
 		query.append(noControl);
 		query.append(" AND NOPREAFILIACION = ");
 		query.append(noControl);
@@ -148,7 +148,7 @@ public class DerechohabienteDB {
 	
 	public Derechohabiente getPersonaByNoControlNoPreafiliacion(long noControl, long noPreafiliacion) {
 		StringBuilder query = new StringBuilder();
-			query.append( "SELECT * FROM DERECHOHABIENTE WHERE NOCONTROL ="); 
+			query.append( "SELECT * FROM WDERECHOHABIENTE WHERE NOCONTROL ="); 
 			query.append(noControl);
 			query.append(" AND NOPREAFILIACION =");
 			query.append(noPreafiliacion);
@@ -174,7 +174,7 @@ public class DerechohabienteDB {
 		StringBuilder query = new StringBuilder();
 		
 		if (esTitular)
-			query.append( "SELECT *, 0 AS CLAVEPARENTESCO FROM  TRABAJADOR  WHERE NOCONTROL = "); 
+			query.append( "SELECT *, 0 AS CLAVEPARENTESCO FROM TRABAJADOR WHERE NOCONTROL = "); 
 		else 
 			query.append( "SELECT * FROM  BENEFICIARIO  WHERE NOCONTROL = ");		
 		query.append(noControl);
@@ -227,7 +227,7 @@ public class DerechohabienteDB {
 		
 	public void actualiza (Derechohabiente persona) {
 		StringBuilder query = new StringBuilder();
-		query.append("UPDATE DERECHOHABIENTE SET NOMBRE= ?, PATERNO= ?, MATERNO = ?, EMAIL= ?, FECHAREGISTRO= ?, SITUACION= ?, CLAVEUSUARIOREGISTRO= ? WHERE NOCONTROL = ? ");
+		query.append("UPDATE WDERECHOHABIENTE SET NOMBRE= ?, PATERNO= ?, MATERNO = ?, EMAIL= ?, FECHAREGISTRO= ?, SITUACION= ?, CLAVEUSUARIOREGISTRO= ? WHERE NOCONTROL = ? ");
 					
 		// System.out.println(query.toString());
 		
@@ -244,7 +244,7 @@ public class DerechohabienteDB {
 	
 	public long actualizaDatos(boolean esAdmin, Derechohabiente datosDerechohabiente) {
 		StringBuilder query = new StringBuilder();
-		query.append("UPDATE DERECHOHABIENTE SET ");
+		query.append("UPDATE WDERECHOHABIENTE SET ");
 		
 		if (esAdmin) 
 			query.append( " EMAIL = '" + datosDerechohabiente.getEmail()
@@ -303,7 +303,7 @@ public class DerechohabienteDB {
 								 + "CODIGOPOSTAL, TELEFONO, FECHAAFILIACION, "
 								 + "SITUACION, CLAVEUSUARIOCAPTURA,");
 			
-			queryDerechohabiente.append("INSERT INTO DERECHOHABIENTE (NOCONTROL, NOPREAFILIACION, NOMBRE, PATERNO, "
+			queryDerechohabiente.append("INSERT INTO WDERECHOHABIENTE (NOCONTROL, NOPREAFILIACION, NOMBRE, PATERNO, "
 									  + "MATERNO, EMAIL, FECHANACIMIENTO, SEXO, CURP, RFC, DIRECCION, "
 									  + "CODIGOPOSTAL, TELEFONOCASA, TELEFONOCELULAR, "
 									  + "FECHAPREAFILIACION, SITUACION, CLAVEUSUARIOREGISTRO,");
@@ -346,7 +346,7 @@ public class DerechohabienteDB {
 			
 		}
 		else 
-			queryDerechohabiente.append("DELETE FROM DERECHOHABIENTE WHERE noControl = " + noControl);
+			queryDerechohabiente.append("DELETE FROM WDERECHOHABIENTE WHERE noControl = " + noControl);
 		
 		/* System.out.println("createOrDeleteDerechohabiente (Trabajador) " + queryTrabajador.toString());
 		System.out.println("createOrDeleteDerechohabiente (Derechohabiente) " + queryDerechohabiente.toString()); */
@@ -390,8 +390,8 @@ public class DerechohabienteDB {
 		
 		StringBuilder query = new StringBuilder();
 		query.append( "SELECT D.NOCONTROL, D.NOPREAFILIACION, D.NOMBRE, D.PATERNO, D.MATERNO, D.CURP, D.CLAVEUSUARIOREGISTRO "
-					+ "FROM DERECHOHABIENTE D, "
-					+ "(SELECT NOCONTROL FROM DOCUMENTO WHERE ESVALIDO = " + estatusValidacion 
+					+ "FROM WDERECHOHABIENTE D, "
+					+ "(SELECT NOCONTROL FROM WDOCUMENTO WHERE ESVALIDO = " + estatusValidacion 
 					+ " GROUP BY NOCONTROL) DOC" 
 					+ " WHERE D.NOCONTROL = DOC.NOCONTROL AND D.NOPREAFILIACION = DOC.NOCONTROL");
 		
@@ -412,10 +412,10 @@ public class DerechohabienteDB {
 
 		StringBuilder query = new StringBuilder();
 		query.append( "SELECT DH.*, BE.NOBENEFICIARIO, BE.CLAVEPARENTESCO "
-				+ "FROM DERECHOHABIENTE DH, "
-				+ "BENEFICIARIO BE "
+				+ "FROM WDERECHOHABIENTE DH, "
+				+ "     WBENEFICIARIO BE "
 				+ "WHERE "
-				+ "DH.NOCONTROL = BE.NOCONTROL AND"
+				+ " DH.NOCONTROL = BE.NOCONTROL AND"
 				+ " DH.NOPREAFILIACION = BE.NOPREAFILIACION "
 				+ " AND DH.NOCONTROL =");
 		query.append(noControl);
@@ -451,18 +451,18 @@ public class DerechohabienteDB {
 					+ "        DOCXDH.*, IF(ISNULL(D.ESVALIDO), 2, D.ESVALIDO) AS ESVALIDO \n"
 					+ "    FROM \n"
 					+ "        (SELECT B.NOCONTROL, B.NOPREAFILIACION, B.CLAVEPARENTESCO, TA.CLAVETIPOARCHIVO, TA.ESOBLIGATORIO \n"
-					+ "        FROM BENEFICIARIO B,  KPARENTESCOTIPOARCHIVO TA \n"
+					+ "        FROM WBENEFICIARIO B, WKPARENTESCOTIPOARCHIVO TA \n"
 					+ "        WHERE B.CLAVEPARENTESCO = TA.CLAVEPARENTESCO \n"
-					+ "			   AND TA.ESOBLIGATORIO = 1 \n"					
-					+ "            AND B.NOCONTROL = ");
+					+ "			     AND TA.ESOBLIGATORIO = 1 \n"					
+					+ "              AND B.NOCONTROL = ");
 		query.append(noControl);
 		
 		if (!incluirTitular)
-			query.append(" AND B.NOPREAFILIACION != " + noControl);
+			query.append("           AND B.NOPREAFILIACION != " + noControl);
 		
-		query.append(" ) DOCXDH \n"
-					+ "        LEFT JOIN DOCUMENTO D \n"
-					+ "		   ON DOCXDH.NOPREAFILIACION = D.NOPREAFILIACION \n"
+		query.append( " ) DOCXDH \n"
+					+ "        LEFT JOIN WDOCUMENTO D \n"
+					+ "		     ON DOCXDH.NOPREAFILIACION = D.NOPREAFILIACION \n"
 					+ "				AND DOCXDH.CLAVEPARENTESCO = D.CLAVEPARENTESCO \n"
 					+ "				AND DOCXDH.CLAVETIPOARCHIVO = D.CLAVETIPOARCHIVO) FALTANTES \n"
 					+ "        WHERE ESOBLIGATORIO = 1 \n"
@@ -485,12 +485,9 @@ public class DerechohabienteDB {
 	
 	public List<Derechohabiente> getBeneficiariosByTrabajadorIssstep(long noControl) {
 		StringBuilder query = new StringBuilder();
-		query.append( "SELECT B.*  "
-				+ "FROM BENEFICIARIO B "
-				+ "WHERE "
-				+ "B.NOCONTROL =");	
-		
-		query.append(noControl);
+		query.append( "SELECT B.*"
+					+ "	FROM BENEFICIARIO B"
+					+ "	WHERE B.NOCONTROL = " + noControl);	
 		
 		// System.out.println(query.toString());
 		List<Derechohabiente> beneficiarios = null;
@@ -513,8 +510,8 @@ public class DerechohabienteDB {
 			query.append( "SELECT DH.NOMBRE, DH.PATERNO, DH.MATERNO, DH.NOCONTROL, "
 						+ "DH.NOPREAFILIACION, 0 AS NOAFILIACION, BE.NOBENEFICIARIO, "
 						+ "DH.CURP, BE.CLAVEPARENTESCO, DH.SEXO "
-						+ "FROM DERECHOHABIENTE DH, "
-						+ "BENEFICIARIO BE "
+						+ "FROM WDERECHOHABIENTE DH, "
+						+ "     WBENEFICIARIO BE "
 						+ "WHERE DH.NOCONTROL = BE.NOCONTROL AND DH.NOPREAFILIACION = BE.NOPREAFILIACION AND ");
 		
 		if (esValorNumerico)
@@ -592,7 +589,7 @@ public class DerechohabienteDB {
 	
 	public boolean existeBeneficiarioRegistrado(long noControl, long claveParentesco) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT * FROM BENEFICIARIO WHERE NOCONTROL = " + noControl);
+		query.append("SELECT * FROM WBENEFICIARIO WHERE NOCONTROL = " + noControl);
 		if (claveParentesco == 3 || claveParentesco == 4 || claveParentesco == 5 || claveParentesco == 9)
 			query.append(" AND CLAVEPARENTESCO IN (3, 4, 5, 9)");
 		else 
@@ -614,7 +611,7 @@ public class DerechohabienteDB {
 	
 	public boolean existeBeneficiarioRegistradoById(long noControl, long noPreAfiliacion) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT * FROM BENEFICIARIO WHERE NOCONTROL = " + noControl + " AND NOPREAFILIACION = '" + noPreAfiliacion + "'");
+		query.append("SELECT * FROM WBENEFICIARIO WHERE NOCONTROL = " + noControl + " AND NOPREAFILIACION = '" + noPreAfiliacion + "'");
 		
 		List<Derechohabiente> beneficiarios = null;
 		try {
@@ -637,7 +634,8 @@ public class DerechohabienteDB {
 			query.append( "SELECT NOCONTROL, NOCONTROL AS NOAFILIACION "
 						+ "FROM (SELECT MAX(NOCONTROL) + 100 AS NOCONTROL FROM TRABAJADOR) NUMEROS ;");
 		else 
-			query.append("SELECT NOCONTROL, MAX(NOPREAFILIACION) + 1 AS NOAFILIACION FROM BENEFICIARIO WHERE NOCONTROL = " + noControl);
+			query.append("SELECT NOCONTROL, MAX(NOPREAFILIACION) + 1 AS NOAFILIACION "
+					   + "FROM WBENEFICIARIO WHERE NOCONTROL = " + noControl);
 
 		NumerosParaRegistro numerosParaRegistro  = null;
 		try {

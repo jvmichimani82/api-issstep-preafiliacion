@@ -29,7 +29,7 @@ public class BeneficiarioDB {
 	
 	public Beneficiario getBeneficiario(long noControl, long noPreAfiliacion, long claveParentesco) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT * FROM BENEFICIARIO WHERE NOCONTROL = ");
+		query.append("SELECT * FROM WBENEFICIARIO WHERE NOCONTROL = ");
 		query.append(noControl);
 		query.append(" AND NOPREAFILIACION= ");
 		query.append(noPreAfiliacion);
@@ -55,7 +55,7 @@ public class BeneficiarioDB {
 	
 	public Beneficiario getBeneficiarioById(long idBeneficiario) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT * FROM BENEFICIARIO WHERE NOBENEFICIARIO = ");
+		query.append("SELECT * FROM WBENEFICIARIO WHERE NOBENEFICIARIO = ");
 		query.append(idBeneficiario);
 		
 		// System.out.println("getBeneficiario == " + query.toString());
@@ -88,7 +88,7 @@ public class BeneficiarioDB {
 		
 		
 		if (opcion.equals("create")) 			
-			query.append("INSERT INTO BENEFICIARIO "
+			query.append("INSERT INTO WBENEFICIARIO "
 					+ "(NOCONTROL, NOPREAFILIACION, CLAVEPARENTESCO, FECHAAFILIACION, SITUACION, CLAVEUSUARIOREGISTRO, FECHAREGISTRO) VALUES("
 					+ noControlTitular + ", " +  derechohabiente.getNoPreAfiliacion() + ", "
 					+ claveParentesco + ", '" + derechohabiente.getFechaPreAfiliacion() + "', 1, " +

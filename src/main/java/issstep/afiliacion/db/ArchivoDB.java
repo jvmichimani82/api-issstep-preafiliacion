@@ -30,7 +30,7 @@ public class ArchivoDB {
 	
 	public Archivo getArchivoByNoControlAndNoPreAfiliacion(long noControl, long noPreAfiliacion) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT * FROM DOCUMENTO WHERE NOCONTROL = ");
+		query.append("SELECT * FROM WDOCUMENTO WHERE NOCONTROL = ");
 		query.append(noControl);
 		query.append(" AND NOPREAFILIACION = ");
 		query.append(noPreAfiliacion);
@@ -51,7 +51,7 @@ public class ArchivoDB {
 	
 	public Archivo getArchivoByPersonaAndParentesco( long noControl, long noPreAfiliacion, long claveParentesco, long claveTipoArchivo ) {
 		StringBuilder query = new StringBuilder();
-		query.append( "SELECT * FROM DOCUMENTO WHERE NOCONTROL = " + noControl
+		query.append( "SELECT * FROM WDOCUMENTO WHERE NOCONTROL = " + noControl
 					+ " AND NOPREAFILIACION = " + noPreAfiliacion
 					+ " AND CLAVEPARENTESCO = " + claveParentesco
 					+ " AND CLAVETIPOARCHIVO = " + claveTipoArchivo);
@@ -72,7 +72,7 @@ public class ArchivoDB {
 	
 	public Archivo getArchivo(long claveDocumento) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT * FROM DOCUMENTO WHERE CLAVEDOCUMENTO = ");
+		query.append("SELECT * FROM WDOCUMENTO WHERE CLAVEDOCUMENTO = ");
 		query.append(claveDocumento);
 		
 				
@@ -97,7 +97,7 @@ public class ArchivoDB {
 	
 	public String getTipoArchivoByParentesco(long idParentesco, long idTipoArchivo) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT TA.DESCRIPCION AS ARCHIVO FROM KPARENTESCOTIPOARCHIVO P, KTIPOARCHIVO TA");
+		query.append("SELECT TA.DESCRIPCION AS ARCHIVO FROM WKPARENTESCOTIPOARCHIVO P, WKTIPOARCHIVO TA");
 		query.append(" WHERE P.CLAVETIPOARCHIVO = TA.CLAVETIPOARCHIVO AND P.CLAVETIPOARCHIVO = ");
 		query.append(idTipoArchivo);
 		query.append(" AND P.CLAVEPARENTESCO = ");
@@ -114,7 +114,7 @@ public class ArchivoDB {
 		
 	
 	public List<DocumentosByParentesco> getDocumentosByParentesco(long idParentesco) {
-		StringBuilder query = new StringBuilder("SELECT P.*, TA.DESCRIPCION AS ARCHIVO FROM KPARENTESCOTIPOARCHIVO P, KTIPOARCHIVO TA ");
+		StringBuilder query = new StringBuilder("SELECT P.*, TA.DESCRIPCION AS ARCHIVO FROM WKPARENTESCOTIPOARCHIVO P, WKTIPOARCHIVO TA ");
 		query.append("WHERE P.CLAVETIPOARCHIVO = TA.CLAVETIPOARCHIVO AND P.CLAVEPARENTESCO = ");
 		
 		query.append(idParentesco);
@@ -133,7 +133,7 @@ public class ArchivoDB {
 	
 	public long insertarArchivo (Archivo archivo) {
 		StringBuilder query = new StringBuilder();
-		query.append("INSERT INTO DOCUMENTO "
+		query.append("INSERT INTO WDOCUMENTO "
 				+ "( NOCONTROL, NOPREAFILIACION, NOBENEFICIARIO, CLAVEPARENTESCO, "
 				+ "CLAVETIPOARCHIVO, NOMBRE, URLARCHIVO, ESVALIDO, CLAVEUSUARIOREGISTRO, "
 				+ "FECHAREGISTRO, CLAVEUSUARIOMODIFICACION, ESTATUS)"
@@ -175,7 +175,7 @@ public class ArchivoDB {
 	
 	public long delete (long claveDocumento) {
 		StringBuilder query = new StringBuilder();
-		query.append("DELETE FROM DOCUMENTO WHERE CLAVEDOCUMENTO = ? ");
+		query.append("DELETE FROM WDOCUMENTO WHERE CLAVEDOCUMENTO = ? ");
 			
 		// System.out.println(query.toString());
 		
@@ -195,7 +195,7 @@ public class ArchivoDB {
 	
 	public long update (Archivo archivo) {
 		StringBuilder query = new StringBuilder();
-		query.append( "UPDATE DOCUMENTO SET NOMBRE = ?, URLARCHIVO = ?, "
+		query.append( "UPDATE WDOCUMENTO SET NOMBRE = ?, URLARCHIVO = ?, "
 					+ "ESVALIDO = ?, FECHAREGISTRO = ?, ESTATUS = ? WHERE CLAVEDOCUMENTO = ? ");
 			
 		// System.out.println(query.toString());
@@ -220,7 +220,7 @@ public class ArchivoDB {
 	
 	public List<Archivo> getArchivos(long noControl, long noPreAfiliacion, long noBeneficiario, long claveParentesco) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT * FROM DOCUMENTO ");
+		query.append("SELECT * FROM WDOCUMENTO ");
 		query.append(" WHERE NOCONTROL = ");
 		query.append(noControl);
 		query.append(" AND NOPREAFILIACION = ");
