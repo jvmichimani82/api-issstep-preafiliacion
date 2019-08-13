@@ -180,7 +180,7 @@ public class DerechohabienteController {
 	public ResponseEntity<?> buscarPreafiliado( @ApiParam(value = "{ \n \"dato\" : \"información a buscar\" \n}", required = true)@RequestBody DatoABuscar datoABuscar,
 													HttpServletResponse response ){
 
-    	return derechohabienteService.buscarInformacionEnPreafiliacion(true, datoABuscar);
+    	return derechohabienteService.buscarInformacionEnPreafiliacion(true, datoABuscar, false);
 	}
     
     @ApiOperation(value = "Buscar afiliado")
@@ -188,7 +188,15 @@ public class DerechohabienteController {
 	public ResponseEntity<?> buscarAfiliado( @ApiParam(value = "{ \n \"dato\" : \"información a buscar\" \n}", required = true)@RequestBody DatoABuscar datoABuscar,
 													HttpServletResponse response ){
 
-    	return derechohabienteService.buscarInformacionEnPreafiliacion(false, datoABuscar);
+    	return derechohabienteService.buscarInformacionEnPreafiliacion(false, datoABuscar, false);
+	}
+    
+    @ApiOperation(value = "Buscar como afiliado o beneficario")
+    @RequestMapping(value = "/buscar/afiliadoOBeneficario", method=RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> afiliadoOBeneficario( @ApiParam(value = "{ \n \"dato\" : \"información a buscar\" \n}", required = true)@RequestBody DatoABuscar datoABuscar,
+													HttpServletResponse response ){
+
+    	return derechohabienteService.buscarInformacionEnPreafiliacion(false, datoABuscar, true);
 	}
     
     @ApiOperation(value = "Documentacion faltante de los beneficiarios")
