@@ -153,6 +153,11 @@ public class DerechohabienteService {
 	
 	
 	public ResponseEntity<?> registraUsuario(boolean registroOnline, Derechohabiente persona, long claveParentesco){
+		
+		Usuario usuario = usuarioDB.getUsuarioByColumnaStringValor("LOGIN", persona.getEmail());
+		if (usuario != null)
+			return new ResponseEntity<>(new Mensaje("Ya existe un usuario con ese correo electrónico"), HttpStatus.CONFLICT);
+		
 		try{
 			Derechohabiente oldPersona = null;
 			
@@ -772,9 +777,9 @@ public class DerechohabienteService {
 		return true;
 	}
 	
-	public ResponseEntity<?> buscarInformacionEnPreafiliacion(boolean enPreafiliacion, DatoABuscar datoABuscar) {
+	public ResponseEntity<?> buscarInformacionEnPreafiliacion(boolean enPreafiliacion, DatoABuscar datoABuscar, boolean incluirBeneficario) {
 		if (datoABuscar.getDato() == null)
-			return new ResponseEntity<>(new Mensaje("Debe proporcional el campo dato"), HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(new Mensaje("Debe proporcionar el campo dato"), HttpStatus.BAD_REQUEST);
 		
 		String campo = "NOMBRE";
 		boolean esValorNumerico = false;
@@ -793,7 +798,7 @@ public class DerechohabienteService {
 		if (enPreafiliacion)
 			resultadoBusqueda = personaDB.getInformacionPreAfiliaconByCampo(campo, datoABuscar.getDato(), esValorNumerico);
 		else 
-			resultadoBusqueda = personaDB.getInformacionAfiliaconByCampo(campo, datoABuscar.getDato(), esValorNumerico);
+			resultadoBusqueda = personaDB.getInformacionAfiliaconByCampo(campo, datoABuscar.getDato(), esValorNumerico, incluirBeneficario);
 		
 		
 		for(ResultadoBusqueda result: resultadoBusqueda){
