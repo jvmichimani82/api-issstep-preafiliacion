@@ -16,6 +16,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
 import issstep.afiliacion.model.Usuario;
+import issstep.afiliacion.utils.Utils;
 import issstep.afiliacion.model.Derechohabiente;
 
 @Component
@@ -246,14 +247,14 @@ public class UsuarioDB {
 					+ "(CLAVEROL, LOGIN, PASSWORD, TOKEN, FECHAREGISTRO, ESTATUS, NOCONTROL,  NOAFILIACION  )"
 					+ " VALUES( "
 					+ usuario.getClaveRol() + ", '" + usuario.getLogin() + "', '" + usuario.getPasswd() + "', '"
-					+ usuario.getToken() + "', '" + usuario.getFechaRegistro() + "', " + usuario.getEstatus() + ", "
+					+ usuario.getToken() + "', '" + Utils.getFechaFromTimeStamp(usuario.getFechaRegistro()) + "', " + usuario.getEstatus() + ", "
 					+ usuario.getNoControl() + ", " + usuario.getNoAfiliacion()
 					+ ")");
 		
 		else 
 			query.append("DELETE FROM WUSUARIO WHERE CLAVEUSUARIO = " + claveUsuario);
 		
-		// System.out.println(query.toString());
+		System.out.println(query.toString());
 		
 		try {
 			KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -266,7 +267,7 @@ public class UsuarioDB {
 	    	    },
 	    	    keyHolder);
 			
-			return (opcion.equals("create")) ? (long) keyHolder.getKey() : (long) 1;		
+			return (opcion.equals("create")) ? (long) keyHolder.getKey().longValue() : (long) 1;		
 	    	
 		} catch (Exception e) {
 			e.printStackTrace();

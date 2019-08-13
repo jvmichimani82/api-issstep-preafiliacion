@@ -4,7 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -27,6 +29,7 @@ import issstep.afiliacion.model.DocumentosFaltantes;
 import issstep.afiliacion.model.InfoDerechohabiente;
 import issstep.afiliacion.model.NumerosParaRegistro;
 import issstep.afiliacion.model.ResultadoBusqueda;
+import issstep.afiliacion.utils.Utils;
 
 @Component
 public class DerechohabienteDB {
@@ -104,7 +107,7 @@ public class DerechohabienteDB {
 				    + "AND MATERNO LIKE '%" + persona.getMaterno() 
 				    + "%' AND NOMBRE LIKE '%" + persona.getNombre()
 				    + "%' AND CLAVEESTADO = " + persona.getClaveEstado()
-				    + " AND FECHANACIMIENTO = '" + format.format(Long.parseLong(persona.getFechaNacimiento())) +"'");	
+				    + " AND FECHANACIMIENTO = '" + format.format(persona.getFechaNacimiento()) +"'");	
 		
 		// System.out.println("Consulta ==> " + query.toString());
 				
@@ -325,7 +328,7 @@ public class DerechohabienteDB {
 			queryTrabajador.append( queryComun2 );
 			queryDerechohabiente.append( queryComun2 + ", '" + derechohabiente.getEmail() + "'" );
 			
-			String queryComun3 = ", '" + derechohabiente.getFechaNacimiento()+ "', '"  + derechohabiente.getSexo()
+			String queryComun3 = ", '" + Utils.getFechaFromDate(derechohabiente.getFechaNacimiento())+ "', '"  + derechohabiente.getSexo()
 				+ "', '" + derechohabiente.getCurp() + "'" + ", '" + derechohabiente.getRfc() + "'"
 				+ ", '" + derechohabiente.getDireccion() + "'" + ", '" + derechohabiente.getCodigoPostal() + "'"
 				+ ", '" + derechohabiente.getTelefonoCasa() + "',";
@@ -333,8 +336,8 @@ public class DerechohabienteDB {
 			queryTrabajador.append( queryComun3 );
 			queryDerechohabiente.append( queryComun3 + "'" + derechohabiente.getTelefonoCelular() + "',");
 			
-			String queryComun4 = " '" + derechohabiente.getFechaPreAfiliacion() + "', "  + derechohabiente.getSituacion() + ", " 
-				+ derechohabiente.getClaveUsuarioRegistro() + ", '"  + derechohabiente.getFechaRegistro() + "', " 
+			String queryComun4 = " '" + Utils.getFechaFromTimeStamp(derechohabiente.getFechaPreAfiliacion()) + "', "  + derechohabiente.getSituacion() + ", " 
+				+ derechohabiente.getClaveUsuarioRegistro() + ", '"  + Utils.getFechaFromTimeStamp(derechohabiente.getFechaRegistro()) + "', " 
 				+ derechohabiente.getClaveUsuarioModificacion() + ", "  
 				+ (derechohabiente.getClaveEstadoCivil() > 0 ? derechohabiente.getClaveEstadoCivil() : null) + ", "  
 				+ derechohabiente.getClaveColonia() + ", " 
@@ -363,7 +366,7 @@ public class DerechohabienteDB {
 		    	        }
 		    	    },
 		    	    keyHolder); */
-			
+			System.out.println("Consulta ==> "+queryDerechohabiente.toString());
 			mysqlTemplate.update(
 		    	    new PreparedStatementCreator() {
 		    	        public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
@@ -448,7 +451,7 @@ public class DerechohabienteDB {
 					+ "	NOCONTROL, NOPREAFILIACION, ESVALIDO, COUNT(ESVALIDO) AS NUMDOCS \n"
 					+ "    FROM \n"
 					+ "	  (SELECT \n"
-					+ "        DOCXDH.*, IF(ISNULL(D.ESVALIDO), 2, D.ESVALIDO) AS ESVALIDO \n"
+					+ "        DOCXDH.*, ISNULL(D.ESVALIDO,2) AS ESVALIDO \n"
 					+ "    FROM \n"
 					+ "        (SELECT B.NOCONTROL, B.NOPREAFILIACION, B.CLAVEPARENTESCO, TA.CLAVETIPOARCHIVO, TA.ESOBLIGATORIO \n"
 					+ "        FROM WBENEFICIARIO B, WKPARENTESCOTIPOARCHIVO TA \n"
@@ -487,7 +490,7 @@ public class DerechohabienteDB {
 		StringBuilder query = new StringBuilder();
 		query.append( "SELECT B.*"
 					+ "	FROM BENEFICIARIO B"
-					+ "	WHERE B.NOCONTROL = " + noControl);	
+					+ "	WHERE B.NOAFILIACION = " + noControl);	
 		
 		// System.out.println(query.toString());
 		List<Derechohabiente> beneficiarios = null;
@@ -710,7 +713,7 @@ class PersonaRowMapper implements RowMapper<Derechohabiente> {
         persona.setPaterno(rs.getString("PATERNO"));
         persona.setMaterno(rs.getString("MATERNO"));
         persona.setEmail(rs.getString("EMAIL"));
-        persona.setFechaNacimiento(rs.getString("FECHANACIMIENTO"));
+        persona.setFechaNacimiento(rs.getDate("FECHANACIMIENTO"));
         persona.setSexo(rs.getString("SEXO"));
         persona.setCurp(rs.getString("CURP"));
         persona.setRfc(rs.getString("RFC"));
@@ -753,7 +756,7 @@ class PersonaConParentescoRowMapper implements RowMapper<Derechohabiente> {
         persona.setPaterno(rs.getString("PATERNO"));
         persona.setMaterno(rs.getString("MATERNO"));
         persona.setEmail(rs.getString("EMAIL"));
-        persona.setFechaNacimiento(rs.getString("FECHANACIMIENTO"));
+        persona.setFechaNacimiento(rs.getDate("FECHANACIMIENTO"));
         persona.setSexo(rs.getString("SEXO"));
         persona.setCurp(rs.getString("CURP"));
         persona.setRfc(rs.getString("RFC"));
@@ -798,7 +801,7 @@ class TrabajadorRowMapper implements RowMapper<Derechohabiente> {
         persona.setNombre(rs.getString("NOMBRE"));
         persona.setPaterno(rs.getString("PATERNO"));
         persona.setMaterno(rs.getString("MATERNO"));
-        persona.setFechaNacimiento(rs.getString("FECHANACIMIENTO"));
+        persona.setFechaNacimiento(rs.getDate("FECHANACIMIENTO"));
         persona.setSexo(rs.getString("SEXO"));
         persona.setCurp(rs.getString("CURP"));
         persona.setRfc(rs.getString("RFC"));
@@ -808,8 +811,8 @@ class TrabajadorRowMapper implements RowMapper<Derechohabiente> {
         persona.setFechaPreAfiliacion(rs.getTimestamp("FECHAAFILIACION"));
         persona.setSituacion(rs.getInt("SITUACION"));
         persona.setClaveUsuarioRegistro(rs.getLong("CLAVEUSUARIOCAPTURA"));
-        persona.setFechaRegistro(rs.getTimestamp("FECHAREGISTRO"));
-        persona.setClaveUsuarioModificacion(rs.getLong("CLAVEUSUARIOMODIFICACION"));
+        persona.setFechaRegistro(new Timestamp(new Date().getTime()));
+        //persona.setClaveUsuarioModificacion(rs.getLong("CLAVEUSUARIOMODIFICACION"));
         persona.setFechaModificacion(rs.getTimestamp("FECHAMODIFICACION"));
         persona.setClaveEstado(rs.getLong("CLAVEESTADO"));
         persona.setClaveMunicipio(rs.getLong("CLAVEMUNICIPIO"));
@@ -818,6 +821,7 @@ class TrabajadorRowMapper implements RowMapper<Derechohabiente> {
         persona.setClaveClinicaServicio(rs.getLong("CLAVECLINICASERVICIO"));
         persona.setClaveEstadoCivil(rs.getLong("CLAVEESTADOCIVIL"));
         persona.setEstatus(4);
+        
         
         return persona;
     }
@@ -831,12 +835,12 @@ class BeneficiarioRowMapper implements RowMapper<Derechohabiente> {
     public Derechohabiente mapRow(ResultSet rs, int rowNum) throws SQLException {
     	Derechohabiente persona = new Derechohabiente();
  
-    	persona.setNoControl(rs.getLong("NOCONTROL"));
+    	persona.setNoControl(rs.getLong("NOAFILIACION"));
     	persona.setNoPreAfiliacion(rs.getLong("NOBENEFICIARIO"));
         persona.setNombre(rs.getString("NOMBRE"));
         persona.setPaterno(rs.getString("PATERNO"));
         persona.setMaterno(rs.getString("MATERNO"));
-        persona.setFechaNacimiento(rs.getString("FECHANACIMIENTO"));
+        persona.setFechaNacimiento(rs.getDate("FECHANACIMIENTO"));
         persona.setSexo(rs.getString("SEXO"));
         persona.setCurp(rs.getString("CURP"));
         persona.setRfc(rs.getString("RFC"));
@@ -845,8 +849,8 @@ class BeneficiarioRowMapper implements RowMapper<Derechohabiente> {
         persona.setFechaPreAfiliacion(rs.getTimestamp("FECHAAFILIACION"));
         persona.setSituacion(rs.getInt("SITUACIONB"));
         persona.setClaveUsuarioRegistro(rs.getLong("CLAVEUSUARIOCAPTURA"));
-        persona.setFechaRegistro(rs.getTimestamp("FECHAREGISTRO"));
-        persona.setClaveUsuarioModificacion(rs.getLong("CLAVEUSUARIOMODIFICACION"));
+        persona.setFechaRegistro(new Timestamp(new Date().getTime()));
+        //persona.setClaveUsuarioModificacion(rs.getLong("CLAVEUSUARIOMODIFICACION"));
         persona.setFechaModificacion(rs.getTimestamp("FECHAMODIFICACION"));
         persona.setClaveEstado(rs.getLong("CLAVEESTADO"));
         persona.setClaveMunicipio(rs.getLong("CLAVEMUNICIPIO"));
@@ -854,6 +858,8 @@ class BeneficiarioRowMapper implements RowMapper<Derechohabiente> {
         persona.setClaveColonia(rs.getLong("CLAVECOLONIA"));
         persona.setClaveClinicaServicio(rs.getLong("CLAVECLINICASERVICIO"));
         persona.setClaveParentesco(rs.getLong("CLAVEPARENTESCO"));
+        
+        	   
         
         return persona;
     }
@@ -872,7 +878,7 @@ class DerechohabienteRowMapper implements RowMapper<Derechohabiente> {
         persona.setPaterno(rs.getString("PATERNO"));
         persona.setMaterno(rs.getString("MATERNO"));
         persona.setEmail(rs.getString("EMAIL"));
-        persona.setFechaNacimiento(rs.getString("FECHANACIMIENTO"));
+        persona.setFechaNacimiento(rs.getDate("FECHANACIMIENTO"));
         persona.setSexo(rs.getString("SEXO"));
         persona.setCurp(rs.getString("CURP"));
         persona.setRfc(rs.getString("RFC"));

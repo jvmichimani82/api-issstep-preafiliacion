@@ -135,8 +135,8 @@ public class CatalogoDB {
 	
 	public List<Catalogo> getLocalidades(long idEstado, long idMunicipio) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT CLAVELOCALIDAD AS ID, DESCRIPCION FROM KLOCALIDAD WHERE CLAVEESTADO = " + idEstado);
-		query.append(" AND CLAVEMUNICIPIO = " + idMunicipio);
+		query.append("SELECT CLAVELOCALIDAD AS ID, DESCRIPCION FROM KLOCALIDAD WHERE");
+		query.append(" CLAVEMUNICIPIO = " + idMunicipio);
 		
 		return getRegistros( query );
 	}
@@ -158,8 +158,8 @@ public class CatalogoDB {
 	
 	public List<Colonia> getColonias(long idEstado, long idMunicipio, long idLocalidad) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT * FROM KCOLONIA WHERE CLAVEESTADO = " + idEstado);
-		query.append(" AND CLAVEMUNICIPIO = " + idMunicipio);
+		query.append("SELECT * FROM KCOLONIA WHERE" );
+		query.append(" CLAVEMUNICIPIO = " + idMunicipio);
 		query.append(" AND CLAVELOCALIDAD = " + idLocalidad);
 		
 		List<Colonia> colonia = null;
@@ -231,7 +231,7 @@ class ColoniaRowMapper implements RowMapper<Colonia> {
 		 
 		 colonia.setClaveClinicaServicio(rs.getLong("CLAVECLINICASERVICIO"));
 		 colonia.setClaveColonia(rs.getLong("CLAVECOLONIA"));
-		 colonia.setClaveEstado(rs.getLong("CLAVEESTADO"));
+		 //colonia.setClaveEstado(rs.getLong("CLAVEESTADO"));
 		 colonia.setClaveLocalidad(rs.getLong("CLAVELOCALIDAD"));
 		 colonia.setClaveMunicipio(rs.getLong("CLAVEMUNICIPIO"));
 		 colonia.setCodigoPostal(rs.getLong("CODIGOPOSTAL"));

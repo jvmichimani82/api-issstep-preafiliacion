@@ -28,6 +28,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class Utils {
@@ -125,6 +126,44 @@ public class Utils {
    public static boolean esEmail(String valor) {	   
 	   return verificaValorVSExpReg( valor,  expRegPatronEmail);
    }
+   
+   
+
+   public static String getFechaFromDate(Date fecha){
+	   SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+      
+       try {
+    	   System.out.println("Fecha ==> "+fecha);
+           String date = formatter.format(fecha);
+           System.out.println("Fecha ==> "+date);
+          return date+"T00:00:00.0";
+
+       } catch (Exception e) {
+    	   
+           e.printStackTrace();
+           String date = formatter.format(new Date());
+           return date+"T00:00:00.0";
+       }
+   }
+   
+   public static String getFechaFromTimeStamp(Timestamp fecha){
+	   SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+      
+       try {
+    	   System.out.println("timestamp ==> "+fecha.getTime());
+           String date = formatter.format(new Date(fecha.getTime()));
+           System.out.println("timestamp ==> "+date);
+          return date+"T00:00:00.0";
+
+       } catch (Exception e) {
+    	   
+           e.printStackTrace();
+           String date = formatter.format(new Date());
+           return date+"T00:00:00.0";
+       }
+   }
+   
+   
    
 
 }

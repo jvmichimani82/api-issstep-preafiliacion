@@ -165,7 +165,7 @@ public class ArchivoDB {
 	    	    },
 	    	    keyHolder);
 			
-	    	return (Long)keyHolder.getKey();
+	    	return (Long)keyHolder.getKey().longValue();
 	    	
 		} catch (Exception e) {
 			e.printStackTrace();

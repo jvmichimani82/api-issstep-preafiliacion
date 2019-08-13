@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import issstep.afiliacion.model.Beneficiario;
 import issstep.afiliacion.model.Derechohabiente;
+import issstep.afiliacion.utils.Utils;
 
 @Component
 public class BeneficiarioDB {
@@ -91,8 +92,8 @@ public class BeneficiarioDB {
 			query.append("INSERT INTO WBENEFICIARIO "
 					+ "(NOCONTROL, NOPREAFILIACION, CLAVEPARENTESCO, FECHAAFILIACION, SITUACION, CLAVEUSUARIOREGISTRO, FECHAREGISTRO) VALUES("
 					+ noControlTitular + ", " +  derechohabiente.getNoPreAfiliacion() + ", "
-					+ claveParentesco + ", '" + derechohabiente.getFechaPreAfiliacion() + "', 1, " +
-					+ derechohabiente.getClaveUsuarioRegistro() + ", '" + derechohabiente.getFechaRegistro() 
+					+ claveParentesco + ", '" + Utils.getFechaFromTimeStamp(derechohabiente.getFechaPreAfiliacion()) + "', 1, " +
+					+ derechohabiente.getClaveUsuarioRegistro() + ", '" + Utils.getFechaFromDate(derechohabiente.getFechaRegistro()) 
 					+ "')" );
 		else 
 			query.append("DELETE FROM WBENEFICIARIO WHERE NOBENEFICIARIO = " + noBeneficiario);
@@ -110,7 +111,7 @@ public class BeneficiarioDB {
 	    	    },
 	    	    keyHolder);
 			
-			return (opcion.equals("create")) ? (long) keyHolder.getKey() : (long) 1;		
+			return (opcion.equals("create")) ? (long) keyHolder.getKey().longValue() : (long) 1;		
 	    	
 		} 
 		catch (DataIntegrityViolationException e) {

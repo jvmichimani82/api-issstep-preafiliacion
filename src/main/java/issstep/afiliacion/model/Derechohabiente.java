@@ -40,7 +40,7 @@ public class Derechohabiente {
 	String email;
 		
 	@JsonView({Derechohabiente.Views.Simple.class})
-	String fechaNacimiento;
+	Date fechaNacimiento;
 	
 	@JsonView({Derechohabiente.Views.Simple.class})
 	String sexo;	
