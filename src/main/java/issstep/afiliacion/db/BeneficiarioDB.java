@@ -98,7 +98,7 @@ public class BeneficiarioDB {
 		else 
 			query.append("DELETE FROM WBENEFICIARIO WHERE NOBENEFICIARIO = " + noBeneficiario);
 		
-		// System.out.println(query.toString());
+		System.out.println(query.toString());
 		
 		try {
 			KeyHolder keyHolder = new GeneratedKeyHolder();

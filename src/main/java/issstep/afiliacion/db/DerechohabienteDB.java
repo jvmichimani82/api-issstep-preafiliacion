@@ -23,6 +23,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
 import issstep.afiliacion.model.ActualizarDatos;
+import issstep.afiliacion.model.Beneficiario;
 import issstep.afiliacion.model.Colonia;
 import issstep.afiliacion.model.Derechohabiente;
 import issstep.afiliacion.model.DocumentosFaltantes;
@@ -445,14 +446,17 @@ public class DerechohabienteDB {
 	}
 	
 	public List<DocumentosFaltantes> getDocumentacionByDerechohabiente(boolean incluirTitular, long noControl) {
-
+		String ambiente = Utils.loadPropertie("ambiente");
 		StringBuilder query = new StringBuilder();
 		query.append( "SELECT \n"
 					+ "	NOCONTROL, NOPREAFILIACION, ESVALIDO, COUNT(ESVALIDO) AS NUMDOCS \n"
 					+ "    FROM \n"
-					+ "	  (SELECT \n"
-					+ "        DOCXDH.*, ISNULL(D.ESVALIDO,2) AS ESVALIDO \n"
-					+ "    FROM \n"
+					+ "	  (SELECT \n");
+		if (ambiente.equals("3"))
+			query.append( "        DOCXDH.*, ISNULL(D.ESVALIDO,2) AS ESVALIDO \n");
+		else 
+			query.append( "        DOCXDH.*, IF(ISNULL(D.ESVALIDO), 2, D.ESVALIDO)  AS ESVALIDO \n");
+		query.append( "    FROM \n"
 					+ "        (SELECT B.NOCONTROL, B.NOPREAFILIACION, B.CLAVEPARENTESCO, TA.CLAVETIPOARCHIVO, TA.ESOBLIGATORIO \n"
 					+ "        FROM WBENEFICIARIO B, WKPARENTESCOTIPOARCHIVO TA \n"
 					+ "        WHERE B.CLAVEPARENTESCO = TA.CLAVEPARENTESCO \n"
@@ -581,7 +585,7 @@ public class DerechohabienteDB {
 				}
 			}
 		
-		System.out.println("Consulta de busqueda (Afiliacion) ==> " + query.toString());
+		// System.out.println("Consulta de busqueda (Afiliacion) ==> " + query.toString());
 		
 		List<ResultadoBusqueda> resultadoBusqueda = null;
 		
@@ -621,12 +625,13 @@ public class DerechohabienteDB {
 	
 	public boolean existeBeneficiarioRegistradoById(long noControl, long noPreAfiliacion) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT * FROM WBENEFICIARIO WHERE NOCONTROL = " + noControl + " AND NOPREAFILIACION = '" + noPreAfiliacion + "'");
+		query.append("SELECT * FROM WBENEFICIARIO WHERE NOCONTROL = " + noControl + " AND NOPREAFILIACION = " + noPreAfiliacion + "");
 		
-		List<Derechohabiente> beneficiarios = null;
+		// System.out.println("existeBeneficiarioRegistradoById" + query.toString());
+		List<Beneficiario> beneficiario = null;
 		try {
-			beneficiarios =  mysqlTemplate.query(query.toString(), new DerechohabienteRowMapper());
-			return !beneficiarios.isEmpty();
+			beneficiario =  mysqlTemplate.query(query.toString(), new BeneficiarioRegRowMapper());
+			return !beneficiario.isEmpty();
 		} 
 		catch (EmptyResultDataAccessException e) {
 			return false;
@@ -824,10 +829,25 @@ class TrabajadorRowMapper implements RowMapper<Derechohabiente> {
         
         
         return persona;
-    }
-    
-    
-    
+    }    
+}
+
+class BeneficiarioRegRowMapper implements RowMapper<Beneficiario> {
+    @Override
+    public Beneficiario mapRow(ResultSet rs, int rowNum) throws SQLException {
+    	Beneficiario beneficiario = new Beneficiario();
+ 
+    	beneficiario.setNoControl(rs.getLong("NOCONTROL"));
+    	beneficiario.setNoBeneficiario(rs.getLong("NOBENEFICIARIO"));
+    	beneficiario.setNoPreAfiliacion(rs.getLong("NOPREAFILIACION"));
+    	beneficiario.setClaveParentesco(rs.getLong("CLAVEPARENTESCO"));
+    	beneficiario.setFechaAfiliacion(rs.getTimestamp("FECHAAFILIACION"));
+    	beneficiario.setSituacion(rs.getLong("SITUACION"));
+    	beneficiario.setClaveUsuarioRegistro(rs.getLong("CLAVEUSUARIOREGISTRO"));
+    	beneficiario.setFechaRegistro(rs.getTimestamp("FECHAREGISTRO"));
+    	
+    	return beneficiario;
+    } 
 }
 
 class BeneficiarioRowMapper implements RowMapper<Derechohabiente> {

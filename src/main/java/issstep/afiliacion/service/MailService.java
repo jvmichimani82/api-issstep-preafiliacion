@@ -79,15 +79,15 @@ public class MailService {
    		 String urlReset = Utils.loadPropertie("url_cambiarPassword")+"/"+token;
    		 MimeMessage message = mailSender.createMimeMessage();
 		     MimeMessageHelper helper = new MimeMessageHelper(message,StandardCharsets.UTF_8.name());	
-		     helper.setFrom("FABRICA_DE_TALENTOS");
+		     helper.setFrom("AFILIACION");
 		     helper.setTo(recipient);
 		     helper.setSubject("Solicitud para reestablecer contraseña");
 		     
-		     if(Utils.loadPropertie("ambiente").equals(PRODUCCION)){
+		     /* if(Utils.loadPropertie("ambiente").equals(PRODUCCION)){
 		    	helper.setBcc("fabrica.talentos.2018@gmail.com");
 		     }else if (Utils.loadPropertie("ambiente").equals(PRUEBAS)){
 		    	 helper.setBcc("fabrica.talentos.2018@gmail.com");
-		     }	
+		     }	*/
 
 		     final Context context = new Context(); 
 		     context.setVariable("nombre_plataforma", nombre_plataforma);

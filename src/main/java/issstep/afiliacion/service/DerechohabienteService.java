@@ -242,7 +242,7 @@ public class DerechohabienteService {
 			//if (Utils.loadPropertie("ambiente").equals(PRODUCCION) || Utils.loadPropertie("ambiente").equals(PRUEBAS)){
 		     //   mailService.prepareAndSendBienvenida(persona.getEmail(),persona.getNombreCompleto() ,persona.getEmail(),persona.gettUsuario().getToken(),persona.gettUsuario().getId());
 		    //}else{
-		        //Manda al correo de fdsditco@gmail.com
+		        //Manda al correo de issstepregistro@gmail.com
 			
 			    oldPersona.setEmail(newPersona.getEmail());
 				
@@ -250,9 +250,14 @@ public class DerechohabienteService {
 			    oldPersona.setClaveUsuarioRegistro(claveUsuario);
 				personaDB.actualiza(oldPersona);
 				
-				// if (!oldPersona.getEmail().equals("issstepregistro@gmail.com" + oldPersona.getNoControl() + "@gmail.com"))	
-				 	mailService.prepareAndSendBienvenida("issstepregistro@gmail.com", oldPersona.getNombreCompleto() ,
+				// if (!oldPersona.getEmail().equals("issstepregistro@gmail.com" + oldPersona.getNoControl() + "@gmail.com"))
+				String ambiente = Utils.loadPropertie("ambiente");
+				if (ambiente.equals("3"))
+				 	mailService.prepareAndSendBienvenida(oldPersona.getEmail(), oldPersona.getNombreCompleto() ,
 		        		 oldPersona.getEmail(), usuario.getToken(), oldPersona.getNoControl());
+				else 
+					mailService.prepareAndSendBienvenida("issstepregistro@gmail.com", oldPersona.getNombreCompleto() ,
+			        		 oldPersona.getEmail(), usuario.getToken(), oldPersona.getNoControl());
 		     //}	
 
 		}
@@ -508,11 +513,11 @@ public class DerechohabienteService {
 		if (beneficiario.getClaveParentesco() == 0)
 			return new ResponseEntity<>(new Mensaje("No puede registrar un beneficiario con clave de titular"), HttpStatus.BAD_REQUEST);
 
-		if (personaDB.existeBeneficiarioRegistradoById(beneficiario.getNoControl(), beneficiario.getNoPreAfiliacion()))
+		if (personaDB.existeBeneficiarioRegistradoById(beneficiario.getNoControlTitular(), beneficiario.getNoPreAfiliacion()))
 			return new ResponseEntity<>(new Mensaje("Ya existe un beneficiario registrado"), HttpStatus.BAD_REQUEST);
 		
 		if (beneficiario.getClaveParentesco() != 6 && beneficiario.getClaveParentesco() != 7) 
-			if (personaDB.existeBeneficiarioRegistrado(beneficiario.getNoControl(), beneficiario.getClaveParentesco()))
+			if (personaDB.existeBeneficiarioRegistrado(beneficiario.getNoControlTitular(), beneficiario.getClaveParentesco()))
 				return new ResponseEntity<>(new Mensaje("Ya existe un beneficiario registrado con ese parenteso"), HttpStatus.BAD_REQUEST);	
 		
 		Derechohabiente persona =  personaDB.getPersonaByNoControlNoPreafiliacion(beneficiario.getNoControl(), beneficiario.getNoPreAfiliacion());
@@ -525,10 +530,10 @@ public class DerechohabienteService {
 			personaDB.createDerechohabiente(persona, false, 4);
 		}
 		
-		Beneficiario oldBeneficiario = beneficiarioDB.getBeneficiario(beneficiario.getNoControl(), beneficiario.getNoPreAfiliacion(), beneficiario.getClaveParentesco());
+		/* Beneficiario oldBeneficiario = beneficiarioDB.getBeneficiario(beneficiario.getNoControl(), beneficiario.getNoPreAfiliacion(), beneficiario.getClaveParentesco());
 		
 		if (oldBeneficiario != null)
-			return new ResponseEntity<>(new Mensaje("Ya existe el beneficiario"), HttpStatus.CONFLICT);
+			return new ResponseEntity<>(new Mensaje("Ya existe el beneficiario"), HttpStatus.CONFLICT); */
 		
 		try{
 			
@@ -539,6 +544,9 @@ public class DerechohabienteService {
 			
 			if (noBeneficiario == 0)
 				return new ResponseEntity<>(new Mensaje("No fue posible asignar el beneficiario"), HttpStatus.INTERNAL_SERVER_ERROR);
+			
+			if (noBeneficiario == -1)
+				return new ResponseEntity<>(new Mensaje("Existe un problema de integridad en beneficiario"), HttpStatus.INTERNAL_SERVER_ERROR);
 			
 			persona.setNoBeneficiario(noBeneficiario);
 			
