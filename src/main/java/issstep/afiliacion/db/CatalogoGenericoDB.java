@@ -146,13 +146,17 @@ public class CatalogoGenericoDB {
 				query.append(" AND CLAVEMUNICIPIO = " + derechohabiente.getClaveMunicipio());
 				break;
 			case "KLOCALIDAD":
-				query.append("SELECT DESCRIPCION FROM "+ catalogo + " WHERE CLAVEESTADO = " + derechohabiente.getClaveEstado());
-				query.append(" AND CLAVEMUNICIPIO = " + derechohabiente.getClaveMunicipio());
+				//query.append("SELECT DESCRIPCION FROM "+ catalogo + " WHERE CLAVEESTADO = " + derechohabiente.getClaveEstado());
+				//query.append(" AND CLAVEMUNICIPIO = " + derechohabiente.getClaveMunicipio());
+				query.append("SELECT DESCRIPCION FROM "+ catalogo + " WHERE");
+				query.append(" CLAVEMUNICIPIO = " + derechohabiente.getClaveMunicipio());
 				query.append(" AND CLAVELOCALIDAD = " + derechohabiente.getClaveLocalidad());
 				break;
 			case "KCOLONIA":
-				query.append("SELECT DESCRIPCION FROM "+ catalogo + " WHERE CLAVEESTADO = " + derechohabiente.getClaveEstado());
-				query.append(" AND CLAVEMUNICIPIO = " + derechohabiente.getClaveMunicipio());
+				//query.append("SELECT DESCRIPCION FROM "+ catalogo + " WHERE CLAVEESTADO = " + derechohabiente.getClaveEstado());
+				//query.append(" AND CLAVEMUNICIPIO = " + derechohabiente.getClaveMunicipio());
+				query.append("SELECT DESCRIPCION FROM "+ catalogo + " WHERE");
+				query.append(" CLAVEMUNICIPIO = " + derechohabiente.getClaveMunicipio());
 				query.append(" AND CLAVELOCALIDAD = " + derechohabiente.getClaveLocalidad());
 				query.append(" AND CLAVECOLONIA = " + derechohabiente.getClaveColonia());
 				break;

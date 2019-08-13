@@ -351,8 +351,8 @@ public class DerechohabienteService {
 				inicializaConValoresDelTitular( registroDerechohabiente, derechohabienteTitular);			
 			}
 			
-			String[] fechaNac = registroDerechohabiente.getFechaNacimiento().split("/");
-			registroDerechohabiente.setFechaNacimiento(fechaNac[2] + "/" + fechaNac[1] + "/"+ fechaNac[0]);
+			//String[] fechaNac = registroDerechohabiente.getFechaNacimiento().split("/");
+			//registroDerechohabiente.setFechaNacimiento(fechaNac[2] + "/" + fechaNac[1] + "/"+ fechaNac[0]);
 			
 			NumerosParaRegistro numerosParaRegistro = personaDB.getNextNumerosRegistro(registroDerechohabiente.getClaveParentesco(), registroDerechohabiente.getNoControl());
 			
