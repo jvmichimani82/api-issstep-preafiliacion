@@ -28,14 +28,13 @@ public class BeneficiarioDB {
 	private JdbcTemplate mysqlTemplate;
 
 	
-	public Beneficiario getBeneficiario(long noControl, long noPreAfiliacion, long claveParentesco) {
+	public Beneficiario getBeneficiario(long noControlTitular, long noControl, long noPreAfiliacion, long claveParentesco) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT * FROM WBENEFICIARIO WHERE NOCONTROL = ");
-		query.append(noControl);
-		query.append(" AND NOPREAFILIACION= ");
-		query.append(noPreAfiliacion);
-		query.append(" AND CLAVEPARENTESCO = ");
-		query.append(claveParentesco);
+		query.append( "SELECT * FROM WBENEFICIARIO \n"
+					+ "	  WHERE NOCONTROLTITULAR = " + noControlTitular + "\n"
+					+ " 	    AND NOCONTROL = " + noControl + "\n");
+		query.append("		    AND NOPREAFILIACION= " + noPreAfiliacion + "\n");
+		query.append("		    AND CLAVEPARENTESCO = " + claveParentesco);
 		
 		// System.out.println("getBeneficiario == " + query.toString());
 				
@@ -90,8 +89,9 @@ public class BeneficiarioDB {
 		
 		if (opcion.equals("create")) 			
 			query.append("INSERT INTO WBENEFICIARIO "
-					+ "(NOCONTROL, NOPREAFILIACION, CLAVEPARENTESCO, FECHAAFILIACION, SITUACION, CLAVEUSUARIOREGISTRO, FECHAREGISTRO) VALUES("
-					+ noControlTitular + ", " +  derechohabiente.getNoPreAfiliacion() + ", "
+					+ "(NOCONTROLTITULAR, NOCONTROL, NOPREAFILIACION, CLAVEPARENTESCO, FECHAAFILIACION, SITUACION, CLAVEUSUARIOREGISTRO, FECHAREGISTRO) VALUES("
+					+ noControlTitular + ", " +  derechohabiente.getNoControl() + ", "
+					+ derechohabiente.getNoPreAfiliacion() + ", "
 					+ claveParentesco + ", '" + Utils.getFechaFromTimeStamp(derechohabiente.getFechaPreAfiliacion()) + "', 1, " +
 					+ derechohabiente.getClaveUsuarioRegistro() + ", '" + Utils.getFechaFromDate(derechohabiente.getFechaRegistro()) 
 					+ "')" );

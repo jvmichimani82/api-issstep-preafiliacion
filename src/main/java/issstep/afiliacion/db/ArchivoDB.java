@@ -72,7 +72,10 @@ public class ArchivoDB {
 	
 	public Archivo getArchivo(long claveDocumento) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT * FROM WDOCUMENTO WHERE CLAVEDOCUMENTO = ");
+		query.append( "SELECT D.*, B.NOCONTROLTITULAR \n"
+					+ "	FROM WDOCUMENTO D, WBENEFICIARIO B \n"
+					+ "	WHERE D.NOBENEFICIARIO = B.NOBENEFICIARIO "
+					+ "		  AND CLAVEDOCUMENTO = ");
 		query.append(claveDocumento);
 		
 				
@@ -220,15 +223,13 @@ public class ArchivoDB {
 	
 	public List<Archivo> getArchivos(long noControl, long noPreAfiliacion, long noBeneficiario, long claveParentesco) {
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT * FROM WDOCUMENTO ");
-		query.append(" WHERE NOCONTROL = ");
-		query.append(noControl);
-		query.append(" AND NOPREAFILIACION = ");
-		query.append(noPreAfiliacion);
-		query.append(" AND NOBENEFICIARIO  = ");
-		query.append(noBeneficiario);
-		query.append(" AND CLAVEPARENTESCO  = ");
-		query.append(claveParentesco);
+		query.append( "SELECT D.*, B.NOCONTROLTITULAR \n"
+					+ " FROM WDOCUMENTO D, WBENEFICIARIO B"
+					+ "	WHERE D.NOBENEFICIARIO = B.NOBENEFICIARIO \n"
+					+ "		  AND D.NOCONTROL = " + noControl + "\n"
+					+ "		  AND D.NOPREAFILIACION = " + noPreAfiliacion + "\n"
+					+ "		  AND D.NOBENEFICIARIO  = " + noBeneficiario + "\n"
+					+ "		  AND D.CLAVEPARENTESCO  = "+ claveParentesco);
 		
 		List<Archivo> archivos = new ArrayList<Archivo>();
 		try {
@@ -279,6 +280,7 @@ class ArchivoRowMapper implements RowMapper<Archivo> {
  
     	archive.setClaveDocumento(rs.getLong("claveDocumento"));
     	archive.setNoControl(rs.getLong("noControl"));
+    	archive.setNoControlTitular(rs.getLong("noControlTitular"));
     	archive.setNoPreAfiliacion(rs.getLong("noPreAfiliacion"));
     	archive.setNoBeneficiario(rs.getLong("noBeneficiario"));
     	archive.setClaveParentesco(rs.getLong("claveParentesco"));

@@ -20,6 +20,9 @@ public class Archivo {
 	long claveDocumento;
 	
 	@JsonView({Archivo.Views.Simple.class})
+	long noControlTitular;
+	
+	@JsonView({Archivo.Views.Simple.class})
 	long noControl;
 	
 	@JsonView({Archivo.Views.Simple.class})

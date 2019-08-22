@@ -24,13 +24,14 @@ public class ArchivoController {
 	ArchivoService archivoService;
 
 	 @ApiOperation(value = "Subir un documento")
-	 @RequestMapping(value="/uploadDocto/{noControl}/{noPreafiliacion}/{claveParentesco}/{claveTipoArchivo}", method = RequestMethod.POST, consumes="multipart/form-data")
-	 public ResponseEntity<?> uploadDoctos(	@PathVariable("noControl") long noControl, 
+	 @RequestMapping(value="/uploadDocto/{noControlTitular}/{noControl}/{noPreafiliacion}/{claveParentesco}/{claveTipoArchivo}", method = RequestMethod.POST, consumes="multipart/form-data")
+	 public ResponseEntity<?> uploadDoctos(	@PathVariable("noControlTitular") long noControlTitular, 
+			 								@PathVariable("noControl") long noControl,
 			 								@PathVariable("noPreafiliacion") long noPreafiliacion, 
 			 								@PathVariable("claveParentesco") long claveParentesco, 
 			 								@PathVariable("claveTipoArchivo") long claveTipoArchivo, 
 			 								@RequestParam("file") MultipartFile uploadingFiles, HttpServletResponse response) throws Exception {	       
-	 	return archivoService.uploadDocumento(noControl, noPreafiliacion, claveParentesco, claveTipoArchivo, uploadingFiles, response );		
+	 	return archivoService.uploadDocumento(noControlTitular, noControl, noPreafiliacion, claveParentesco, claveTipoArchivo, uploadingFiles, response );		
 	 }
 	
 	 @ApiOperation(value = "Actualizar un documento de un derechohabiente")
@@ -62,12 +63,13 @@ public class ArchivoController {
  	 }
 	
 	 @ApiOperation(value = "Relacion de documentos de un derecohabiente")
-	 @RequestMapping(value="/listadoArchivos/{noControl}/{noPreAfiliacion}/{claveParentesco}", method = RequestMethod.GET)
-		public ResponseEntity<?> listaArchivos(	@PathVariable("noControl") long noControl, 
+	 @RequestMapping(value="/listadoArchivos/{noControlTitular}/{noControl}/{noPreAfiliacion}/{claveParentesco}", method = RequestMethod.GET)
+		public ResponseEntity<?> listaArchivos(	@PathVariable("noControlTitular") long noControlTitular,
+												@PathVariable("noControl") long noControl,
 												@PathVariable("noPreAfiliacion") long noPreAfiliacion,
 												@PathVariable("claveParentesco") long claveParentesco,  
 												HttpServletResponse response) throws Exception {   
-	 		return archivoService.listaArchivos( noControl, noPreAfiliacion, claveParentesco, response );	
+	 		return archivoService.listaArchivos( noControlTitular, noControl, noPreAfiliacion, claveParentesco, response );	
 	 }
 	 
      @ApiOperation(value = "Establece la valiacion de un documento")

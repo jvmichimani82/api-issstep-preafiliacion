@@ -11,10 +11,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ResultadoValidacion {
+public class InfoPersona {
+	long noControlTitular;
 	
-	boolean esValido;
+	long noControl;
 	
-	String mensaje;
+	long noPreAfiliacion;
 	
+	long claveParentesco;	
 }

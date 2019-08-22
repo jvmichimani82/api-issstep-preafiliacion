@@ -29,6 +29,7 @@ import issstep.afiliacion.model.ResultadoValidacion;
 import issstep.afiliacion.model.Usuario;
 import issstep.afiliacion.model.Beneficiario;
 import issstep.afiliacion.model.Derechohabiente;
+import issstep.afiliacion.model.InfoPersona;
 import issstep.afiliacion.utils.UtilsImage;
 
 import javax.servlet.http.*;
@@ -36,10 +37,10 @@ import javax.servlet.http.*;
 @Service
 public class ArchivoService{
 	
-	private static final String IMG_PNG = "png";
+	/* private static final String IMG_PNG = "png";
 	private static final String IMG_JPG = "jpg";
 	private static final String IMG_JPEG = "jpeg";
-	private static final String FOTO = "foto";
+	private static final String FOTO = "foto"; */
 
 	
 	  
@@ -59,11 +60,10 @@ public class ArchivoService{
    DerechohabienteDB derechohabienteDB;
    
   
-	public ResponseEntity<?> uploadDocumento( long noControl, long noPreAfiliacion, long claveParentesco, long claveTipoArchivo,  MultipartFile uploadedFile, HttpServletResponse response) {
+	public ResponseEntity<?> uploadDocumento( long noControlTitular, long noControl, long noPreAfiliacion, long claveParentesco, long claveTipoArchivo,  MultipartFile uploadedFile, HttpServletResponse response) {
+		ResultadoValidacion resultadoValidacion = validaEstatusRegistro (noControlTitular, noControl, noPreAfiliacion, claveParentesco);
 		
-		ResultadoValidacion resultadoValidacion = validaEstatusRegistro (noControl, noPreAfiliacion);
-		
-		if (!resultadoValidacion.isEtatus())
+		if (!resultadoValidacion.isEsValido())
 			return new ResponseEntity<>(new Mensaje(resultadoValidacion.getMensaje()), HttpStatus.CONFLICT);
 		
 		try{
@@ -83,7 +83,7 @@ public class ArchivoService{
 				return new ResponseEntity<>(new Mensaje("No existe el tipo de documento"), HttpStatus.CONFLICT);
 				
 			else {
-				Beneficiario beneficiario = beneficiarioDB.getBeneficiario(noControl, noPreAfiliacion, claveParentesco);
+				Beneficiario beneficiario = beneficiarioDB.getBeneficiario(noControlTitular, noControl, noPreAfiliacion, claveParentesco);
 				
 				if (beneficiario != null) {
 					
@@ -132,15 +132,17 @@ public class ArchivoService{
 		try{	
 			Archivo archivo = archivoDB.getArchivo(claveDocumento);
 			
-			ResultadoValidacion resultadoValidacion = validaEstatusRegistro (archivo.getNoControl(), archivo.getNoPreAfiliacion());
-			
-			if (!resultadoValidacion.isEtatus())
-				return new ResponseEntity<>(new Mensaje(resultadoValidacion.getMensaje()), HttpStatus.CONFLICT);
-			
 			if (archivo == null) 
 				return new ResponseEntity<>(new Mensaje("El archivo no existe"), HttpStatus.NO_CONTENT);
-	
-			// System.out.println("Eliminacion de informacion");
+			
+			ResultadoValidacion resultadoValidacion = validaEstatusRegistro (archivo.getNoControlTitular(), 
+																			 archivo.getNoControl(), 
+																			 archivo.getNoPreAfiliacion(),
+																			 archivo.getClaveParentesco());
+			
+			if (!resultadoValidacion.isEsValido())
+				return new ResponseEntity<>(new Mensaje(resultadoValidacion.getMensaje()), HttpStatus.CONFLICT);
+			
 			UtilsImage.deleteDocto(archivo.getUrlArchivo());
 			
 			String desTipoDocto = archivoDB.getTipoArchivoByParentesco(archivo.getClaveParentesco(), archivo.getClaveTipoArchivo());
@@ -174,9 +176,12 @@ public class ArchivoService{
 			// System.out.println(archivo);
 			
 			if(archivo != null) {
-				ResultadoValidacion resultadoValidacion = validaEstatusRegistro (archivo.getNoControl(), archivo.getNoPreAfiliacion());
+				ResultadoValidacion resultadoValidacion = validaEstatusRegistro (archivo.getNoControlTitular(),  
+																				 archivo.getNoControl(), 
+																				 archivo.getNoPreAfiliacion(),
+																				 archivo.getClaveParentesco());
 				
-				if (!resultadoValidacion.isEtatus())
+				if (!resultadoValidacion.isEsValido())
 					return new ResponseEntity<>(new Mensaje(resultadoValidacion.getMensaje()), HttpStatus.CONFLICT);
 				
 			
@@ -218,8 +223,8 @@ public class ArchivoService{
 		}
 	}
 	
-	public ResponseEntity<?> listaArchivos(long noControl, long noPreAfiliacion, long claveParentesco, HttpServletResponse response) {
-		Beneficiario beneficiario = beneficiarioDB.getBeneficiario(noControl, noPreAfiliacion, claveParentesco);
+	public ResponseEntity<?> listaArchivos(long noControlTitular, long noControl, long noPreAfiliacion, long claveParentesco, HttpServletResponse response) {
+		Beneficiario beneficiario = beneficiarioDB.getBeneficiario(noControlTitular, noControl, noPreAfiliacion, claveParentesco);
 		
 		if (beneficiario != null) {
 			try {
@@ -251,9 +256,12 @@ public class ArchivoService{
 			if(archivo == null)
 				return new ResponseEntity<>(new Mensaje("Documento no encontrado"), HttpStatus.NOT_FOUND);
 			
-			ResultadoValidacion resultadoValidacion = validaEstatusRegistro (archivo.getNoControl(), archivo.getNoPreAfiliacion());
+			ResultadoValidacion resultadoValidacion = validaEstatusRegistro (archivo.getNoControlTitular(),  
+																			 archivo.getNoControl(), 
+																			 archivo.getNoPreAfiliacion(),
+																			 archivo.getClaveParentesco());
 			
-			if (!resultadoValidacion.isEtatus())
+			if (!resultadoValidacion.isEsValido())
 				return new ResponseEntity<>(new Mensaje(resultadoValidacion.getMensaje()), HttpStatus.CONFLICT);
 			
 			Usuario usuarioLogin = getInfoLogin();
@@ -301,12 +309,15 @@ public class ArchivoService{
 		}
 	}
 
-	ResultadoValidacion validaEstatusRegistro(long noControl, long noPreAfiliacion) {
+	ResultadoValidacion validaEstatusRegistro(long noControlTitular, long noControl, long noPreAfiliacion, long claveParentesco) {
 		ResultadoValidacion resultadoValidacion = new ResultadoValidacion();
-		Derechohabiente derechohabiente =  derechohabienteDB.getPersonaByNoControlNoPreafiliacion(noControl, noPreAfiliacion);
+		
+		InfoPersona infoPersona = creaInforPersona(noControlTitular, noControl, noPreAfiliacion, claveParentesco);
+				
+		Derechohabiente derechohabiente =  derechohabienteDB.getPersonaByNoControlNoPreafiliacion( infoPersona );
 		
 		if (derechohabiente == null) {
-			resultadoValidacion.setEtatus(false);
+			resultadoValidacion.setEsValido(false);
 			resultadoValidacion.setMensaje("No existe el derechohabiente con número de control: " + noControl
 										+  "y número de afiliación: " + noPreAfiliacion);
 			return resultadoValidacion;
@@ -315,12 +326,12 @@ public class ArchivoService{
 		int estatus = derechohabiente.getEstatus();
 		
 		if (estatus == 9)  {
-			resultadoValidacion.setEtatus(false);
+			resultadoValidacion.setEsValido(false);
 			resultadoValidacion.setMensaje("El derechohabiente no se puede actualizar");
 			return resultadoValidacion;
 		}
 		
-		resultadoValidacion.setEtatus(true);
+		resultadoValidacion.setEsValido(true);
 		resultadoValidacion.setMensaje("");
 		return resultadoValidacion;
 		
@@ -333,6 +344,16 @@ public class ArchivoService{
 		Usuario usuario =  usuarioDB.getUsuarioByColumnaStringValor("LOGIN", user);
 	
 		return usuario;
+	}
+	
+	InfoPersona creaInforPersona(long noControlTitular, long noControl, long noPreAfiliacion, long claveParentesco) {
+		InfoPersona infoPersona = new InfoPersona();
+		infoPersona.setNoControlTitular(noControlTitular);
+		infoPersona.setNoControl(noControl);
+		infoPersona.setNoPreAfiliacion(noPreAfiliacion); 
+		infoPersona.setClaveParentesco(claveParentesco);
+		
+		return infoPersona;
 	}
 		
 }

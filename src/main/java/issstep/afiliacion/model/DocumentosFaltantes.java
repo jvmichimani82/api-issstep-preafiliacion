@@ -1,5 +1,7 @@
 package issstep.afiliacion.model;
 
+import java.sql.Date;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,8 +19,14 @@ public class DocumentosFaltantes {
 	
 	long noPreAfiliacion;
 	
-	int esValido;
+	long claveParentesco;
+	 
+	long claveTipoArchivo;
 	
-	int numDocs;
+	Date fechaNacimiento;
+	
+	int esObligatorio;
+	
+	int estatus;
 
 }

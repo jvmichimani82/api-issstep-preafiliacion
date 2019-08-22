@@ -7,8 +7,6 @@ public class DerechohabienteCONST {
 	
 	public static final String registroUsuario="Json para Registro Usuario online \n\n"+"{"
 			+"\r\n" + 
-			"			    \"nocontrol\": \"100\",\r\n" +
-			"			    \"noAfiliacion\": \"100\",\r\n" + 
 			"			    \"curp\": \"AACJ520925HPLBML03\",\r\n" + 
 			"			    \"email\": \"email@correo.com\",\r\n" + 
 			"			    \"usuario\": {\r\n" + 
@@ -53,7 +51,7 @@ public class DerechohabienteCONST {
 			
 			"			    }" ;
 	
-	public static final String asignaBeneficiario="Json para Asignar beneficiario a derechohabiente\n\n"+"{"
+	public static final String informacionBeneficiario="Json para Asignar beneficiario a derechohabiente\n\n"+"{"
 			+"\n" + 
 			"			    \"noControlTitular\": 200,\n" + 	
 			"			    \"noControl\": 20011,\n" + 

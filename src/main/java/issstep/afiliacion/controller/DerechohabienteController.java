@@ -18,8 +18,8 @@ import issstep.afiliacion.model.Curp;
 import issstep.afiliacion.model.DatoABuscar;
 import issstep.afiliacion.model.Derechohabiente;
 import issstep.afiliacion.model.Email;
+import issstep.afiliacion.model.InfoPersona;
 import issstep.afiliacion.model.ResetPassword;
-import issstep.afiliacion.model.ActualizarDatos;
 import issstep.afiliacion.model.ActualizarPassword;
 import issstep.afiliacion.model.Beneficiario;
 import issstep.afiliacion.service.DerechohabienteService;
@@ -60,12 +60,11 @@ public class DerechohabienteController {
     
     @ApiOperation(value = "Obtiene la información de un preafiliado")
     @JsonView(Derechohabiente.Views.Simple.class)
-    @RequestMapping(value = "/{noControl}/{noPreAfiliacion}", method = RequestMethod.GET)
-    public ResponseEntity<?> getPersonaById(@ApiParam(value = "noControl", required = true) @PathVariable long noControl, 
-    										@ApiParam(value = "noPreAfiliacion", required = true) @PathVariable long noPreAfiliacion,
+    @RequestMapping(value = "/informacion", method = RequestMethod.PUT)
+    public ResponseEntity<?> getPersonaById(@ApiParam(value = DerechohabienteCONST.informacionBeneficiario, required = true) @RequestBody InfoPersona infoPersona,
     										HttpServletResponse response) {
 
-    	return derechohabienteService.getPersonaByNoControlNoPreafiliacion(noControl, noPreAfiliacion);
+    	return derechohabienteService.getPersonaByNoControlNoPreafiliacion(infoPersona);
     }
     
     @ApiOperation(value = "Obtiene la información de un afiliado")
@@ -123,7 +122,7 @@ public class DerechohabienteController {
     @ApiOperation(value = "Asignar beneficiario")
     @JsonView(Derechohabiente.Views.RegistroDerechohabiente.class)
     @RequestMapping(value = "/asignar/beneficiario", method = RequestMethod.POST)
-    public ResponseEntity<?> asignarBeneficiario(@ApiParam(value = DerechohabienteCONST.asignaBeneficiario, required = true)@RequestBody Beneficiario beneficiario,
+    public ResponseEntity<?> asignarBeneficiario(@ApiParam(value = DerechohabienteCONST.informacionBeneficiario, required = true)@RequestBody Beneficiario beneficiario,
     											 HttpServletResponse response) {
    
     	return derechohabienteService.asignarBeneficiario( beneficiario );

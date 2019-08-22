@@ -11,10 +11,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ResultadoValidacion {
+public class ResultadoCreacionCuenta {
 	
-	boolean esValido;
+	boolean etatus;
 	
-	String mensaje;
+	Derechohabiente derechohabiente;
+	
+	Mensaje mensaje;
 	
 }

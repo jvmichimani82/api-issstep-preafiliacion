@@ -46,12 +46,14 @@ public class AuthenticationRestController {
     @RequestMapping(value = "/authJWTtoken", method = RequestMethod.POST)
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtAuthenticationRequest authenticationRequest, Device device, ServletResponse response) throws AuthenticationException {
     	Authentication authentication = tokenAuthenticationService.getAuthentication(authenticationRequest.getUsername(),authenticationRequest.getPassword());
+    	System.out.println(authentication);
     	if(authentication != null) {
 	    	SecurityContextHolder.getContext().setAuthentication(authentication);
 	        Usuario usuarioDetails = (Usuario) authentication.getPrincipal();
-	        /* System.out.println("Usuario ==> ");
+	        System.out.println("Usuario ==> ");
 	        System.out.println(usuarioDetails.getNoControl());
-	        System.out.println(usuarioDetails.getEstatus()); */
+	        System.out.println(usuarioDetails.getEstatus());
+	        
 	        
 	        if (usuarioDetails.getEstatus() == -1 )
 	        	return new ResponseEntity<>(new Mensaje("Usuario no activo"), HttpStatus.CONFLICT);

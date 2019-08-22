@@ -15,7 +15,7 @@ public class NumerosParaRegistro {
 
 	long noControl;
 	
-	long noAfiliacion;
+	long noPreAfiliacion;
 	
 	long noBeneficiario;
 	
