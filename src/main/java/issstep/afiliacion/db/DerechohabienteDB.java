@@ -527,9 +527,9 @@ public class DerechohabienteDB {
 	
 	public List<Derechohabiente> getBeneficiariosByTrabajadorIssstep(long noControl) {
 		StringBuilder query = new StringBuilder();
-		query.append( "SELECT B.*, B.NOCONTROL AS NOAFILIACION"
+		query.append( "SELECT B.*"
 					+ "	FROM BENEFICIARIO B"
-					+ "	WHERE B.NOCONTROL = " + noControl);	
+					+ "	WHERE B.NOAFILIACION = " + noControl);	
 		
 		// System.out.println(query.toString());
 		List<Derechohabiente> beneficiarios = null;
@@ -592,8 +592,8 @@ public class DerechohabienteDB {
 						+ "0 AS CLAVEPARENTESCO, T.SEXO " 
 						+ "FROM TRABAJADOR T WHERE ");
 			queryComplemento = " UNION " + 
-							  "SELECT B.NOMBRE, B.MATERNO, B.PATERNO, B.NOCONTROL, "
-							+ "B.NOBENEFICIARIO AS NOAFILIACION, 0 AS NOPREAFILIACION, "
+							  "SELECT B.NOMBRE, B.MATERNO, B.PATERNO, B.NOAFILIACION AS NOCONTROL"
+							+ "B.NOAFILIACION, 0 AS NOPREAFILIACION, "
 							+ "B.NOBENEFICIARIO, B.CURP, B.CLAVEPARENTESCO, B.SEXO " 
 							+ "	FROM BENEFICIARIO B WHERE ";
 			
