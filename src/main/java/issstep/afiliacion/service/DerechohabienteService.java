@@ -88,7 +88,7 @@ public class DerechohabienteService {
 			persona = personaDB.getTrabajadorIssstepByColumnaStringValor("CURP", curp);
 			
 		if (persona == null)
-			return null;
+			return new ResponseEntity<>(new Mensaje("No existe el derechohabiente"), HttpStatus.NOT_FOUND);
 		
 		fillDerechohabiente(persona);
 		return new ResponseEntity<>(persona, HttpStatus.OK);		
@@ -517,7 +517,7 @@ public class DerechohabienteService {
 			// registroDerechohabiente.setNoControl(usuario.getNoControl()); 
 			inicializaConValoresDelTitular( registroDerechohabiente, derechohabienteTitular, usuario);
 			
-			// }
+			// }ur
 			
 			//String[] fechaNac = registroDerechohabiente.getFechaNacimiento().split("/");
 			//registroDerechohabiente.setFechaNacimiento(fechaNac[2] + "/" + fechaNac[1] + "/"+ fechaNac[0]);
@@ -527,6 +527,9 @@ public class DerechohabienteService {
 			if (estatusRegistro == 0) 
 				return new ResponseEntity<>(new Mensaje("No fue posible registrar al derechohabiente"), HttpStatus.INTERNAL_SERVER_ERROR);
 				
+			beneficiarioDB.createBeneficiario(registroDerechohabiente.getNoControl(), 
+											  registroDerechohabiente, 
+											  registroDerechohabiente.getClaveParentesco());
 			
 			return new ResponseEntity<>(registroDerechohabiente, HttpStatus.CREATED);					
 			
@@ -706,8 +709,10 @@ public class DerechohabienteService {
 		
 		// Sino tenemos resultado de nuestra base de datos vamos por los datos a la bd de issstep
 		if(persona == null) {
-			
-			persona = personaDB.getPersonaByNoControlNoAfiliacionIssstep(beneficiario.getNoControl(), beneficiario.getNoPreAfiliacion());
+			long tipoBeneficiario = (beneficiario.getNoControl() == beneficiario.getNoPreAfiliacion()) ? 0 : 1;
+			persona = personaDB.getAfiliadoByNoControlNoPreafiliacion(beneficiario.getNoControl(), 
+																	  beneficiario.getNoPreAfiliacion(),
+																	  tipoBeneficiario);
 			// persona.setNoControl(beneficiario.getNoControlTitular());
 			personaDB.createDerechohabiente(persona, false, 4);
 		}
@@ -948,29 +953,51 @@ public class DerechohabienteService {
 			if (!usuarioLogin.getRol().equals("ADMINISTRADOR"))
 				return new ResponseEntity<>( new ArrayList[0], HttpStatus.NOT_FOUND) ;
 			
-			Derechohabiente trabajador = null;
+			Derechohabiente derechohabiente = null;
 			
-			trabajador = personaDB.getPersonaByNoControlNoAfiliacionIssstep(noControl, noControl);
+			InfoPersona infoPersona = creaInforPersona(noControl, noControl, noControl, 0);
+			derechohabiente = personaDB.getPersonaByNoControlNoPreafiliacion(infoPersona);
 			
 			// Verificamos si se encontrol en la bd de derecohabientes
-			if(trabajador != null) {
-				// Si no se encontro se crear el registro del titular en la bd de derechohabientes
-				if(personaDB.createDerechohabiente(trabajador, false, 4) > 0) { 
-					// Se recuperan los benefiarios y se registran en la bd de derechochoabientes
-					beneficiarioDB.createBeneficiario(trabajador.getNoControl(),  trabajador, 0);
-					for(Derechohabiente beneficiario : personaDB.getBeneficiariosByTrabajadorIssstep(trabajador.getNoControl())) {
-						personaDB.createDerechohabiente(beneficiario, false, 4);
-						beneficiarioDB.createBeneficiario(trabajador.getNoControl(), beneficiario, beneficiario.getClaveParentesco());
+			if (derechohabiente == null) {
+				Derechohabiente trabajador = null;
+				trabajador = personaDB.getPersonaByNoControlNoAfiliacionIssstep(noControl, noControl);
+				
+				// Verificamos si se encontrol en la bd de afiliados
+				if(trabajador != null) {
+					// Si no se encontro se crear el registro del titular en la bd de derechohabientes
+					if(personaDB.createDerechohabiente(trabajador, false, 4) > 0) { 
+						// Se recuperan los benefiarios y se registran en la bd de derechochoabientes
+						beneficiarioDB.createBeneficiario(trabajador.getNoControl(),  trabajador, 0);
+						for(Derechohabiente beneficiario : personaDB.getBeneficiariosByTrabajadorIssstep(trabajador.getNoControl())) {
+							personaDB.createDerechohabiente(beneficiario, false, 4);
+							beneficiarioDB.createBeneficiario(trabajador.getNoControl(), beneficiario, beneficiario.getClaveParentesco());
+						}
+						return getBeneficiarios(true, noControl);
 					}
-					return getBeneficiarios(true, noControl);
+					else
+						return new ResponseEntity<>(new Mensaje("No fue posible registrar la información del trabajador para realizar el proceso de pre-afiliación: " + noControl), HttpStatus.INTERNAL_SERVER_ERROR);				
 				}
-				else
-					return new ResponseEntity<>(new Mensaje("No fue posible registrar la información del trabajador para realizar el proceso de pre-afiliación: " + noControl), HttpStatus.OK);				
+				else 
+					return new ResponseEntity<>(new Mensaje("No existe información para el número de control: " + noControl), HttpStatus.BAD_REQUEST);
 			}
-			else 
-				return new ResponseEntity<>(new Mensaje("No existe información para el número de control: " + noControl), HttpStatus.BAD_REQUEST);
-		}
-		
+			else {
+				beneficiarioDB.createBeneficiario(derechohabiente.getNoControl(),  derechohabiente, 0);
+				Derechohabiente benef = null;
+				
+				List<Derechohabiente> beneficiarios = personaDB.getBeneficiariosByTrabajadorIssstep(derechohabiente.getNoControl());
+				
+				for(Derechohabiente beneficiario: beneficiarios) {
+					infoPersona = creaInforPersona(beneficiario.getNoControl(), beneficiario.getNoControl(), beneficiario.getNoPreAfiliacion(), 0);
+					benef = personaDB.getPersonaByNoControlNoPreafiliacion(infoPersona);
+					if (benef == null) {
+						personaDB.createDerechohabiente(beneficiario, false, 4);
+						beneficiarioDB.createBeneficiario(derechohabiente.getNoControl(), beneficiario, beneficiario.getClaveParentesco());	
+					}
+				}
+				return getBeneficiarios(true, noControl);			
+			}			
+		}		
     }
 	
 	public ResponseEntity<?> getDocumentacionBeneficiarios(boolean incluirTitular, long noControl) {		

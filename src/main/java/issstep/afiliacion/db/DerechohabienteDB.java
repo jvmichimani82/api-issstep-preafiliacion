@@ -87,7 +87,7 @@ public class DerechohabienteDB {
 		
 		Derechohabiente persona = null;
 		try {
-			persona =  afiliacionDBTemplate.queryForObject(query.toString(), new TrabajadorRowMapper());
+			persona =  afiliacionDBTemplate.queryForObject(query.toString(), new TrabajadorRowMapper());		
 		}
 		catch (EmptyResultDataAccessException e) {
 			return null;
@@ -209,7 +209,7 @@ public class DerechohabienteDB {
 		if (esTitular)
 			query.append( "SELECT *, 0 AS CLAVEPARENTESCO FROM TRABAJADOR WHERE NOCONTROL = "); 
 		else 
-			query.append( "SELECT * FROM  BENEFICIARIO  WHERE NOCONTROL = ");		
+			query.append( "SELECT * FROM  BENEFICIARIO  WHERE NOAFILIACION = ");		
 		query.append(noControl);
 		
 		if (esTitular)
@@ -218,7 +218,7 @@ public class DerechohabienteDB {
 			query.append(" AND NOBENEFICIARIO = ");
 		query.append(noAafiliacion);
 				
-		// System.out.println(query.toString());
+		System.out.println(query.toString());
 		
 		Derechohabiente persona = null;
 		try {
@@ -381,7 +381,7 @@ public class DerechohabienteDB {
 		else 
 			queryDerechohabiente.append("DELETE FROM WDERECHOHABIENTE WHERE noControl = " + noControl);
 		
-		/* System.out.println("createOrDeleteDerechohabiente (Trabajador) " + queryTrabajador.toString());
+		/* System.out.println("createOrDeleteDerechohabiente (Trabajador) " + queryTrabajador.toString()); 
 		System.out.println("createOrDeleteDerechohabiente (Derechohabiente) " + queryDerechohabiente.toString()); */
 		
 		try {
@@ -396,7 +396,7 @@ public class DerechohabienteDB {
 		    	        }
 		    	    },
 		    	    keyHolder); */
-			System.out.println("Consulta ==> "+queryDerechohabiente.toString());
+			// System.out.println("Consulta ==> "+queryDerechohabiente.toString());
 			mysqlTemplate.update(
 		    	    new PreparedStatementCreator() {
 		    	        public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
@@ -588,12 +588,12 @@ public class DerechohabienteDB {
 		String queryComplemento = "";
 		
 			query.append( "SELECT T.NOMBRE, T.MATERNO, T.PATERNO, T.NOCONTROL, T.NOAFILIACION, "
-						+ "0 AS NOPREAFILIACION, T.NOCONTROL AS NOBENEFICIARIO, T.CURP, "
+						+ "0 AS NOPREAFILIACION, T.NOAFILIACION AS NOBENEFICIARIO, T.CURP, "
 						+ "0 AS CLAVEPARENTESCO, T.SEXO " 
 						+ "FROM TRABAJADOR T WHERE ");
 			queryComplemento = " UNION " + 
-							  "SELECT B.NOMBRE, B.MATERNO, B.PATERNO, B.NOAFILIACION AS NOCONTROL"
-							+ "B.NOAFILIACION, 0 AS NOPREAFILIACION, "
+							  "SELECT B.NOMBRE, B.MATERNO, B.PATERNO, B.NOAFILIACION AS NOCONTROL, "
+							+ "B.NOBENEFICIARIO, 0 AS NOPREAFILIACION, "
 							+ "B.NOBENEFICIARIO, B.CURP, B.CLAVEPARENTESCO, B.SEXO " 
 							+ "	FROM BENEFICIARIO B WHERE ";
 			
@@ -620,7 +620,7 @@ public class DerechohabienteDB {
 				}
 			}
 		
-		// System.out.println("Consulta de busqueda (Afiliacion) ==> " + query.toString());
+		System.out.println("Consulta de busqueda (Afiliacion) ==> " + query.toString());
 		
 		List<ResultadoBusqueda> resultadoBusqueda = null;
 		
@@ -689,7 +689,8 @@ public class DerechohabienteDB {
 						+ "FROM (SELECT MAX(NOCONTROL) + 100 AS NOCONTROL FROM TRABAJADOR) NUMEROS ;");
 		else  */
 		query.append("SELECT NOCONTROLTITULAR, NOCONTROL, MAX(NOPREAFILIACION) + 1 AS NOPREAFILIACION "
-				   + "FROM WBENEFICIARIO WHERE NOCONTROLTITULAR = " + noControl);
+				   + "	FROM WBENEFICIARIO WHERE NOCONTROLTITULAR = " + noControl
+				   + "	GROUP BY NOCONTROLTITULAR, NOCONTROL");
 
 		NumerosParaRegistro numerosParaRegistro  = null;
 		try {
