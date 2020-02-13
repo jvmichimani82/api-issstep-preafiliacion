@@ -37,7 +37,7 @@ public class TokenAuthenticationService {
 	public Authentication getAuthentication(String nombreUsuario, String password) {
 		Usuario userLogin = usuarioDB.getSession(nombreUsuario, Hashing.sha256().hashString(password, Charsets.UTF_8).toString());
 	
-		// System.out.println("Autent....");
+		 System.out.println("Autent...."+ Hashing.sha256().hashString(password, Charsets.UTF_8).toString());
 		
 		if (userLogin!=null)
 			return new UsernamePasswordAuthenticationToken(userLogin, password, userLogin.getAuthorities());

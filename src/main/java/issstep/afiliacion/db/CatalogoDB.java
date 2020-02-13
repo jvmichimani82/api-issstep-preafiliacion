@@ -234,7 +234,12 @@ class ColoniaRowMapper implements RowMapper<Colonia> {
 		 //colonia.setClaveEstado(rs.getLong("CLAVEESTADO"));
 		 colonia.setClaveLocalidad(rs.getLong("CLAVELOCALIDAD"));
 		 colonia.setClaveMunicipio(rs.getLong("CLAVEMUNICIPIO"));
+		 try {
 		 colonia.setCodigoPostal(rs.getLong("CODIGOPOSTAL"));
+		 }
+		 catch(Exception e) {
+			 colonia.setCodigoPostal(0);
+		 }
 		 colonia.setDescripcion(rs.getString("DESCRIPCION"));
 		 
 		return colonia;
