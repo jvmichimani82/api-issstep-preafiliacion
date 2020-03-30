@@ -26,6 +26,12 @@ public class DocumentosByParentesco {
 	@JsonView({DocumentosByParentesco.Views.Simple.class})
 	String archivo;
 	
+	@JsonView({DocumentosByParentesco.Views.Simple.class})
+	String instrucciones;
+	
+	@JsonView({DocumentosByParentesco.Views.Simple.class})
+	String ejemplo;
+	
 	public static final class Views {
 		public interface Simple {}
 	}

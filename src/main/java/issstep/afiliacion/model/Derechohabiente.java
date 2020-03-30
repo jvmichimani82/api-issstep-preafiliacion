@@ -135,7 +135,15 @@ public class Derechohabiente {
 	@JsonView({Derechohabiente.Views.Simple.class})
 	Usuario usuario;
 	
+	@JsonView({Derechohabiente.Views.Simple.class})
+	String dependenciades;
 	
+	@JsonView({Derechohabiente.Views.Simple.class})
+	String coloniades;
+	
+
+	@JsonView({Derechohabiente.Views.Simple.class})
+	int porValidar;
 
 
 	public String getNombreCompleto() {
@@ -146,5 +154,11 @@ public class Derechohabiente {
 		public interface Simple extends Mensaje.Views.Simple {}
 		public interface RegistroDerechohabiente {}
 	}
-
+	
+	public int getPorValidar() {
+		if(this.getEstatus() >= 8 ) {
+			return 1;
+		}
+		return 0;
+	}
 }

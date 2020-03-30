@@ -5,6 +5,7 @@ package issstep.afiliacion.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -13,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import issstep.afiliacion.model.Comentario;
 import issstep.afiliacion.service.ArchivoService;
 
 import javax.servlet.http.HttpServletResponse;
@@ -78,8 +80,13 @@ public class ArchivoController {
  											 @PathVariable("claveDocumento") long claveDocumento,
  											 @ApiParam(value = "1 - Valido, \n  0 - Invalido", required = true)
  											 @PathVariable("estatusValidacion") int estatusValidacion,
- 											 HttpServletResponse response) throws Exception {   
-	 		return archivoService.updateValidacionDocto( claveDocumento, estatusValidacion, response );	
+ 											 @RequestBody (required=false) Comentario comentario,
+ 											 HttpServletResponse response) throws Exception {  
+    	 
+    	 String coment = comentario != null ? comentario.getComentario(): "";
+    	 
+    		 
+	 		return archivoService.updateValidacionDocto( claveDocumento, estatusValidacion, coment, response );	
  	 }	 
 }
 

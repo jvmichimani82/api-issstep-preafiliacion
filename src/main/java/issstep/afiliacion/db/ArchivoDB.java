@@ -117,7 +117,8 @@ public class ArchivoDB {
 		
 	
 	public List<DocumentosByParentesco> getDocumentosByParentesco(long idParentesco) {
-		StringBuilder query = new StringBuilder("SELECT P.*, TA.DESCRIPCION AS ARCHIVO FROM WKPARENTESCOTIPOARCHIVO P, WKTIPOARCHIVO TA ");
+		StringBuilder query = new StringBuilder("SELECT P.*, TA.DESCRIPCION AS ARCHIVO, TA.INSTRUCCIONES AS INSTRUCCIONES, TA.EJEMPLO AS EJEMPLO  "
+				+ "FROM WKPARENTESCOTIPOARCHIVO P, WKTIPOARCHIVO TA ");
 		query.append("WHERE P.CLAVETIPOARCHIVO = TA.CLAVETIPOARCHIVO AND P.CLAVEPARENTESCO = ");
 		
 		query.append(idParentesco);
@@ -199,14 +200,14 @@ public class ArchivoDB {
 	public long update (Archivo archivo) {
 		StringBuilder query = new StringBuilder();
 		query.append( "UPDATE WDOCUMENTO SET NOMBRE = ?, URLARCHIVO = ?, "
-					+ "ESVALIDO = ?, FECHAREGISTRO = ?, ESTATUS = ? WHERE CLAVEDOCUMENTO = ? ");
+					+ "ESVALIDO = ?, FECHAREGISTRO = ?, COMENTARIO = ? WHERE CLAVEDOCUMENTO = ? ");
 			
 		// System.out.println(query.toString());
 		
 		try {
 			  mysqlTemplate.update(query.toString(), new Object[] { archivo.getNombre(),
 					  archivo.getUrlArchivo(), archivo.getEsValido(), archivo.getFechaRegistro(),
-					  archivo.getEstatus(), archivo.getClaveDocumento(),
+					   archivo.getComentario(), archivo.getClaveDocumento(),
 					  });
 			  return  archivo.getClaveDocumento();
 		} 
@@ -269,6 +270,25 @@ public class ArchivoDB {
 		return 0;
 	} */
 
+	
+	public boolean actualizaEstatusDoctosDerechohabiente (long noControl, long noAfiliacion, int estatus) {
+		StringBuilder query = new StringBuilder();
+		query.append("UPDATE WDOCUMENTO SET ESVALIDO = ? WHERE NOCONTROL = ? AND NOPREAFILIACION = ?  AND ESTATUS = 1 AND ESVALIDO IN (-1, 0)");
+			
+		 System.out.println(query.toString());
+		
+		try {
+			  mysqlTemplate.update(query.toString(), new Object[] { 
+					  estatus, noControl, noAfiliacion
+			});
+			return true;
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+	}
     
 	
 }
@@ -280,7 +300,7 @@ class ArchivoRowMapper implements RowMapper<Archivo> {
  
     	archive.setClaveDocumento(rs.getLong("claveDocumento"));
     	archive.setNoControl(rs.getLong("noControl"));
-    	archive.setNoControlTitular(rs.getLong("noControlTitular"));
+    	//archive.setNoControlTitular(rs.getLong("noControlTitular"));
     	archive.setNoPreAfiliacion(rs.getLong("noPreAfiliacion"));
     	archive.setNoBeneficiario(rs.getLong("noBeneficiario"));
     	archive.setClaveParentesco(rs.getLong("claveParentesco"));
@@ -291,6 +311,7 @@ class ArchivoRowMapper implements RowMapper<Archivo> {
     	archive.setClaveUsuarioRegistro(rs.getLong("claveUsuarioRegistro")); 
     	archive.setFechaRegistro(rs.getTimestamp("fechaRegistro"));
     	archive.setClaveUsuarioModificacion(rs.getLong("claveUsuarioModificacion"));
+    	archive.setComentario(rs.getString("comentario"));
  
         return archive;
     }
@@ -304,6 +325,8 @@ class ParentescoTipoArchivoRowMapper implements RowMapper<DocumentosByParentesco
     	parentescoTipoArchivo.setClaveParentesco(rs.getLong("CLAVEPARENTESCO"));
     	parentescoTipoArchivo.setClaveTipoArchivo(rs.getLong("CLAVETIPOARCHIVO"));
     	parentescoTipoArchivo.setEsObligatorio(rs.getLong("ESOBLIGATORIO"));
+    	parentescoTipoArchivo.setInstrucciones(rs.getString("INSTRUCCIONES"));
+    	parentescoTipoArchivo.setEjemplo(rs.getString("EJEMPLO"));
     	parentescoTipoArchivo.setArchivo(rs.getString("ARCHIVO"));
     	
         return parentescoTipoArchivo;

@@ -12,6 +12,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class Curp  {
-	String curp;
+	String rfc;
 
 }

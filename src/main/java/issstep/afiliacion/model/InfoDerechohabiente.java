@@ -28,6 +28,8 @@ public class InfoDerechohabiente {
 	
 	String nombreCompleto;
 	
+	long noAfiliacion;
+	
 	public String getNombreCompleto() {
 		return this.nombre.trim() + " " + this.paterno.trim() + " " + this.materno.trim();	
 	}

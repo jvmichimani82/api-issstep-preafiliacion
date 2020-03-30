@@ -54,10 +54,16 @@ public class ArchivoService{
    UsuarioDB usuarioDB;
    
    @Autowired
+   DerechohabienteDB personaDB;
+   
+   @Autowired
    BeneficiarioDB beneficiarioDB;
    
    @Autowired
    DerechohabienteDB derechohabienteDB;
+   
+   @Autowired
+   SambaService sambaService;
    
   
 	public ResponseEntity<?> uploadDocumento( long noControlTitular, long noControl, long noPreAfiliacion, long claveParentesco, long claveTipoArchivo,  MultipartFile uploadedFile, HttpServletResponse response) {
@@ -87,7 +93,16 @@ public class ArchivoService{
 				
 				if (beneficiario != null) {
 					
-					String resultado = UtilsImage.uploadFileToServer(UtilsImage.toPrettyURL(desTipoDocto), (MultipartFile) uploadedFile, "Persona"+noControl+noPreAfiliacion+claveParentesco+claveTipoArchivo+"-"+UtilsImage.toPrettyURL(desTipoDocto));
+					String resultado = null;
+					String ubicacion = "192.168.1.23//Pre-Afiliacion//"+(noControl+noPreAfiliacion);
+					if(sambaService.creaDirectorio(ubicacion, "PREAFIL", "Pr32019")) {
+						resultado = sambaService.upload((MultipartFile) uploadedFile, ubicacion, UtilsImage.toPrettyURL(desTipoDocto), "PREAFIL", "Pr32019");
+					}
+					
+					if(resultado == null) {
+						resultado = UtilsImage.uploadFileToServer(UtilsImage.toPrettyURL(desTipoDocto), (MultipartFile) uploadedFile, "Persona"+noControl+noPreAfiliacion+claveParentesco+claveTipoArchivo+"-"+UtilsImage.toPrettyURL(desTipoDocto));
+					}
+					
 					
 					archivo = new Archivo();
 					
@@ -98,7 +113,7 @@ public class ArchivoService{
 					archivo.setClaveTipoArchivo(claveTipoArchivo);
 					archivo.setNombre(uploadedFile.getOriginalFilename());
 					archivo.setUrlArchivo(resultado);
-					archivo.setEsValido(2);
+					archivo.setEsValido(-1); //<- 2 por validar, 1 valido 0 invalido, -1 por primera vez
 					archivo.setClaveUsuarioRegistro(beneficiario.getClaveUsuarioRegistro());
 					archivo.setFechaRegistro(new Timestamp(new Date().getTime()));					
 					archivo.setClaveUsuarioModificacion(beneficiario.getClaveUsuarioModificacion());
@@ -176,18 +191,24 @@ public class ArchivoService{
 			// System.out.println(archivo);
 			
 			if(archivo != null) {
-				ResultadoValidacion resultadoValidacion = validaEstatusRegistro (archivo.getNoControlTitular(),  
+				/*ResultadoValidacion resultadoValidacion = validaEstatusRegistro (archivo.getNoControlTitular(),  
 																				 archivo.getNoControl(), 
 																				 archivo.getNoPreAfiliacion(),
 																				 archivo.getClaveParentesco());
 				
 				if (!resultadoValidacion.isEsValido())
-					return new ResponseEntity<>(new Mensaje(resultadoValidacion.getMensaje()), HttpStatus.CONFLICT);
+					return new ResponseEntity<>(new Mensaje(resultadoValidacion.getMensaje()), HttpStatus.CONFLICT);*/
 				
 			
 				String nombreTemp = archivo.getUrlArchivo();
-				InputStream imputStream = new FileInputStream(new File(nombreTemp));
-				byte[] document = IOUtils.toByteArray(imputStream);
+				InputStream imputStream;
+				byte[] document = sambaService.download(archivo.getUrlArchivo(), "PREAFIL", "Pr32019");
+				
+				if(document == null) {
+					imputStream = new FileInputStream(new File(nombreTemp));
+					document = IOUtils.toByteArray(imputStream);
+				}
+					
 				String ext = FilenameUtils.getExtension(nombreTemp);
 				String x = (!ext.equalsIgnoreCase("pdf"))?"image":"application";
 				HttpHeaders header = new HttpHeaders();
@@ -256,13 +277,13 @@ public class ArchivoService{
 			if(archivo == null)
 				return new ResponseEntity<>(new Mensaje("Documento no encontrado"), HttpStatus.NOT_FOUND);
 			
-			ResultadoValidacion resultadoValidacion = validaEstatusRegistro (archivo.getNoControlTitular(),  
+			/*ResultadoValidacion resultadoValidacion = validaEstatusRegistro (archivo.getNoControlTitular(),  
 																			 archivo.getNoControl(), 
 																			 archivo.getNoPreAfiliacion(),
 																			 archivo.getClaveParentesco());
 			
 			if (!resultadoValidacion.isEsValido())
-				return new ResponseEntity<>(new Mensaje(resultadoValidacion.getMensaje()), HttpStatus.CONFLICT);
+				return new ResponseEntity<>(new Mensaje(resultadoValidacion.getMensaje()), HttpStatus.CONFLICT);*/
 			
 			Usuario usuarioLogin = getInfoLogin();
 			if (usuarioLogin == null)
@@ -271,7 +292,7 @@ public class ArchivoService{
 			if (archivo.getEsValido() == 1 && !usuarioLogin.getRol().equals("ADMINISTRADOR")) 
 				return new ResponseEntity<>(new Mensaje("El estatus del documento es valido"), HttpStatus.NOT_FOUND);
 			
-			UtilsImage.deleteDocto(archivo.getUrlArchivo());
+			//UtilsImage.deleteDocto(archivo.getUrlArchivo());
 			if (archivoDB.delete(claveDocumento) == -1)
 				return new ResponseEntity<>(new Mensaje("El documento no se pudo eliminar"), HttpStatus.INTERNAL_SERVER_ERROR);
 		
@@ -284,7 +305,7 @@ public class ArchivoService{
 		}
 	}
 	
-	public ResponseEntity<?> updateValidacionDocto( long claveDocumento, int estatusValidacion, HttpServletResponse response) {
+	public ResponseEntity<?> updateValidacionDocto( long claveDocumento, int estatusValidacion, String comentario, HttpServletResponse response) {
 		if (estatusValidacion < 0 || estatusValidacion > 2)
 			return new ResponseEntity<>(new Mensaje("Estatus invalido"), HttpStatus.BAD_REQUEST);
 		
@@ -295,10 +316,19 @@ public class ArchivoService{
 			if(archivo == null)
 				return new ResponseEntity<>(new Mensaje("Documento no encontrado"), HttpStatus.NOT_FOUND);
 			
+			System.out.println("aqui va el "+ comentario);
+			archivo.setComentario(comentario);
 			archivo.setEsValido(estatusValidacion);
 			
 			if (archivoDB.update(archivo) == -1)
 				return new ResponseEntity<>(new Mensaje("El no pudo actualizar el documento"), HttpStatus.INTERNAL_SERVER_ERROR);
+			
+			try {
+				if(estatusValidacion == 0)
+				personaDB.actualizaEstatusValidarDerechohabiente(archivo.getNoControl(), archivo.getNoPreAfiliacion(), 1);
+			} catch(Exception e) {
+				
+			}
 		
 			return new ResponseEntity<>(new Mensaje("Actualizacion correcta"), HttpStatus.OK);	
 		} 

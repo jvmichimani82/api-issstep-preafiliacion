@@ -29,6 +29,9 @@ public class Beneficiario {
 	long noPreAfiliacion;
 	
 	@JsonView({Beneficiario.Views.Simple.class})
+	long noAfiliacion;
+	
+	@JsonView({Beneficiario.Views.Simple.class})
 	long claveParentesco;
 	
 	@JsonView({Beneficiario.Views.Simple.class})

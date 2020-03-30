@@ -41,6 +41,9 @@ public class Archivo {
 	String nombre;
 	
 	@JsonView({Archivo.Views.Simple.class})
+	String comentario;
+	
+	@JsonView({Archivo.Views.Simple.class})
 	String urlArchivo;
 	
 	@JsonView({Archivo.Views.Simple.class})

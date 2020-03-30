@@ -157,7 +157,7 @@ public class Utils {
 
        } catch (Exception e) {
     	   
-           e.printStackTrace();
+         //  e.printStackTrace();
            String date = formatter.format(new Date());
            return date+"T00:00:00.0";
        }

@@ -36,10 +36,10 @@ public class DerechohabienteController {
     // servicio para la validacion por curp de los derechohabientes
     @JsonView(Derechohabiente.Views.Simple.class)
     @ApiOperation(value = "Verifica si hay un derechohabiente mediante su CURP")
-    @RequestMapping(value = "/validaCurp", method = RequestMethod.POST)
+    @RequestMapping(value = "/validaRfc", method = RequestMethod.POST)
     public ResponseEntity<?> validaPersonaCurp( @ApiParam(value = DerechohabienteCONST.curp, required = true)@RequestBody Curp curp, HttpServletResponse response) {
 
-    	return derechohabienteService.getPersonaByCurp(curp.getCurp());
+    	return derechohabienteService.getPersonaByCurp(curp.getRfc());
     }
     
     @JsonView(Derechohabiente.Views.Simple.class)
@@ -221,6 +221,17 @@ public class DerechohabienteController {
     										 HttpServletResponse response) {
 
     	return derechohabienteService.updateEstatusByNoControlAndNoPreAfiliacion( noControl, noPreAfiliacion, 9 );
+    }
+    
+    @ApiOperation(value = "Documentos de Derechohabiente listo para validar")
+    @JsonView(Derechohabiente.Views.Simple.class)
+    @RequestMapping(value = "/validarDocumentos/{noControl}/{noPreAfiliacion}", method = RequestMethod.PUT)
+    public ResponseEntity<?> updateEstatusDoctoByNoControlAndNoPreafiliacion(
+    										 @ApiParam(value = "noControl", required = true) @PathVariable long noControl, 
+    										 @ApiParam(value = "noPreAfiliacion", required = true) @PathVariable long noPreAfiliacion,
+    										 HttpServletResponse response) {
+
+    	return derechohabienteService.updateEstatusDoctosByNoControlAndNoPreAfiliacion( noControl, noPreAfiliacion, 2 );
     }
     
 }

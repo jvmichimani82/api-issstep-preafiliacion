@@ -25,6 +25,7 @@ import com.google.common.hash.Hashing;
 
 import issstep.afiliacion.db.DerechohabienteDB;
 import issstep.afiliacion.db.UsuarioDB;
+import issstep.afiliacion.db.ArchivoDB;
 import issstep.afiliacion.db.BeneficiarioDB;
 import issstep.afiliacion.db.CatalogoGenericoDB;
 import issstep.afiliacion.model.Mensaje;
@@ -57,12 +58,16 @@ public class DerechohabienteService {
 	
 	private static final int LIMITE_EDAD = 18;
 	private static final int INACTIVA = -1;
+	private static final int ACTIVA = -1;
 		
 	@Autowired
 	DerechohabienteDB personaDB;
 	
 	@Autowired
 	UsuarioDB usuarioDB;
+	
+	@Autowired
+	ArchivoDB archivoDB;
 	
 	@Autowired
 	BeneficiarioDB beneficiarioDB;
@@ -73,19 +78,21 @@ public class DerechohabienteService {
 	@Autowired
 	MailService mailService;
 		
-	public ResponseEntity<?> getPersonaByCurp(String curp) {
-		if (curp == null)
-			return new ResponseEntity<>(new Mensaje("Debe proporcionar el campo curp"), HttpStatus.BAD_REQUEST);
+	public ResponseEntity<?> getPersonaByCurp(String rfc) {
+		if (rfc == null)
+			return new ResponseEntity<>(new Mensaje("Debe proporcionar el campo rfc"), HttpStatus.BAD_REQUEST);
 		
-		if (!Utils.esCURP(curp))
-			return new ResponseEntity<>(new Mensaje("Formato de curp invalido"), HttpStatus.BAD_REQUEST);
+		//if (!Utils.esCURP(curp))
+		//	return new ResponseEntity<>(new Mensaje("Formato de curp invalido"), HttpStatus.BAD_REQUEST);
 		
 		// Revisamos que la persona exista en nuestra base de datos
-		Derechohabiente persona =  personaDB.getPersonaByColumnaStringValor("CURP", curp);
+		//Derechohabiente persona =  personaDB.getPersonaByColumnaStringValor("CURP", curp);
+		
+		Derechohabiente persona = null;// =  personaDB.getPersonaByColumnaStringValor("CURP", curp);
 			
 		// Sino tenemos resultado de nuestra base de datos vamos por los datos a la bd de issstep
 		if(persona == null) 
-			persona = personaDB.getTrabajadorIssstepByColumnaStringValor("CURP", curp);
+			persona = personaDB.getTrabajadorIssstepByColumnaStringValor("RFC", rfc);
 			
 		if (persona == null)
 			return new ResponseEntity<>(new Mensaje("No existe el derechohabiente"), HttpStatus.NOT_FOUND);
@@ -181,7 +188,7 @@ public class DerechohabienteService {
 			// if(persona.getCurp() != null) {
 				
 			// Revisamos que la persona exista en nuestra base de datos
-			 oldPersona =  personaDB.getPersonaByColumnaStringValor("CURP", persona.getCurp());
+			 oldPersona =  personaDB.getPersonaByColumnaStringValor("RFC", persona.getRfc());
 			
 			// Sin encontramos un resultado en nuestra bd rechacamos la creacion del usuario
 			if(oldPersona != null) {
@@ -192,14 +199,14 @@ public class DerechohabienteService {
 					return new ResponseEntity<>(new Mensaje("Ya existe una cuenta para el derechohabiente"), HttpStatus.CONFLICT);
 				
 				// Se crea la cuenta	
-				ResultadoCreacionCuenta infoCuenta = creaCuenta(oldPersona, persona, INACTIVA);
+				ResultadoCreacionCuenta infoCuenta = creaCuenta(oldPersona, persona, ACTIVA);
 				
 				if (!infoCuenta.isEtatus())
 					return new ResponseEntity<>( infoCuenta.getMensaje() , HttpStatus.INTERNAL_SERVER_ERROR);					
 			}
 			else {
 				// Sino hacemos la consulta a la bd de issstep
-				oldPersona = personaDB.getTrabajadorIssstepByColumnaStringValor("CURP", persona.getCurp());
+				oldPersona = personaDB.getTrabajadorIssstepByColumnaStringValor("RFC", persona.getRfc());
 				
 				//Si encontramos un resultado en la base de datos ISSSTEP procedemos a la creacion del Derechohabiente y su usuario de la plataforma
 				if(oldPersona != null) {
@@ -263,7 +270,7 @@ public class DerechohabienteService {
 		ResultadoValidacion resultadoValidacion =  new ResultadoValidacion();
 		resultadoValidacion.setEsValido(true);				
 		
-		if (persona.getCurp() == null ) {
+		/*if (persona.getCurp() == null ) {
 			resultadoValidacion.setEsValido(false);
 			resultadoValidacion.setMensaje("Debe proporcional la curp");
 			return resultadoValidacion;
@@ -274,7 +281,7 @@ public class DerechohabienteService {
 				resultadoValidacion.setMensaje("Formato de CURP invalido");
 				return resultadoValidacion;
 			}
-		}
+		}*/
 		
 		if (persona.getEmail() == null ) {
 			resultadoValidacion.setEsValido(false);
@@ -388,6 +395,7 @@ public class DerechohabienteService {
 		usuario.setFechaRegistro(new Timestamp(new Date().getTime()));
 		usuario.setEstatus(estatus);
 		usuario.setNoAfiliacion(oldPersona.getNoPreAfiliacion());
+	
 		
 		long claveUsuario = usuarioDB.createUsuario( 0, usuario );
 				
@@ -478,8 +486,10 @@ public class DerechohabienteService {
 		if (!resultadoValidacion.isEsValido())
 			return new ResponseEntity<>(new Mensaje(resultadoValidacion.getMensaje()), HttpStatus.BAD_REQUEST);
 		
-		if  (getPersonaByCurp(registroDerechohabiente.getCurp()) != null) 
-			return new ResponseEntity<>(new Mensaje("Ya exite un derechohabiente con esa Curp"), HttpStatus.CONFLICT);
+		
+		// aqui debemos verificar que exista un beneficiario en la tabla beneficiario con esa curp
+		/*if  (getPersonaByCurp(registroDerechohabiente.getCurp()) != null) 
+			return new ResponseEntity<>(new Mensaje("Ya exite un derechohabiente con esa Curp"), HttpStatus.CONFLICT);*/
 		
 		String user = (String) SecurityContextHolder.getContext().getAuthentication().getName();
 		Usuario usuario =  usuarioDB.getUsuarioByColumnaStringValor("LOGIN", user);
@@ -491,8 +501,10 @@ public class DerechohabienteService {
 		
 		boolean esAdmin = usuario.getClaveRol() == 1;
 		
+		long noClaveParentesco = registroDerechohabiente.getClaveParentesco();
+		
 		// if (!esAdmin) 
-		if (registroDerechohabiente.getClaveParentesco() == 0)
+		if (noClaveParentesco == 0)
 			return new ResponseEntity<>(new Mensaje("El alta de titulares no es permitido"), HttpStatus.BAD_REQUEST);
 				
 		try{	
@@ -506,7 +518,7 @@ public class DerechohabienteService {
 				
 			InfoPersona infoPersona = creaInforPersona(usuario.getNoControl(), 
 													   usuario.getNoControl(), 
-													   usuario.getNoControl(), 
+													   usuario.getNoAfiliacion(), 
 													   0);
 			// Se reucpera la informacion del titular
 			derechohabienteTitular = personaDB.getPersonaByNoControlNoPreafiliacion(infoPersona);
@@ -529,7 +541,7 @@ public class DerechohabienteService {
 				
 			beneficiarioDB.createBeneficiario(registroDerechohabiente.getNoControl(), 
 											  registroDerechohabiente, 
-											  registroDerechohabiente.getClaveParentesco());
+											  noClaveParentesco);
 			
 			return new ResponseEntity<>(registroDerechohabiente, HttpStatus.CREATED);					
 			
@@ -667,11 +679,11 @@ public class DerechohabienteService {
 			}
 		}
 		
-		if (datosRegistro.getClaveEstadoCivil() == 0) {
+		/*if (datosRegistro.getClaveEstadoCivil() == 0) {
 			resultadoValidacion.setEsValido(false);
 			resultadoValidacion.setMensaje("Debe proporcional el campo claveEstadoCivil");
 			return resultadoValidacion;
-		}
+		}*/
 		
 		return resultadoValidacion;
 		
@@ -886,6 +898,29 @@ public class DerechohabienteService {
 		if (personaDB.actualizaDatos(esAdmin, datosDerechohabiente) == -1)
 			return new ResponseEntity<>(new Mensaje("No se pudo actualizar el usuario con número de Control: " + datosDerechohabiente.getNoControl()), HttpStatus.INTERNAL_SERVER_ERROR);
 		
+		try {
+			personaDB.actualizaParentescoBeneficiario(esAdmin, datosDerechohabiente);
+		}
+		catch(Exception i) {
+			i.printStackTrace();
+		}
+		
+		try {
+			
+			datosDerechohabiente.setClaveUsuarioRegistro(151);
+			datosDerechohabiente.setClaveUsuarioModificacion(151);
+			
+			if(personaDB.existeDerechoHabienteRegistradoIntermedia(datosDerechohabiente.getNoControl(), datosDerechohabiente.getNoPreAfiliacion())) {
+				long resultado = personaDB.actualizaDatosIntermedia(datosDerechohabiente);
+			}
+			else {
+				long resultado2 = personaDB.createDerechohabienteIntermedia(datosDerechohabiente, datosDerechohabiente.getNoPreAfiliacion());
+			}
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		
 		return new ResponseEntity<>(derechohabiente , HttpStatus.OK);				
     }
 	
@@ -931,7 +966,31 @@ public class DerechohabienteService {
 			return new ResponseEntity<>(new Mensaje("Estatus de validacion incorrecto"), HttpStatus.BAD_REQUEST);
 		
 		List<InfoDerechohabiente> derechohabientes = personaDB.getDerechohabientesPorEstatusDeValidacion( estatusValidacion );
+		
+		for(InfoDerechohabiente dh : derechohabientes) {
+			dh.setNoAfiliacion(personaDB.getNoAfiliacionDerechoHabienteRegistradoIntermedia(dh.getNoControl(), dh.getNoPreAfiliacion()));
+		}
+		
+		List<InfoDerechohabiente> listaBeneficiariosResult = new ArrayList<InfoDerechohabiente>();
+		
+		for(InfoDerechohabiente dha : derechohabientes) {
+			List<Derechohabiente> listaBeneficiarios = personaDB.getBeneficiariosByDerechohabiente(false, dha.getNoControl());
+			List<DocumentosFaltantes> listaDocumentosFaltantes = personaDB.getDocumentacionByDerechohabiente(false, dha.getNoControl());
 			
+			boolean encontrado = false;
+			
+			for(Derechohabiente dr : listaBeneficiarios) {
+				for(DocumentosFaltantes df : listaDocumentosFaltantes) {
+					if(df.getNoControl() == dr.getNoControl() && df.getNoPreAfiliacion() == dr.getNoPreAfiliacion() && df.getEstatus() == estatusValidacion ) {
+						System.out.println("Encontrado");
+					}
+					else{
+						
+					}
+				}
+			}
+		}
+		
 		return new ResponseEntity<>(derechohabientes, HttpStatus.OK);	
     }
 	
@@ -1061,7 +1120,7 @@ public class DerechohabienteService {
 			return new ResponseEntity<>(resultadoBusqueda, HttpStatus.OK);
 		
 		else
-			return new ResponseEntity<>(new ArrayList[0] , HttpStatus.OK);
+			return new ResponseEntity<>(new ArrayList[0] , HttpStatus.NO_CONTENT);
 		
     }
 	
@@ -1100,8 +1159,59 @@ public class DerechohabienteService {
 		if(!usuarioDB.actualizaEstatusDerechohabiente(noControl, noPreAfiliacion, estatus))
 			return new ResponseEntity<>(new Mensaje("No fue posible actualizar el estatus"), HttpStatus.INTERNAL_SERVER_ERROR);
 		
+		try {
+			System.out.println(noPreAfiliacion);
+			if(personaDB.existeDerechoHabienteRegistradoIntermedia(noControl, noPreAfiliacion)) {
+				personaDB.actualizaSituacionDerechohabienteIntermedia(noControl, noPreAfiliacion, 2);
+			}
+			
+		}catch(Exception e) {
+			
+		}
+		
 		return new ResponseEntity<>(new Mensaje("Actualizacion exitosa"), HttpStatus.OK);
     }
+	
+	/********************************** metodos que nos ayudaran a actualizar el estatus de los doctos **************************/
+	
+	
+	
+	public ResponseEntity<?> updateEstatusDoctosByNoControlAndNoPreAfiliacion(long noControl, long noPreAfiliacion, int estatus) {
+		if (estatus < 0 && estatus > catalogoGenericoDB.getUltimoEstatus())
+			return new ResponseEntity<>(new Mensaje("Estatus no valido"), HttpStatus.BAD_REQUEST);
+		
+			
+		if(!archivoDB.actualizaEstatusDoctosDerechohabiente(noControl, noPreAfiliacion, estatus)) {
+			
+			
+			return new ResponseEntity<>(new Mensaje("No fue posible actualizar el estatus"), HttpStatus.INTERNAL_SERVER_ERROR);
+			
+		}
+		
+		personaDB.actualizaEstatusValidarDerechohabiente(noControl, noPreAfiliacion, 8);
+		
+		return new ResponseEntity<>(new Mensaje("Actualizacion exitosa"), HttpStatus.OK);
+    }
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/*************************************************************/
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	int getNoDocumentosFaltantes(List<DocumentosFaltantes> listaDocumentosFaltantes, 
 								 long noControl, 
