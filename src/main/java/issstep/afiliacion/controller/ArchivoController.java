@@ -49,6 +49,13 @@ public class ArchivoController {
 												HttpServletResponse response) throws Exception {   
 	 		return archivoService.dowloadDocumento(claveDocumento, response );	
 	 }
+	 
+	 @ApiOperation(value = "Descargar un QR")
+	 @RequestMapping(value="/qr/{cadena}", method = RequestMethod.GET)
+		public ResponseEntity<?> downloadDocto(	@PathVariable("cadena") String cadena, 
+												HttpServletResponse response) throws Exception {   
+	 		return archivoService.getQRCodeImage(cadena, 200,200 );	
+	 }
 	
 	 @ApiOperation(value = "Eliminar un documento")
 	 @RequestMapping(value="/deleteDocto/{claveDocumento}", method = RequestMethod.DELETE)

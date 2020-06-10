@@ -93,7 +93,7 @@ public class BeneficiarioDB {
 					+ noControlTitular + ", " +  derechohabiente.getNoControl() + ", "
 					+ derechohabiente.getNoPreAfiliacion() + ", "
 					+ claveParentesco + ", '" + Utils.getFechaFromTimeStamp(derechohabiente.getFechaPreAfiliacion()) + "', 1, " +
-					+ derechohabiente.getClaveUsuarioRegistro() + ", '" + Utils.getFechaFromDate(derechohabiente.getFechaRegistro()) 
+					+ derechohabiente.getClaveUsuarioRegistro() + ", '" + Utils.getFechaFromTimeStamp(derechohabiente.getFechaRegistro()) 
 					+ "')" );
 		else 
 			query.append("DELETE FROM WBENEFICIARIO WHERE NOBENEFICIARIO = " + noBeneficiario);

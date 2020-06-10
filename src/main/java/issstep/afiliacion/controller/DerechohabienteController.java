@@ -22,6 +22,7 @@ import issstep.afiliacion.model.InfoPersona;
 import issstep.afiliacion.model.ResetPassword;
 import issstep.afiliacion.model.ActualizarPassword;
 import issstep.afiliacion.model.Beneficiario;
+import issstep.afiliacion.service.ArchivoService;
 import issstep.afiliacion.service.DerechohabienteService;
 import javax.servlet.http.HttpServletResponse;
 
@@ -33,9 +34,12 @@ public class DerechohabienteController {
     @Autowired
     public DerechohabienteService derechohabienteService;
     
+    @Autowired
+    public ArchivoService archivoService;
+    
     // servicio para la validacion por curp de los derechohabientes
     @JsonView(Derechohabiente.Views.Simple.class)
-    @ApiOperation(value = "Verifica si hay un derechohabiente mediante su CURP")
+    @ApiOperation(value = "Verifica si hay un derechohabiente mediante su RFC")
     @RequestMapping(value = "/validaRfc", method = RequestMethod.POST)
     public ResponseEntity<?> validaPersonaCurp( @ApiParam(value = DerechohabienteCONST.curp, required = true)@RequestBody Curp curp, HttpServletResponse response) {
 
@@ -58,6 +62,11 @@ public class DerechohabienteController {
     	return derechohabienteService.getPersonaByNombre(persona, response);
     }
     
+    /*
+     * 
+     * Aqui es el metodo para recuperar la informacion de un trabajador o beneficiario
+     * 
+     */
     @ApiOperation(value = "Obtiene la información de un preafiliado")
     @JsonView(Derechohabiente.Views.Simple.class)
     @RequestMapping(value = "/informacion", method = RequestMethod.PUT)
@@ -165,6 +174,12 @@ public class DerechohabienteController {
     	return derechohabienteService.actualizarDatos(datosDerechohabiente);
 	}
     
+    
+    /*
+     * 
+     * Aqui es el metodo para sacar el listado de los trabajadores.
+     * 
+     */
     @ApiOperation(value = "Relación de derechohabientes por estatus de validación")
     @RequestMapping(value = "/relacion/{estatusValidacion}", method=RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getListaDerechohabientesPorEstatusDeValidacion(@ApiParam(value = "2 - Por validar, \n 1 - Valido, \n  0 - Invalido", required = true)
@@ -172,6 +187,67 @@ public class DerechohabienteController {
 	 																		HttpServletResponse response ){
 
     	return derechohabienteService.getDerechohabientesPorEstatusDeValidacion(estatusValidacion);
+	}
+    
+    /*
+     * 
+     * Aqui es el metodo para sacar el listado de los trabajadores a validar su documentacion.
+     * 
+     */
+    @ApiOperation(value = "Relación de derechohabientes benefiiarios a validar documentacion")
+    @RequestMapping(value = "/documentos_por_validar", method=RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getListaDerechohabientesAndBeneficiariosPorValidarDoc(HttpServletResponse response ){
+
+    	return derechohabienteService.getDerechohabientesAndBeneficiariosPorValidarODoctosValidados(false);
+	}
+    
+    /*
+     * 
+     * Aqui es el metodo para sacar el listado de los trabajadores con doctos validados
+     * 
+     */
+    @ApiOperation(value = "Relación de derechohabientes benefiiarios a validar documentacion")
+    @RequestMapping(value = "/documentos_validados", method=RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getListaDerechohabientesAndBeneficiariosConDoctosValidos(HttpServletResponse response ){
+
+    	return derechohabienteService.getDerechohabientesAndBeneficiariosPorValidarODoctosValidados(true);
+	}
+    
+    /*
+     * 
+     * Aqui es el metodo para sacar el listado de los trabajadores por notificar
+     * 
+     */
+    @ApiOperation(value = "Relación de derechohabientes y benefiiarios por notificar con no afiliacion")
+    @RequestMapping(value = "/por_notificar", method=RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getListaDerechohabientesAndBeneficiariosPorNotificar(HttpServletResponse response ){
+
+    	return derechohabienteService.getDerechohabientesAndBeneficiariosConNoAfiliacioPorNotificar(false);
+	}
+    
+    /*
+     * 
+     * Aqui es el metodo para sacar el listado de los trabajadores notificados
+     * 
+     */
+    @ApiOperation(value = "Relación de derechohabientes benefiiarios notificados")
+    @RequestMapping(value = "/notificados", method=RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getListaDerechohabientesAndBeneficiariosNotificados(HttpServletResponse response ){
+
+    	return derechohabienteService.getDerechohabientesAndBeneficiariosConNoAfiliacioPorNotificar(true);
+	}
+    
+    
+    /*
+     * 
+     * Aqui es el metodo para sacar el listado de los trabajadores a notificar
+     * 
+     */
+    @ApiOperation(value = "Relación de derechohabientes por estatus de validación")
+    @RequestMapping(value = "/notificarDerechohabientes", method=RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> notificarDerechohabientes(HttpServletResponse response ){
+
+    	return derechohabienteService.notificarDerechohabientes();
 	}
     
     @ApiOperation(value = "Buscar preafiliado")
@@ -212,6 +288,12 @@ public class DerechohabienteController {
     	return derechohabienteService.getDocumentacionBeneficiarios(true, noControl);
     }
     
+    /*
+     * 
+     * Aqui es el metodo para mandar a preafiliar un trabajador o beneficiario
+     * 
+     */
+    
     @ApiOperation(value = "Derechohabiente listo para afiliar")
     @JsonView(Derechohabiente.Views.Simple.class)
     @RequestMapping(value = "/afiliar/{noControl}/{noPreAfiliacion}", method = RequestMethod.PUT)
@@ -232,6 +314,28 @@ public class DerechohabienteController {
     										 HttpServletResponse response) {
 
     	return derechohabienteService.updateEstatusDoctosByNoControlAndNoPreAfiliacion( noControl, noPreAfiliacion, 2 );
+    }
+    
+    
+    @ApiOperation(value = "Documento de Afiliacion")
+    @JsonView(Derechohabiente.Views.Simple.class)
+    @RequestMapping(value = "/downloadAfiliacion/{noControl}/{noPreAfiliacion}", method = RequestMethod.GET)
+    public ResponseEntity<?> updateSituacionAndNoAfiliacion(
+											    		 @ApiParam(value = "noControl", required = true) @PathVariable long noControl, 
+														 @ApiParam(value = "noPreAfiliacion", required = true) @PathVariable long noPreAfiliacion,
+														 HttpServletResponse response) {
+
+    	return archivoService.dowloadAfiliacionDerechohabiente( noControl , noPreAfiliacion, response );
+    }
+    
+    @ApiOperation(value = "Verifica Afiliacion")
+    @JsonView(Derechohabiente.Views.Simple.class)
+    @RequestMapping(value = "/validaQR/{noAfiliacion}", method = RequestMethod.GET)
+    public ResponseEntity<?> validarQR(
+    										 @ApiParam(value = "noAfiliacion", required = true) @PathVariable long noAfiliacion,
+    										 HttpServletResponse response) {
+
+    	return archivoService.verificaAfiliacionDerechohabiente( noAfiliacion , response );
     }
     
 }

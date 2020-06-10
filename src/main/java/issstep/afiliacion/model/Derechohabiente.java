@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
+import issstep.afiliacion.utils.Utils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,6 +26,9 @@ public class Derechohabiente {
 	long noPreAfiliacion;
 	
 	@JsonView({Derechohabiente.Views.Simple.class})
+	long noAfiliacion;
+	
+	@JsonView({Derechohabiente.Views.Simple.class})
 	long noBeneficiario;
 	
 	@JsonView({Derechohabiente.Views.Simple.class})
@@ -40,7 +44,7 @@ public class Derechohabiente {
 	String email;
 		
 	@JsonView({Derechohabiente.Views.Simple.class})
-	Date fechaNacimiento;
+	String fechaNacimiento;
 	
 	@JsonView({Derechohabiente.Views.Simple.class})
 	String sexo;	
@@ -141,6 +145,9 @@ public class Derechohabiente {
 	@JsonView({Derechohabiente.Views.Simple.class})
 	String coloniades;
 	
+	@JsonView({Derechohabiente.Views.Simple.class})
+	String nombramiento;
+	
 
 	@JsonView({Derechohabiente.Views.Simple.class})
 	int porValidar;
@@ -160,5 +167,12 @@ public class Derechohabiente {
 			return 1;
 		}
 		return 0;
+	}
+	
+	public int getEstatus() {
+		if(this.noAfiliacion > 0)
+			return 4;
+		else
+			return this.estatus;
 	}
 }

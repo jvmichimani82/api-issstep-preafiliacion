@@ -26,6 +26,10 @@ import java.text.Normalizer;
 import java.text.Normalizer.Form;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.format.TextStyle;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -129,37 +133,140 @@ public class Utils {
    
    
 
-   public static String getFechaFromDate(Date fecha){
-	   SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+   public static String getFechaFromStringInsertUpdate(String fecha){
+	   SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
       
        try {
-    	   System.out.println("Fecha ==> "+fecha);
-           String date = formatter.format(fecha);
-           System.out.println("Fecha ==> "+date);
-          return date+"T00:00:00.0";
+    	   //System.out.println("Fecha ==> "+fecha);
+           //String date = formatter.format(fecha);
+           System.out.println("getFechaFromStringInsertUpdate ==> "+fecha);
+          return fecha.replace("-", "")+" 00:00:00 AM";
 
        } catch (Exception e) {
     	   
-           e.printStackTrace();
+          // e.printStackTrace();
            String date = formatter.format(new Date());
-           return date+"T00:00:00.0";
+           return date+" 00:00:00 AM ";
+       }
+   }
+   
+   public static String getStringFromFecha(Date fecha){
+	   SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+      
+       try {
+    	   System.out.println("getStringFromFecha antes ==> "+fecha);
+           String date = formatter.format(fecha);
+           System.out.println("getStringFromFecha despues ==> "+date);
+          return date;
+
+       } catch (Exception e) {
+    	   
+          // e.printStackTrace();
+           String date = formatter.format(new Date());
+           return date;
+       }
+   }
+   
+   public static String getFechaNacimiento(Date fecha){
+	   SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+      
+       try {
+    	   System.out.println("getStringFromFecha antes ==> "+fecha);
+           String date = formatter.format(fecha);
+           System.out.println("getStringFromFecha despues ==> "+date);
+          return date;
+
+       } catch (Exception e) {
+    	   
+          
+           return "";
        }
    }
    
    public static String getFechaFromTimeStamp(Timestamp fecha){
-	   SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+	   SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
       
        try {
     	   System.out.println("timestamp ==> "+fecha.getTime());
            String date = formatter.format(new Date(fecha.getTime()));
            System.out.println("timestamp ==> "+date);
-          return date+"T00:00:00.0";
+          return date+" 00:00:00 AM";
 
        } catch (Exception e) {
     	   
          //  e.printStackTrace();
            String date = formatter.format(new Date());
-           return date+"T00:00:00.0";
+           return date+" 00:00:00 AM";
+       }
+   }
+   
+   public static String getFechaFromTimeStampPDF(Timestamp fecha){
+	   SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyy");
+      
+       try {
+    	   return formatter.format(new Date(fecha.getTime()));
+    
+       } catch (Exception e) {
+    	   
+         //  e.printStackTrace();
+    	   return formatter.format(new Date());
+        }
+   }
+   
+   public static String getFechaFromTimeStamp3MesesPDF(Timestamp fecha){
+	   SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyy");
+	   Calendar calendar = Calendar.getInstance();
+       
+       try {
+    	   calendar.setTimeInMillis(fecha.getTime());
+    	   calendar.add(Calendar.DAY_OF_MONTH, +90);
+    	   Date today90 = calendar.getTime();
+    	   
+    	   return formatter.format(today90);
+    
+       } catch (Exception e) {
+    	   
+    	   calendar.setTimeInMillis(new Date().getTime());
+    	   calendar.add(Calendar.DAY_OF_MONTH, +90);
+    	   Date today90 = calendar.getTime();
+    	   
+    	   return formatter.format(today90);
+        }
+   }
+   
+   public static String getFechaDescripcion(){
+	// Obtienes el mes actual
+	   try {
+	   int mes = LocalDate.now().getMonth().getValue();
+	   int dia = LocalDate.now().getDayOfMonth();
+
+	   int anio = LocalDate.now().getYear();
+	   
+	   // Obtienes el nombre del mes
+	   String nombreMes = null;
+
+      switch(mes) {
+      case 1: nombreMes = "Enero"; break;
+      case 2: nombreMes = "Febrero"; break;
+      case 3: nombreMes = "Marzo"; break;
+      case 4: nombreMes = "Abril"; break;
+      case 5: nombreMes = "Mayo"; break;
+      case 6: nombreMes = "Junio"; break;
+      case 7: nombreMes = "Julio"; break;
+      case 8: nombreMes = "Agosto"; break;
+      case 9: nombreMes = "Septiembre"; break;
+      case 10: nombreMes = "Octubre"; break;
+      case 11: nombreMes = "Noviembre"; break;
+      case 12: nombreMes = "Diciembre"; break;
+	   }
+      
+    	
+          return ""+dia+" de "+ nombreMes + " de " + anio;
+
+       } catch (Exception e) {
+    	   
+        
+           return "Sin fecha";
        }
    }
    

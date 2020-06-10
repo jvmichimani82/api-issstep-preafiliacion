@@ -1,11 +1,18 @@
 package issstep.afiliacion.service;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -18,6 +25,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.thymeleaf.context.Context;
+
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 
 import issstep.afiliacion.db.ArchivoDB;
 import issstep.afiliacion.db.UsuarioDB;
@@ -30,7 +45,9 @@ import issstep.afiliacion.model.Usuario;
 import issstep.afiliacion.model.Beneficiario;
 import issstep.afiliacion.model.Derechohabiente;
 import issstep.afiliacion.model.InfoPersona;
+import issstep.afiliacion.utils.Utils;
 import issstep.afiliacion.utils.UtilsImage;
+import org.thymeleaf.TemplateEngine;
 
 import javax.servlet.http.*;
 
@@ -65,6 +82,10 @@ public class ArchivoService{
    @Autowired
    SambaService sambaService;
    
+   @Autowired
+   private TemplateEngine templateEngine;
+
+   
   
 	public ResponseEntity<?> uploadDocumento( long noControlTitular, long noControl, long noPreAfiliacion, long claveParentesco, long claveTipoArchivo,  MultipartFile uploadedFile, HttpServletResponse response) {
 		ResultadoValidacion resultadoValidacion = validaEstatusRegistro (noControlTitular, noControl, noPreAfiliacion, claveParentesco);
@@ -94,13 +115,13 @@ public class ArchivoService{
 				if (beneficiario != null) {
 					
 					String resultado = null;
-					String ubicacion = "192.168.1.23//Pre-Afiliacion//"+(noControl+noPreAfiliacion);
+					String ubicacion = "192.168.1.23//Pre-Afiliacion//"+(noPreAfiliacion);
 					if(sambaService.creaDirectorio(ubicacion, "PREAFIL", "Pr32019")) {
 						resultado = sambaService.upload((MultipartFile) uploadedFile, ubicacion, UtilsImage.toPrettyURL(desTipoDocto), "PREAFIL", "Pr32019");
 					}
 					
 					if(resultado == null) {
-						resultado = UtilsImage.uploadFileToServer(UtilsImage.toPrettyURL(desTipoDocto), (MultipartFile) uploadedFile, "Persona"+noControl+noPreAfiliacion+claveParentesco+claveTipoArchivo+"-"+UtilsImage.toPrettyURL(desTipoDocto));
+						resultado = UtilsImage.uploadFileToServer(UtilsImage.toPrettyURL(desTipoDocto), (MultipartFile) uploadedFile, "Persona"+noPreAfiliacion+claveParentesco+claveTipoArchivo+"-"+UtilsImage.toPrettyURL(desTipoDocto));
 					}
 					
 					
@@ -385,5 +406,117 @@ public class ArchivoService{
 		
 		return infoPersona;
 	}
+	
+	/* 
+	This method takes the text to be encoded, the width and height of the QR Code, 
+	and returns the QR Code in the form of a byte array.
+	*/
+	public ResponseEntity<?> getQRCodeImage(String text, int width, int height) throws WriterException, IOException {
+	    
+		String cadenaQR = text.replace("%20"," ");		
+		
+		
+		QRCodeWriter qrCodeWriter = new QRCodeWriter();
+	    BitMatrix bitMatrix = qrCodeWriter.encode(cadenaQR, BarcodeFormat.QR_CODE, width, height);
+	    
+	    ByteArrayOutputStream pngOutputStream = new ByteArrayOutputStream();
+	    MatrixToImageWriter.writeToStream(bitMatrix, "PNG", pngOutputStream);
+	    byte[] pngData = pngOutputStream.toByteArray(); 
+	    
+	    HttpHeaders header = new HttpHeaders();
+		header.setContentType(new MediaType("image", "PNG"));
+		header.set("Content-Disposition", "inline; filename=qr.png");
+		header.setContentLength(pngData.length);
+	    
+	    return new ResponseEntity<>(pngData, header, HttpStatus.OK);
+	  
+	}
+	
+	public ResponseEntity<?> dowloadAfiliacionDerechohabiente(long noControl, long noPreafiliacion, HttpServletResponse response) {
+		try {
+			
+				Map<String, Object> variables = new HashMap<String, Object>();
+				Derechohabiente derechohabiente = personaDB.getDerechoHabienteRegistradoIntermedia(noControl, noPreafiliacion);
+				try {
+					
+					if(derechohabiente != null) {
+						personaDB.actualizaSituacionDerechohabienteIntermediaByNoAfiliacion(derechohabiente.getNoAfiliacion(), 5);
+						
+						
+					}	
+					
+				}catch(Exception e) {
+					
+				}
+				
+				String x = derechohabiente.getNombreCompleto().toUpperCase() + ", Numero de afiliacion: "+derechohabiente.getNoAfiliacion();
+				String cadena = x.replace(" ","%20");		
+						
+			
+				variables.put("cadena", cadena);
+				variables.put("noAfiliacion", derechohabiente.getNoAfiliacion());
+				variables.put("nombre", derechohabiente.getNombreCompleto().toUpperCase());
+				variables.put("fecha", Utils.getFechaDescripcion());
+				variables.put("fechaPresentarse", Utils.getFechaFromTimeStampPDF(derechohabiente.getFechaModificacion()));
+				variables.put("fechaVigencia", Utils.getFechaFromTimeStamp3MesesPDF(derechohabiente.getFechaModificacion()));
+				
+				
+				
+				InputStream imputStream = new FileInputStream(exportToPdfBox( variables, "preafiliacion", "preafiliacion.pdf"));
+				byte[] document = IOUtils.toByteArray(imputStream);
+				HttpHeaders header = new HttpHeaders();
+				header.setContentType(new MediaType("application","pdf"));
+				header.set("Content-Disposition", "inline; filename= preafiliacion.pdf");
+				header.setContentLength(document.length);
+				return new ResponseEntity<>(document, header, HttpStatus.OK);
+			
+		
+		} catch (Exception ex) {
+			System.err.println("Exception ArchivoService.downloadFile");
+			ex.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	
+	public ResponseEntity<?> verificaAfiliacionDerechohabiente(long noAfiliacion, HttpServletResponse response) {
+		try {
+				Derechohabiente derechohabiente = personaDB.getDerechoHabienteRegistradoIntermediaByNoAfiliacion(noAfiliacion);
+				
+				return new ResponseEntity<>(derechohabiente, HttpStatus.OK);
+			
+		
+		} catch (Exception ex) {
+			System.err.println("Exception ArchivoService.verificaAfiliacionDerechohabiente");
+			ex.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	
+	
+	public File exportToPdfBox(Map<String, Object> variables, String templatePath, String out) {
+	    try (OutputStream os = new FileOutputStream(out);) {
+	        // There are more options on the builder than shown below.
+	        PdfRendererBuilder builder = new PdfRendererBuilder();
+	        builder.withHtmlContent(getHtmlString(variables, templatePath), "file:");
+	        builder.toStream(os);
+	        builder.run();
+	    } catch (Exception e) {
+	        
+	    }
+	    return new File(out);
+	}
+
+	private String getHtmlString(Map<String, Object> variables, String templatePath) {
+	    try {
+	        final Context ctx = new Context();
+	        ctx.setVariables(variables);
+	        return templateEngine.process(templatePath, ctx);
+	    } catch (Exception e) {
+	        return null;
+	    }
+	}
+
 		
 }

@@ -1,6 +1,8 @@
 package issstep.afiliacion.service;
 
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 import javax.mail.internet.MimeMessage;
 
@@ -33,7 +35,15 @@ public class MailService {
 	String urlSistema = Utils.loadPropertie("url_sistema");
 	String header_correo = Utils.loadPropertie("header_correo");
 	String nombre_plataforma = Utils.loadPropertie("nombre_plataforma");
-	//String mail_copia = Utils.loadPropertie("mail.copia");
+	
+	public static int noOfQuickServiceThreads = 20;
+	
+	/**
+	 * this statement create a thread pool of twenty threads
+	 * here we are assigning send mail task using ScheduledExecutorService.submit();
+	 */
+	private ScheduledExecutorService quickService = Executors.newScheduledThreadPool(noOfQuickServiceThreads); // Creates a thread pool that reuses fixed number of threads(as specified by noOfThreads in this case).
+  
 
     public void prepareAndSendBienvenida( final String recipient,  final String nombre,	final String usuario,final String token, final Long num_identificacion) {
     	 try {     
@@ -44,12 +54,6 @@ public class MailService {
 		     helper.setTo(recipient);
 		     helper.setSubject("Correo de Bienvenida");
 		     
-		     /*if(Utils.loadPropertie("ambiente").equals(PRODUCCION)){
-		    	 helper.setBcc("fabrica.talentos.2018@gmail.com");
-		     }else if (Utils.loadPropertie("ambiente").equals(PRUEBAS)){
-		    	 helper.setBcc("fabrica.talentos.2018@gmail.com");
-		     }		*/
-
 		     final Context context = new Context(); 
 		     context.setVariable("nombre_plataforma", nombre_plataforma);
 		     context.setVariable("nombre", nombre);
@@ -64,7 +68,19 @@ public class MailService {
 		     final String htmlContent = templateEngine.process("plantilla_activa_cuenta", context); 
 		     helper.setText(htmlContent, true); 
 		        
-		     mailSender.send(message); 
+		     quickService.submit(new Runnable() {
+					@Override
+					public void run() {
+						try{
+							mailSender.send(message); 
+						}catch(Exception e){
+							e.printStackTrace();
+						}
+					}
+				});
+
+
+		     
 
     	    } catch (Exception e) {
     	    	System.err.println("Exception prepareAndSendBienvenida");
@@ -72,6 +88,80 @@ public class MailService {
     	    }
     }
     
+    public void SendMensaje1( final String recipient,  final String nombre) {
+   	 try {     
+   		 	MimeMessage message = mailSender.createMimeMessage();
+		     MimeMessageHelper helper = new MimeMessageHelper(message,StandardCharsets.UTF_8.name());	
+		     helper.setFrom("AFILIACION");
+		     helper.setTo(recipient);
+		     helper.setSubject("Notificacion ISSSTEP");
+		     
+		     final Context context = new Context(); 
+		     context.setVariable("nombre_plataforma", nombre_plataforma);
+		     context.setVariable("nombre", nombre);
+		     context.setVariable("header_correo", header_correo);
+		     
+		      
+		     final String htmlContent = templateEngine.process("plantilla_mensaje1", context); 
+		     helper.setText(htmlContent, true); 
+		        
+		     quickService.submit(new Runnable() {
+					@Override
+					public void run() {
+						try{
+							mailSender.send(message); 
+						}catch(Exception e){
+							e.printStackTrace();
+						}
+					}
+				});
+
+
+		     
+
+   	    } catch (Exception e) {
+   	    	System.err.println("Exception SendMensaje");
+   			e.printStackTrace();
+   	    }
+   }
+    
+    public void SendMensaje2( final String recipient,  final String nombre) {
+      	 try {     
+      		 	MimeMessage message = mailSender.createMimeMessage();
+   		     MimeMessageHelper helper = new MimeMessageHelper(message,StandardCharsets.UTF_8.name());	
+   		     helper.setFrom("AFILIACION");
+   		     helper.setTo(recipient);
+   		     helper.setSubject("Notificacion ISSSTEP");
+   		     
+   		     final Context context = new Context(); 
+   		     context.setVariable("nombre_plataforma", nombre_plataforma);
+   		     context.setVariable("nombre", nombre);
+   		     context.setVariable("header_correo", header_correo);
+   		     
+   		      
+   		     final String htmlContent = templateEngine.process("plantilla_mensaje2", context); 
+   		     helper.setText(htmlContent, true); 
+   		        
+   		     quickService.submit(new Runnable() {
+   					@Override
+   					public void run() {
+   						try{
+   							mailSender.send(message); 
+   						}catch(Exception e){
+   							e.printStackTrace();
+   						}
+   					}
+   				});
+
+
+   		     
+
+      	    } catch (Exception e) {
+      	    	System.err.println("Exception SendMensaje");
+      			e.printStackTrace();
+      	    }
+      }
+   
 
     
     public void prepareAndSendResetPass( final String recipient,  final String nombre ,final String token) {

@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -35,6 +37,7 @@ import issstep.afiliacion.model.ResultadoBusqueda;
 import issstep.afiliacion.model.ResultadoCreacionCuenta;
 import issstep.afiliacion.model.Derechohabiente;
 import issstep.afiliacion.model.DocumentosFaltantes;
+import issstep.afiliacion.model.InfoBeneficiarios;
 import issstep.afiliacion.model.InfoDerechohabiente;
 import issstep.afiliacion.model.InfoPersona;
 import issstep.afiliacion.model.Usuario;
@@ -78,6 +81,9 @@ public class DerechohabienteService {
 	@Autowired
 	MailService mailService;
 		
+	  
+
+	
 	public ResponseEntity<?> getPersonaByCurp(String rfc) {
 		if (rfc == null)
 			return new ResponseEntity<>(new Mensaje("Debe proporcionar el campo rfc"), HttpStatus.BAD_REQUEST);
@@ -92,7 +98,7 @@ public class DerechohabienteService {
 			
 		// Sino tenemos resultado de nuestra base de datos vamos por los datos a la bd de issstep
 		if(persona == null) 
-			persona = personaDB.getTrabajadorIssstepByColumnaStringValor("RFC", rfc);
+			persona = personaDB.getTrabajadorIssstepByRFC(rfc);
 			
 		if (persona == null)
 			return new ResponseEntity<>(new Mensaje("No existe el derechohabiente"), HttpStatus.NOT_FOUND);
@@ -151,6 +157,9 @@ public class DerechohabienteService {
 			
 		if (persona == null) 
 			return new ResponseEntity<>(new Mensaje("No existe esa persona"), HttpStatus.CONFLICT);
+		
+		persona.setNoAfiliacion(personaDB.getNoAfiliacionDerechoHabienteRegistradoIntermedia(persona.getNoControl(), persona.getNoPreAfiliacion()));
+		
 		
 		fillDerechohabiente(persona);
 		return new ResponseEntity<>(persona, HttpStatus.OK);		
@@ -218,8 +227,11 @@ public class DerechohabienteService {
 						persona.setEmail("issstepregistro" + oldPersona.getNoControl() +  "@gmail.com");
 						estatus = 1;
 					} */
+					
+					if(oldPersona.getNoPreAfiliacion() == 0)
+						oldPersona.setNoPreAfiliacion(oldPersona.getNoControl());
 				
-					if(personaDB.createDerechohabiente(oldPersona, false, 4) > 0) { 
+					if(personaDB.createDerechohabiente(oldPersona, false, 1) > 0) { 
 						// Benefiario del trabajador
 						
 						ResultadoCreacionCuenta infoCuenta = creaCuenta(oldPersona, persona, INACTIVA);
@@ -538,10 +550,12 @@ public class DerechohabienteService {
 			
 			if (estatusRegistro == 0) 
 				return new ResponseEntity<>(new Mensaje("No fue posible registrar al derechohabiente"), HttpStatus.INTERNAL_SERVER_ERROR);
-				
+			
+			if(! (personaDB.existeBeneficiarioRegistrado(registroDerechohabiente.getNoControl(), registroDerechohabiente.getNoPreAfiliacion()))) {
 			beneficiarioDB.createBeneficiario(registroDerechohabiente.getNoControl(), 
 											  registroDerechohabiente, 
 											  noClaveParentesco);
+			}
 			
 			return new ResponseEntity<>(registroDerechohabiente, HttpStatus.CREATED);					
 			
@@ -921,7 +935,10 @@ public class DerechohabienteService {
 			e.printStackTrace();
 		}
 		
-		return new ResponseEntity<>(derechohabiente , HttpStatus.OK);				
+		Derechohabiente resultado = personaDB.getPersonaByNoControlNoPreafiliacion(infoPersona);
+		
+		
+		return new ResponseEntity<>(resultado , HttpStatus.OK);				
     }
 	
 	ResultadoValidacion validaDatosAActualizar(ActualizarDatos actualizarDatos) {
@@ -967,13 +984,13 @@ public class DerechohabienteService {
 		
 		List<InfoDerechohabiente> derechohabientes = personaDB.getDerechohabientesPorEstatusDeValidacion( estatusValidacion );
 		
-		for(InfoDerechohabiente dh : derechohabientes) {
+		/*for(InfoDerechohabiente dh : derechohabientes) {
 			dh.setNoAfiliacion(personaDB.getNoAfiliacionDerechoHabienteRegistradoIntermedia(dh.getNoControl(), dh.getNoPreAfiliacion()));
-		}
+		}*/
 		
-		List<InfoDerechohabiente> listaBeneficiariosResult = new ArrayList<InfoDerechohabiente>();
+		//List<InfoDerechohabiente> listaBeneficiariosResult = new ArrayList<InfoDerechohabiente>();
 		
-		for(InfoDerechohabiente dha : derechohabientes) {
+		/*for(InfoDerechohabiente dha : derechohabientes) {
 			List<Derechohabiente> listaBeneficiarios = personaDB.getBeneficiariosByDerechohabiente(false, dha.getNoControl());
 			List<DocumentosFaltantes> listaDocumentosFaltantes = personaDB.getDocumentacionByDerechohabiente(false, dha.getNoControl());
 			
@@ -989,10 +1006,126 @@ public class DerechohabienteService {
 					}
 				}
 			}
+		}*/
+		
+		return new ResponseEntity<>(derechohabientes, HttpStatus.OK);	
+    }
+	
+	/*
+	 * Listado de derechohabientes y beneficiarios por validar documentos o que sus documentos fueron rechazados
+	 * 
+	 */
+	
+	public ResponseEntity<?> getDerechohabientesAndBeneficiariosPorValidarODoctosValidados(boolean validados) {	
+		
+		List<InfoDerechohabiente> derechohabientes = personaDB.getDerechohabientesBeneficiariosPorValidarDocOValidados(validados);
+		
+		return new ResponseEntity<>(derechohabientes, HttpStatus.OK);	
+    }
+	
+	/*
+	 * Listado de Derechohabientes con no de afiliacion
+	 * 
+	 */
+	
+	public ResponseEntity<?> getDerechohabientesAndBeneficiariosConNoAfiliacioPorNotificar(boolean notificados ) {	
+		
+		InfoDerechohabiente infoD;
+		List<InfoDerechohabiente> listaDerechohabientes = new ArrayList<InfoDerechohabiente>();
+		List<InfoDerechohabiente> derechohabientes = personaDB.getDerechohabientesConNoAfiliacion(notificados);
+		List<InfoDerechohabiente> beneficiarios = personaDB.getBeneficiariosDerechohabientesConNoAfiliacionPorNotificar(notificados);
+				
+		for(InfoDerechohabiente dha : derechohabientes) {
+			try {
+				infoD = new InfoDerechohabiente();
+				infoD.setNoControl(dha.getNoControl());
+				infoD.setNoPreAfiliacion(dha.getNoPreAfiliacion());
+				infoD.setNoAfiliacion(dha.getNoAfiliacion());
+				infoD.setNombre(dha.getNombre());
+				infoD.setPaterno(dha.getPaterno());
+				infoD.setMaterno(dha.getMaterno());
+				infoD.setCurp(dha.getCurp());
+				infoD.setFechaAfiliacion(dha.getFechaAfiliacion());
+				infoD.setClaveParentesco(0);
+				infoD.setEstatus(4);
+				infoD.setSituacion(dha.getSituacion());
+				infoD.setFechaVerificacion(dha.getFechaVerificacion());
+				
+				listaDerechohabientes.add(infoD);
+			}catch(Exception e) {}
+			
+		}
+		
+		for(InfoDerechohabiente dha : beneficiarios) {
+			try {
+				infoD = new InfoDerechohabiente();
+				infoD.setNoControl(dha.getNoControl());
+				infoD.setNoPreAfiliacion(dha.getNoPreAfiliacion());
+				infoD.setNoAfiliacion(dha.getNoAfiliacion());
+				infoD.setNombre(dha.getNombre());
+				infoD.setPaterno(dha.getPaterno());
+				infoD.setMaterno(dha.getMaterno());
+				infoD.setCurp(dha.getCurp());
+				infoD.setFechaAfiliacion(dha.getFechaAfiliacion());
+				infoD.setClaveParentesco(dha.getClaveParentesco());
+				infoD.setEstatus(4);
+				infoD.setSituacion(dha.getSituacion());
+				infoD.setFechaVerificacion(dha.getFechaVerificacion());
+				
+				listaDerechohabientes.add(infoD);		
+			}catch(Exception e) {}
+			
+		}
+		
+		return new ResponseEntity<>(listaDerechohabientes, HttpStatus.OK);	
+    }
+
+	
+	/*
+	 * 
+	 * Aqui recorremos el listado de trabajadores que tienen ya un numero de afiliacion para enviar correo
+	 * 
+	 */
+	
+	public ResponseEntity<?> notificarDerechohabientes( ) {	
+		
+		List<InfoDerechohabiente> derechohabientes = personaDB.getDerechohabientesConNoAfiliacion(false);
+		List<InfoBeneficiarios> beneficiarios = personaDB.getBeneficiariosDerechohabientesConNoAfiliacion();
+				
+		for(InfoDerechohabiente dha : derechohabientes) {
+			try {
+				if(personaDB.existeDerechoHabienteRegistradoIntermedia(dha.getNoControl(), dha.getNoPreAfiliacion())) {
+						//Actualizamos el estatus de derechohabiente a 4 para indicar que ya fue notificado;
+						personaDB.actualizaSituacionDerechohabienteIntermedia(dha.getNoControl(), dha.getNoPreAfiliacion(), 4);
+						//Actualizamos el estatus de derechohabiente a 4 para indicar que ya esta afiliado;
+						personaDB.actualizaSituacionDerechohabiente(dha.getNoControl(), dha.getNoPreAfiliacion(), 4);
+						mailService.SendMensaje2(dha.getEmail(), dha.getNombreCompleto());
+						
+				}	
+				
+			}catch(Exception e) {}
+			
+		}
+		
+		for(InfoBeneficiarios dha : beneficiarios) {
+			try {
+				if(personaDB.existeDerechoHabienteRegistradoIntermedia(dha.getNoControlBeneficiario(), dha.getNoPreAfiliacionBeneficiario())) {
+					//Actualizamos el estatus de derechohabiente a 4 para indicar que ya fue notificado;	
+					personaDB.actualizaSituacionDerechohabienteIntermedia(dha.getNoControlBeneficiario(), dha.getNoPreAfiliacionBeneficiario(), 4);
+					//Actualizamos el estatus de derechohabiente a 4 para indicar que ya esta afiliado;
+					personaDB.actualizaSituacionDerechohabiente(dha.getNoControlBeneficiario(), dha.getNoPreAfiliacionBeneficiario(), 4);
+					mailService.SendMensaje2(dha.getEmailTitular(), dha.getNombreTitular());
+						
+				}	
+				
+			}catch(Exception e) {}
+			
 		}
 		
 		return new ResponseEntity<>(derechohabientes, HttpStatus.OK);	
     }
+	
+	
 	
 	// funcion que regrerara los beneficiarios de algun trabador
 	public ResponseEntity<?> getBeneficiarios(boolean incluirTitular, long noControl) {	
@@ -1004,6 +1137,9 @@ public class DerechohabienteService {
 		
 		if (listaBeneficiarios != null) {
 			for(Derechohabiente dere: listaBeneficiarios){
+				
+				dere.setNoAfiliacion(personaDB.getNoAfiliacionDerechoHabienteRegistradoIntermedia(dere.getNoControl(), dere.getNoPreAfiliacion()));
+				
 				fillDerechohabiente(dere);
 			}
 			return new ResponseEntity<>(listaBeneficiarios, HttpStatus.OK);
@@ -1125,6 +1261,9 @@ public class DerechohabienteService {
     }
 	
 	public ResponseEntity<?> updateEstatusByNoControlAndNoPreAfiliacion(long noControl, long noPreAfiliacion, int estatus) {
+		String mail;
+		String nombre;
+		
 		if (estatus < 0 && estatus > catalogoGenericoDB.getUltimoEstatus())
 			return new ResponseEntity<>(new Mensaje("Estatus no valido"), HttpStatus.BAD_REQUEST);
 		
@@ -1134,6 +1273,9 @@ public class DerechohabienteService {
 		
 		if (afiliado == null) 
 			return new ResponseEntity<>(new Mensaje("No existe el derechohabiente"), HttpStatus.CONFLICT);
+		
+		mail = afiliado.getEmail();
+		nombre = afiliado.getNombreCompleto();
 		
 		if (estatus == 9) {
 			List<DocumentosFaltantes> listaDocumentosFaltantes = personaDB.getDocumentacionByDerechohabiente(true, noControl);
@@ -1160,10 +1302,13 @@ public class DerechohabienteService {
 			return new ResponseEntity<>(new Mensaje("No fue posible actualizar el estatus"), HttpStatus.INTERNAL_SERVER_ERROR);
 		
 		try {
-			System.out.println(noPreAfiliacion);
+			//System.out.println(noPreAfiliacion);
 			if(personaDB.existeDerechoHabienteRegistradoIntermedia(noControl, noPreAfiliacion)) {
 				personaDB.actualizaSituacionDerechohabienteIntermedia(noControl, noPreAfiliacion, 2);
-			}
+				
+				mailService.SendMensaje1(mail, nombre);
+				
+			}	
 			
 		}catch(Exception e) {
 			
